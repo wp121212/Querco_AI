@@ -1,60 +1,106 @@
-
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Querco — Generator Ofert</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background:transparent}
-.header{background:#102A3D;padding:14px 20px;display:flex;align-items:center;gap:12px;border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f6f8;color:#1a1a2e}
+.header{background:#102A3D;padding:14px 20px;display:flex;align-items:center;gap:12px}
 .logo{color:#fff;font-size:17px;font-weight:500;letter-spacing:-0.3px}
+.logo span{font-weight:400;color:#8ba3b8}
 .badge{background:#1a3f5c;color:#7fb5d5;font-size:11px;padding:3px 9px;border-radius:4px;font-weight:500}
-.upload-zone{border:1.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:32px;text-align:center;cursor:pointer;margin:16px;transition:all 0.2s;background:var(--color-background-secondary)}
-.upload-zone:hover{border-color:#102A3D;background:var(--color-background-primary)}
-.upload-loaded{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--color-background-success);border-radius:var(--border-radius-md);margin:12px 16px;font-size:13px;color:var(--color-text-success)}
-.section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px 20px;margin:0 16px 10px}
+.main{max-width:900px;margin:0 auto;padding:16px}
+.upload-zone{border:1.5px dashed #bfc8d2;border-radius:10px;padding:32px;text-align:center;cursor:pointer;margin-bottom:16px;transition:all 0.2s;background:#fff}
+.upload-zone:hover{border-color:#102A3D;background:#fafbfc}
+.upload-loaded{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#edf7ed;border-radius:8px;margin-bottom:16px;font-size:13px;color:#2e6b2e}
+.section{background:#fff;border:1px solid #e5e8ec;border-radius:10px;padding:16px 20px;margin-bottom:10px}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sec-title{font-size:14px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:8px}
-.sec-num{background:#102A3D;color:#fff;width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
-.opt-label{font-size:11px;color:var(--color-text-tertiary)}
+.sec-title{font-size:14px;font-weight:600;color:#102A3D;display:flex;align-items:center;gap:8px}
+.sec-num{background:#102A3D;color:#fff;width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.opt-label{font-size:11px;color:#999}
 .toggle{width:38px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0}
-.toggle-dot{position:absolute;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s}
+.toggle-dot{position:absolute;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
 .field-full{grid-column:1/-1}
-label{display:block;font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:4px;letter-spacing:0.1px}
-input,textarea,select{width:100%;font-size:13px;color:var(--color-text-primary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 10px;font-family:var(--font-sans);transition:border-color 0.15s;outline:none}
+label{display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:4px;letter-spacing:0.1px}
+input,textarea,select{width:100%;font-size:13px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;border-radius:6px;padding:8px 10px;font-family:inherit;transition:border-color 0.15s;outline:none}
 input:focus,textarea:focus{border-color:#102A3D}
 textarea{min-height:80px;resize:vertical}
-.gen-btn{display:block;width:calc(100% - 32px);margin:4px 16px 16px;padding:13px;background:#102A3D;color:#fff;border:none;border-radius:var(--border-radius-lg);font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s;font-family:var(--font-sans)}
+.gen-btn{display:block;width:100%;margin-top:8px;padding:13px;background:#102A3D;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s;font-family:inherit}
 .gen-btn:hover{background:#1a3f5c}
 .gen-btn:disabled{background:#8ba3b8;cursor:not-allowed}
-.status{text-align:center;font-size:12px;color:var(--color-text-secondary);padding:8px;margin:0 16px 8px}
-.disabled-section{opacity:0.45;pointer-events:none}
-</style>
+.status{text-align:center;font-size:12px;color:#666;padding:8px;margin-top:4px}
 
-<h2 class="sr-only">Generator ofert PPTX — Querco Property</h2>
+/* AI Section */
+.ai-section{background:#fff;border:1px solid #e5e8ec;border-radius:10px;padding:20px;margin-bottom:16px}
+.ai-section-title{font-size:14px;font-weight:600;color:#102A3D;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.ai-section-title .icon{font-size:18px}
+.ai-textarea{width:100%;min-height:100px;font-size:13px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;border-radius:6px;padding:10px 12px;font-family:inherit;resize:vertical;outline:none;transition:border-color 0.15s}
+.ai-textarea:focus{border-color:#102A3D}
+.ai-btn-row{display:flex;gap:8px;margin-top:10px;align-items:center}
+.ai-btn{padding:9px 18px;background:#102A3D;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px}
+.ai-btn:hover{background:#1a3f5c}
+.ai-btn:disabled{background:#8ba3b8;cursor:not-allowed}
+.ai-status{font-size:12px;color:#666;display:none;align-items:center;gap:8px}
+.spinner{width:14px;height:14px;border:2px solid #dde1e6;border-top-color:#102A3D;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-hint{font-size:11px;color:#999;margin-top:6px}
+.ai-filled{border-color:#2e9e2e!important;background:#f8fdf8!important}
+</style>
+</head>
+<body>
 
 <div class="header">
-  <div class="logo">QUERCO <span style="font-weight:400;color:#8ba3b8">property</span></div>
-  <span class="badge">GENERATOR OFERT</span>
+  <div class="logo">QUERCO <span>property</span></div>
+  <span class="badge">AI GENERATOR OFERT</span>
 </div>
 
+<div class="main">
+
+<!-- SZABLON PPTX UPLOAD -->
 <div id="upload-area">
   <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" 
        ondragover="event.preventDefault();this.style.borderColor='#102A3D'" 
        ondragleave="this.style.borderColor=''" 
        ondrop="handleDrop(event)">
-    <i class="ti ti-file-upload" style="font-size:28px;color:var(--color-text-tertiary);display:block;margin-bottom:8px" aria-hidden="true"></i>
-    <div style="font-size:14px;color:var(--color-text-secondary)">Przeciągnij szablon PPTX lub kliknij</div>
-    <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">Magazyn_wzorzec_ai.pptx</div>
+    <div style="font-size:28px;margin-bottom:8px">📁</div>
+    <div style="font-size:14px;color:#555">Przeciągnij szablon PPTX lub kliknij</div>
+    <div style="font-size:11px;color:#999;margin-top:4px">Magazyn_wzorzec_ai.pptx</div>
   </div>
   <input type="file" id="file-input" accept=".pptx" style="display:none" onchange="loadTemplate(this.files[0])">
 </div>
 
 <div id="loaded-bar" style="display:none" class="upload-loaded">
-  <i class="ti ti-circle-check" aria-hidden="true"></i>
+  <span>✓</span>
   <span id="loaded-name"></span>
-  <button onclick="resetTemplate()" style="margin-left:auto;background:none;border:0.5px solid var(--color-border-success);border-radius:4px;padding:3px 8px;cursor:pointer;font-size:11px;color:var(--color-text-success);font-family:var(--font-sans)">Zmień</button>
+  <button onclick="resetTemplate()" style="margin-left:auto;background:none;border:1px solid #2e6b2e;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:11px;color:#2e6b2e;font-family:inherit">Zmień</button>
 </div>
 
 <div id="form-area" style="display:none">
 
+<!-- ===== AI EXTRACTION SECTION ===== -->
+<div class="ai-section">
+  <div class="ai-section-title">
+    <span class="icon">✨</span> AI uzupełnianie pól
+  </div>
+  <textarea class="ai-textarea" id="ai-source" placeholder="Wklej treść maila, notatki, opis z oferty developera, dane z systemu...
+
+Np: SPRZEDAŻ: Wynajęty Park Magazynowo-Produkcyjny NOHO, 8331 m2 PUU, ul. Bartników, Kraków. Cena: 28 000 000 PLN. Grunt: 1,8 ha, działka 45/3, obręb 0012. 5 najemców, occupancy 92%, NOI 1 450 000 EUR..."></textarea>
+  <div class="ai-btn-row">
+    <button class="ai-btn" id="ai-btn" onclick="aiExtract()">
+      ✨ AI uzupełnij pola
+    </button>
+    <div class="ai-status" id="ai-status">
+      <div class="spinner"></div>
+      <span id="ai-status-text">Analizuję...</span>
+    </div>
+  </div>
+  <div class="ai-hint">AI wyciągnie dane z tekstu i wypełni formularz. Sprawdź i popraw przed generowaniem.</div>
+</div>
+
+<!-- SLIDE 1: OKŁADKA -->
 <div class="section">
   <div class="sec-head"><div class="sec-title"><span class="sec-num">1</span> Okładka</div></div>
   <div class="field-grid">
@@ -64,6 +110,7 @@ textarea{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- SLIDE 2: GRUNT / LOKALIZACJA -->
 <div class="section">
   <div class="sec-head"><div class="sec-title"><span class="sec-num">2</span> Grunt / Lokalizacja</div></div>
   <div class="field-grid">
@@ -86,6 +133,7 @@ textarea{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- SLIDE 3: ZABUDOWA -->
 <div class="section">
   <div class="sec-head"><div class="sec-title"><span class="sec-num">3</span> Zabudowa</div></div>
   <div class="field-grid">
@@ -99,6 +147,7 @@ textarea{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- SLIDE 4: DOCHODY (OPCJONALNY) -->
 <div class="section" id="sec-slide4">
   <div class="sec-head">
     <div class="sec-title">
@@ -122,6 +171,7 @@ textarea{min-height:80px;resize:vertical}
   </div>
 </div>
 
+<!-- SLIDE 5: MPZP -->
 <div class="section">
   <div class="sec-head"><div class="sec-title"><span class="sec-num">5</span> MPZP</div></div>
   <div class="field-grid">
@@ -139,16 +189,81 @@ textarea{min-height:80px;resize:vertical}
 </div>
 
 <button class="gen-btn" id="gen-btn" onclick="generatePptx()">
-  <i class="ti ti-download" aria-hidden="true"></i> Generuj PPTX
+  ⬇ Generuj PPTX
 </button>
 <div class="status" id="status"></div>
-</div>
+
+</div><!-- /form-area -->
+</div><!-- /main -->
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 var templateBuffer = null;
 var slide4Active = true;
 
+/* ===== AI EXTRACTION ===== */
+async function aiExtract() {
+  var text = document.getElementById('ai-source').value.trim();
+  if (!text) { setStatus('Wklej tekst do analizy'); return; }
+
+  var btn = document.getElementById('ai-btn');
+  var statusEl = document.getElementById('ai-status');
+  btn.disabled = true;
+  statusEl.style.display = 'flex';
+  document.getElementById('ai-status-text').textContent = 'Analizuję tekst...';
+  setStatus('');
+
+  try {
+    var resp = await fetch('/api/extract', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text })
+    });
+
+    if (!resp.ok) {
+      var errData = await resp.json().catch(function() { return {}; });
+      throw new Error(errData.error || 'Błąd serwera (' + resp.status + ')');
+    }
+
+    var data = await resp.json();
+
+    // Fill all fields from AI response
+    var allFields = [
+      'broker_name','broker_email','broker_phone',
+      'city','street','land_area','plot_number','precinct','commune','county','ownership','price_pln',
+      'dist_airport','dist_expressway','dist_port','dist_highway','dist_railway','dist_transit','description',
+      'building_footprint','total_area','parking_spots','warehouse_area','office_area','year_modernization','price_pln_building',
+      'num_tenants','occupancy','noi_eur','yield_pct','price_eur','rent_income_pln','service_charge_eur','gross_income_eur','eur_pln_rate',
+      'mpzp_resolution','terrain_card','terrain_function','excluded_functions',
+      'building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'
+    ];
+
+    var filledCount = 0;
+    allFields.forEach(function(id) {
+      var value = data[id];
+      if (value && value !== 'null' && value !== 'brak danych' && value.trim() !== '') {
+        var el = document.getElementById(id);
+        if (el) {
+          el.value = value;
+          el.classList.add('ai-filled');
+          filledCount++;
+        }
+      }
+    });
+
+    setStatus('AI wypełniło ' + filledCount + ' pól. Sprawdź i popraw.');
+    setTimeout(function() { setStatus(''); }, 6000);
+
+  } catch (err) {
+    console.error(err);
+    setStatus('Błąd: ' + err.message);
+  }
+
+  btn.disabled = false;
+  statusEl.style.display = 'none';
+}
+
+/* ===== TEMPLATE HANDLING (unchanged) ===== */
 function handleDrop(e){
   e.preventDefault();
   document.getElementById('drop-zone').style.borderColor='';
@@ -195,6 +310,7 @@ function replaceAll(str,find,rep){
   return str;
 }
 
+/* ===== PPTX SLIDE PROCESSORS (unchanged) ===== */
 function processSlide1(xml){
   var name=val('broker_name');
   var parts=name.split(' ');
@@ -386,6 +502,8 @@ async function generatePptx(){
     console.error(err);
     setStatus('Błąd: '+err.message);
   }
-  btn.disabled=false;btn.innerHTML='<i class="ti ti-download" aria-hidden="true"></i> Generuj PPTX';
+  btn.disabled=false;btn.innerHTML='⬇ Generuj PPTX';
 }
 </script>
+</body>
+</html>
