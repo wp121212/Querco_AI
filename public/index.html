@@ -592,10 +592,9 @@ function processSlide2(xml) {
       });
     }
     if (tblIdx === 2) {
-      // Update currency label in the table header
+      // Replace [CUR] with selected currency
       var priceVal = val('asking_price');
-      m = m.replace(/CENA OFERTOWA \[PLN\]/g, 'CENA OFERTOWA [' + priceCur + ']');
-      m = m.replace(/ASKING PRICE \[PLN\]/g, 'ASKING PRICE [' + priceCur + ']');
+      m = replaceAll(m, '[CUR]', '[' + priceCur + ']');
       return m.replace(/>TEKST</, '>' + priceVal + '<');
     }
     return m;
@@ -639,8 +638,7 @@ function processSlide3(xml) {
     }
     if (tblIdx === 2) {
       var priceVal = val('asking_price_building') || val('asking_price');
-      m = m.replace(/CENA OFERTOWA \[PLN\]/g, 'CENA OFERTOWA [' + priceCur + ']');
-      m = m.replace(/ASKING PRICE \[PLN\]/g, 'ASKING PRICE [' + priceCur + ']');
+      m = replaceAll(m, '[CUR]', '[' + priceCur + ']');
       return m.replace(/>TEKST</, '>' + priceVal + '<');
     }
     return m;
@@ -655,39 +653,31 @@ function processSlide4(xml) {
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
 
-  // Update currency labels in slide XML
-  var noiCur = cur('noi');
-  var priceSaleCur = cur('price_sale');
-  var rentCur = cur('rent_income');
-  var scCur = cur('service_charge');
-  var giCur = cur('gross_income');
-
-  // Bottom table labels
-  xml = xml.replace(/ROCZNY PRZYCHÓD Z NAJMU \[PLN \/ m²\]/g, 'ROCZNY PRZYCHÓD Z NAJMU [' + rentCur + ' / m²]');
-  xml = xml.replace(/ANNUAL RENTAL INCOME \[PLN \/ m²\]/g, 'ANNUAL RENTAL INCOME [' + rentCur + ' / m²]');
-  xml = xml.replace(/ROCZNY PRZYCHÓD Z OPŁAT SERWISOWYCH \[EUR \/ m²\]/g, 'ROCZNY PRZYCHÓD Z OPŁAT SERWISOWYCH [' + scCur + ' / m²]');
-  xml = xml.replace(/ANNUAL SERVICE CHARGE INCOME \[EUR \/ m²\]/g, 'ANNUAL SERVICE CHARGE INCOME [' + scCur + ' / m²]');
-  xml = xml.replace(/ŁĄCZNY ROCZNY PRZYCHÓD OPERACYJNY \[EUR \/ m²\]/g, 'ŁĄCZNY ROCZNY PRZYCHÓD OPERACYJNY [' + giCur + ' / m²]');
-  xml = xml.replace(/GROSS OPERATING INCOME \[EUR \/ m²\]/g, 'GROSS OPERATING INCOME [' + giCur + ' / m²]');
-
-  // Right-side table labels
-  xml = xml.replace(/DOCHÓD OPERACYJNY NETTO \[EUR\]/g, 'DOCHÓD OPERACYJNY NETTO [' + noiCur + ']');
-  xml = xml.replace(/NOI \[EUR\]/g, 'NOI [' + noiCur + ']');
-  xml = xml.replace(/CENA OFERTOWA \[EUR\]/g, 'CENA OFERTOWA [' + priceSaleCur + ']');
-  xml = xml.replace(/ASKING PRICE \[EUR\]/g, 'ASKING PRICE [' + priceSaleCur + ']');
+  // Get currencies for each financial field
+  var noiCur = cur('noi') || 'PLN';
+  var priceSaleCur = cur('price_sale') || 'PLN';
+  var rentCur = cur('rent_income') || 'PLN';
+  var scCur = cur('service_charge') || 'PLN';
+  var giCur = cur('gross_income') || 'PLN';
 
   var tblIdx = 0;
   xml = xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(m) {
     tblIdx++;
     if (tblIdx === 1) {
+      // Bottom table: rent_income, service_charge, gross_income — each row has its own [CUR]
       var fields = [val('rent_income'), val('service_charge'), val('gross_income')];
+      var currencies = [rentCur, scCur, giCur];
       var ri = 0;
       return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = fields[ri++];
+        var v = fields[ri];
+        var c = currencies[ri];
+        ri++;
+        row = replaceAll(row, '[CUR]', '[' + c + ']');
         return row.replace(/>5t<|>tak<|>TEKST</, '>' + (v || '') + '<');
       });
     }
     if (tblIdx === 2) {
+      // num_tenants, occupancy — no currency
       var f = [val('num_tenants'), val('occupancy')];
       var ri2 = 0;
       return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
@@ -697,10 +687,15 @@ function processSlide4(xml) {
       });
     }
     if (tblIdx === 3) {
+      // noi, yield_pct, price_sale — each row has its own [CUR]
       var f2 = [val('noi'), val('yield_pct'), val('price_sale')];
+      var currencies2 = [noiCur, 'PLN', priceSaleCur]; // yield has no currency
       var ri3 = 0;
       return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = f2[ri3++];
+        var v = f2[ri3];
+        var c = currencies2[ri3];
+        ri3++;
+        row = replaceAll(row, '[CUR]', '[' + c + ']');
         if (v) return row.replace(/>TEKST</, '>' + v + '<');
         return row;
       });
