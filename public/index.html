@@ -1080,6 +1080,42 @@ function replaceKnownBuildingLabels(row, targetField) {
   return row;
 }
 
+
+// Dynamic labels for Section 03 / Zabudowa in PowerPoint slide master.
+// Important: slide 3 values are stored in ppt/slides/slide3.xml, but labels are stored
+// in ppt/slideMasters/slideMaster6.xml. Therefore, when a building field is disabled,
+// we must shift BOTH the value rows on slide3 AND the label rows on slideMaster6.
+function processSlideMaster6BuildingLabels(xml) {
+  var activeFields = getActiveBuildingSlideFields();
+  var tblIdx = 0;
+
+  return xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(tableXml) {
+    tblIdx++;
+
+    // First table on slideMaster6 = technical building labels.
+    if (tblIdx === 1) {
+      var rowIdx = 0;
+      return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+        var cfg = activeFields[rowIdx++];
+
+        // No active field for this slot: remove the entire master row so no empty label line remains.
+        if (!cfg) return '';
+
+        // Replace the row's original label pair with the next active field label pair.
+        return replaceKnownBuildingLabels(rowXml, cfg);
+      });
+    }
+
+    // Second table on slideMaster6 = building asking price label.
+    // If price field is disabled, remove the whole label table to avoid a dangling price label.
+    if (tblIdx === 2 && !isPptFieldEnabled('asking_price_building')) {
+      return '';
+    }
+
+    return tableXml;
+  });
+}
+
 /* ===== BROKER PROFILE SELECTOR ===== */
 var BROKER_PROFILES = {
   piotr_wrobel: {
@@ -1837,6 +1873,13 @@ async function generatePptx() {
       // Replace custom labels in slideMasters (always, regardless of CUR)
       if (xmlPath.indexOf('slideMaster') !== -1) {
         var before = xmlStr;
+
+        // Section 03 / Zabudowa labels are in slideMaster6.
+        // Apply field ON/OFF shifting here, not only in slide3 values.
+        if (xmlPath.indexOf('slideMaster6') !== -1) {
+          xmlStr = processSlideMaster6BuildingLabels(xmlStr);
+        }
+
         xmlStr = replacePptxLabels(xmlStr);
         if (xmlStr !== before) modified = true;
       }
