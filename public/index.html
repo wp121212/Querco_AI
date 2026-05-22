@@ -1122,6 +1122,7 @@ select:focus {
 </div><!-- /main -->
 
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 var templateBuffer = null;
 var slide4Active = true;
@@ -1875,6 +1876,102 @@ function renderFileList() {
   sizeEl.className = ts > MAX_SIZE * 0.9 ? 'file-limit-warn' : '';
 }
 
+
+/* ===== CLIENT-SIDE PDF/TXT TEXT EXTRACTION ===== */
+/*
+  Backend /api/extract dalej dostaje pliki, ale PDF/TXT próbujemy najpierw
+  odczytać w przeglądarce i dopisać do pola "text". Dzięki temu AI analizuje
+  PDF tak samo jak tekst wklejony ręcznie, nawet jeśli backendowy parser PDF
+  nie działa idealnie.
+*/
+var PDF_TEXT_MAX_CHARS = 90000;
+
+function configurePdfJsWorker() {
+  if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+}
+
+function readTextFile(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function() { resolve(String(reader.result || '')); };
+    reader.onerror = function() { reject(new Error('Nie udało się odczytać pliku TXT: ' + file.name)); };
+    reader.readAsText(file, 'utf-8');
+  });
+}
+
+async function extractPdfTextClientSide(file, statusText) {
+  if (!window.pdfjsLib) {
+    return { text: '', warning: 'Nie załadowała się biblioteka PDF.js — odczyt PDF w przeglądarce jest niedostępny.' };
+  }
+
+  configurePdfJsWorker();
+
+  var arrayBuffer = await file.arrayBuffer();
+  var pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  var pages = [];
+  var totalChars = 0;
+
+  for (var pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+    if (statusText) statusText.textContent = 'Odczytuję PDF: ' + file.name + ' — strona ' + pageNo + ' / ' + pdf.numPages;
+
+    var page = await pdf.getPage(pageNo);
+    var content = await page.getTextContent();
+    var pageText = content.items.map(function(item) { return item.str || ''; }).join(' ');
+    pageText = pageText.replace(/\s+/g, ' ').trim();
+
+    if (pageText) {
+      pages.push('--- PDF: ' + file.name + ' | STRONA ' + pageNo + ' ---\n' + pageText);
+      totalChars += pageText.length;
+    }
+
+    if (totalChars > PDF_TEXT_MAX_CHARS) {
+      pages.push('\n[UWAGA: tekst PDF został skrócony do ok. ' + PDF_TEXT_MAX_CHARS + ' znaków, żeby nie przeciążyć AI.]');
+      break;
+    }
+  }
+
+  var extracted = pages.join('\n\n').trim();
+  if (!extracted || extracted.length < 30) {
+    return {
+      text: '',
+      warning: 'PDF "' + file.name + '" nie zawiera tekstu możliwego do zaznaczenia albo jest skanem. Wklej tekst ręcznie albo użyj OCR.'
+    };
+  }
+
+  console.log('[PDF client extraction]', file.name, 'chars:', extracted.length, 'preview:', extracted.slice(0, 500));
+  return { text: extracted.slice(0, PDF_TEXT_MAX_CHARS), warning: '' };
+}
+
+async function extractTextFromUploadedFilesClientSide(statusText) {
+  var chunks = [];
+  var warnings = [];
+
+  for (var i = 0; i < uploadedFiles.length; i++) {
+    var file = uploadedFiles[i].file;
+    var ext = getFileExt(file.name);
+
+    try {
+      if (ext === 'pdf') {
+        var pdfResult = await extractPdfTextClientSide(file, statusText);
+        if (pdfResult.text) chunks.push(pdfResult.text);
+        if (pdfResult.warning) warnings.push(pdfResult.warning);
+      } else if (ext === 'txt') {
+        if (statusText) statusText.textContent = 'Odczytuję TXT: ' + file.name;
+        var txt = await readTextFile(file);
+        if (txt && txt.trim()) chunks.push('--- TXT: ' + file.name + ' ---\n' + txt.trim());
+      }
+    } catch (err) {
+      console.error('[File text extraction error]', file.name, err);
+      warnings.push('Nie udało się odczytać pliku "' + file.name + '": ' + err.message);
+    }
+  }
+
+  return { text: chunks.join('\n\n'), warnings: warnings };
+}
+
+
 /* ===== AI EXTRACTION ===== */
 async function aiExtract() {
   var text = document.getElementById('ai-source').value.trim();
@@ -1890,11 +1987,37 @@ async function aiExtract() {
   setStatus('');
 
   try {
+    var extractedFiles = { text: '', warnings: [] };
+    if (hasFiles) {
+      statusText.textContent = 'Odczytuję tekst z PDF/TXT...';
+      extractedFiles = await extractTextFromUploadedFilesClientSide(statusText);
+    }
+
+    var combinedParts = [];
+    if (text) combinedParts.push('--- TEKST WKLEJONY PRZEZ UŻYTKOWNIKA ---\n' + text);
+    if (extractedFiles.text) combinedParts.push('--- TEKST WYCIĄGNIĘTY Z PLIKÓW PDF/TXT ---\n' + extractedFiles.text);
+    var combinedText = combinedParts.join('\n\n');
+
+    if (!combinedText && hasFiles) {
+      var onlyWarnings = (extractedFiles.warnings || []).join('\n');
+      setStatus(onlyWarnings || 'Nie udało się wyciągnąć tekstu z plików. Wklej treść ręcznie.');
+      btn.disabled = false;
+      statusEl.style.display = 'none';
+      return;
+    }
+
     var formData = new FormData();
-    formData.append('text', text);
+    formData.append('text', combinedText || text);
+
+    // Pliki nadal wysyłamy do backendu jako fallback/przyszłą obsługę obrazów,
+    // ale PDF/TXT trafia już także jako zwykły tekst.
     uploadedFiles.forEach(function(f) {
       formData.append('files', f.file);
     });
+
+    if (extractedFiles.warnings && extractedFiles.warnings.length) {
+      console.warn('[PDF/TXT extraction warnings]', extractedFiles.warnings);
+    }
 
     statusText.textContent = 'AI analizuje' + (hasFiles ? ' (' + uploadedFiles.length + ' plików)' : '') + '...';
 
@@ -1968,11 +2091,14 @@ async function aiExtract() {
     var hasIncome = incomeFields.some(function(f) { return data[f] && data[f].trim(); });
     if (hasIncome && !slide4Active) { toggleSection('slide4'); }
 
-    // Show warnings from API (e.g. PDF without text)
+    // Show warnings from API + client-side PDF/TXT extraction
     var statusMsg = 'AI wypełniło ' + filledCount + ' pól. Sprawdź i popraw.';
-    if (data._warnings && data._warnings.length > 0) {
-      statusMsg += '\n⚠ ' + data._warnings.join('\n⚠ ');
-      console.warn('[AI Warnings]', data._warnings);
+    var allWarnings = [];
+    if (data._warnings && data._warnings.length > 0) allWarnings = allWarnings.concat(data._warnings);
+    if (extractedFiles.warnings && extractedFiles.warnings.length > 0) allWarnings = allWarnings.concat(extractedFiles.warnings);
+    if (allWarnings.length > 0) {
+      statusMsg += '\n⚠ ' + allWarnings.join('\n⚠ ');
+      console.warn('[AI/PDF Warnings]', allWarnings);
     }
     setStatus(statusMsg);
     setTimeout(function() { setStatus(''); }, data._warnings ? 12000 : 6000);
