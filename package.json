@@ -1,5 +1,9 @@
 {
   "name": "querco-generator",
-  "version": "1.0.0",
-  "private": true
+  "version": "1.1.0",
+  "private": true,
+  "dependencies": {
+    "formidable": "^3.5.2",
+    "pdf-parse": "^1.1.1"
+  }
 }
