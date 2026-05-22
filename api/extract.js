@@ -1,6 +1,5 @@
 import { IncomingForm } from 'formidable';
 import fs from 'fs';
-import pdf from 'pdf-parse/lib/pdf-parse.js';
 
 export const config = {
   api: { bodyParser: false },
@@ -97,6 +96,7 @@ function parseForm(req) {
       maxFileSize: 25 * 1024 * 1024,
       maxFiles: 10,
       keepExtensions: true,
+      multiples: true,
     });
     form.parse(req, (err, fields, files) => {
       if (err) return reject(err);
@@ -107,31 +107,32 @@ function parseForm(req) {
 
 async function extractTextFromPdf(buffer) {
   try {
-    const data = await pdf(buffer);
+    // Dynamic import to handle different module formats
+    let pdfParse;
+    try {
+      pdfParse = (await import('pdf-parse/lib/pdf-parse.js')).default;
+    } catch (e1) {
+      try {
+        pdfParse = (await import('pdf-parse')).default;
+      } catch (e2) {
+        const mod = await import('pdf-parse');
+        pdfParse = mod.default || mod;
+      }
+    }
+    const data = await pdfParse(buffer);
     return data.text || '';
   } catch (e) {
-    console.error('PDF parse error:', e.message);
+    console.error('[PDF PARSE ERROR]', e.message, e.stack?.split('\n')[1]);
     return '';
   }
 }
 
-function fileToBase64(filepath) {
-  const buf = fs.readFileSync(filepath);
-  return buf.toString('base64');
-}
-
-function getMimeType(filename) {
-  const ext = (filename || '').toLowerCase().split('.').pop();
-  const map = {
-    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
-    webp: 'image/webp', gif: 'image/gif', pdf: 'application/pdf',
-    txt: 'text/plain', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  };
-  return map[ext] || 'application/octet-stream';
-}
-
 function isImage(mime) {
-  return mime.startsWith('image/');
+  return (mime || '').startsWith('image/');
+}
+
+function getExt(filename) {
+  return (filename || '').toLowerCase().split('.').pop();
 }
 
 export default async function handler(req, res) {
@@ -145,59 +146,158 @@ export default async function handler(req, res) {
   }
 
   let textContent = '';
-  let imageContents = []; // { base64, mime }
+  let imageContents = [];
+  let warnings = [];
+  let debugInfo = { filesReceived: 0, fileDetails: [] };
 
   const contentType = req.headers['content-type'] || '';
+  console.log('[EXTRACT] Content-Type:', contentType);
 
   if (contentType.includes('multipart/form-data')) {
-    // Multipart: text + files
     const { fields, files } = await parseForm(req);
-    textContent = (Array.isArray(fields.text) ? fields.text[0] : fields.text) || '';
 
-    // files can be { files: [File, File] } or { files: File }
-    let fileList = files.files || [];
-    if (!Array.isArray(fileList)) fileList = [fileList];
+    // Debug: log raw structure
+    console.log('[EXTRACT] Fields keys:', Object.keys(fields));
+    console.log('[EXTRACT] Files keys:', Object.keys(files));
+    console.log('[EXTRACT] Files structure:', JSON.stringify(Object.keys(files).map(k => {
+      const v = files[k];
+      if (Array.isArray(v)) return { key: k, count: v.length, names: v.map(f => f?.originalFilename) };
+      return { key: k, name: v?.originalFilename };
+    })));
 
-    for (const file of fileList) {
-      if (!file || !file.filepath) continue;
-      const mime = file.mimetype || getMimeType(file.originalFilename);
+    // Get text field - formidable v3 returns arrays for fields
+    const textField = fields.text;
+    textContent = Array.isArray(textField) ? (textField[0] || '') : (textField || '');
+    console.log('[EXTRACT] Text from textarea:', textContent.length, 'chars');
 
-      if (mime === 'application/pdf') {
-        const buf = fs.readFileSync(file.filepath);
-        const pdfText = await extractTextFromPdf(buf);
-        if (pdfText.trim()) {
-          textContent += '\n\n--- DOKUMENT PDF: ' + (file.originalFilename || 'plik.pdf') + ' ---\n' + pdfText;
-        } else {
-          // PDF with no extractable text — might be scanned, send as images would need pdf-to-image
-          // For now, note it
-          textContent += '\n\n--- PDF BEZ TEKSTU: ' + (file.originalFilename || 'plik.pdf') + ' (skan — brak tekstu do ekstrakcji) ---';
-        }
-      } else if (isImage(mime)) {
-        const b64 = fileToBase64(file.filepath);
-        imageContents.push({ base64: b64, mime: mime, name: file.originalFilename || 'image' });
-      } else if (mime === 'text/plain') {
-        const txt = fs.readFileSync(file.filepath, 'utf-8');
-        textContent += '\n\n--- PLIK TXT: ' + (file.originalFilename || 'plik.txt') + ' ---\n' + txt;
+    // Normalize file list - formidable v3 always returns arrays
+    // But files might be under 'files' key or other keys
+    let fileList = [];
+    for (const key of Object.keys(files)) {
+      const val = files[key];
+      if (Array.isArray(val)) {
+        fileList = fileList.concat(val);
+      } else if (val && val.filepath) {
+        fileList.push(val);
       }
+    }
+
+    debugInfo.filesReceived = fileList.length;
+    console.log('[EXTRACT] Total files found:', fileList.length);
+
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
+      if (!file || !file.filepath) {
+        console.log('[EXTRACT] File', i, ': INVALID (no filepath)');
+        continue;
+      }
+
+      const filename = file.originalFilename || file.newFilename || 'unknown';
+      const mime = file.mimetype || '';
+      const ext = getExt(filename);
+      let fileSize = 0;
+      try { fileSize = fs.statSync(file.filepath).size; } catch (e) {}
+
+      console.log('[EXTRACT] File', i, ':', {
+        name: filename,
+        mime: mime,
+        ext: ext,
+        size: fileSize,
+        filepath: file.filepath,
+      });
+
+      const fileDebug = { name: filename, mime, size: fileSize, type: '', textLength: 0 };
+
+      // Determine type by extension (more reliable than MIME on some systems)
+      const isPdf = ext === 'pdf' || mime === 'application/pdf';
+      const isImg = isImage(mime) || ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext);
+      const isTxt = ext === 'txt' || mime === 'text/plain';
+
+      if (isPdf) {
+        fileDebug.type = 'pdf';
+        console.log('[EXTRACT] Processing PDF:', filename);
+
+        try {
+          const buf = fs.readFileSync(file.filepath);
+          console.log('[EXTRACT] PDF buffer size:', buf.length, 'bytes');
+
+          const pdfText = await extractTextFromPdf(buf);
+          fileDebug.textLength = pdfText.length;
+
+          console.log('[EXTRACT] PDF extracted text length:', pdfText.length, 'chars');
+          if (pdfText.length > 0) {
+            console.log('[EXTRACT] PDF first 500 chars:', pdfText.substring(0, 500));
+            textContent += '\n\n--- DOKUMENT PDF: ' + filename + ' ---\n' + pdfText;
+          } else {
+            console.log('[EXTRACT] PDF: NO TEXT EXTRACTED');
+            warnings.push('PDF "' + filename + '" nie zawiera tekstu możliwego do odczytu — spróbuj wkleić tekst ręcznie.');
+            textContent += '\n\n--- PDF BEZ TEKSTU: ' + filename + ' (skan — brak tekstu do ekstrakcji) ---';
+          }
+        } catch (e) {
+          console.error('[EXTRACT] PDF processing error:', e.message);
+          warnings.push('Błąd przetwarzania PDF "' + filename + '": ' + e.message);
+        }
+      } else if (isImg) {
+        fileDebug.type = 'image';
+        console.log('[EXTRACT] Processing image:', filename);
+        try {
+          const buf = fs.readFileSync(file.filepath);
+          const b64 = buf.toString('base64');
+          const imgMime = mime.startsWith('image/') ? mime : ('image/' + (ext === 'jpg' ? 'jpeg' : ext));
+          imageContents.push({ base64: b64, mime: imgMime, name: filename });
+          console.log('[EXTRACT] Image added, base64 length:', b64.length);
+        } catch (e) {
+          console.error('[EXTRACT] Image read error:', e.message);
+        }
+      } else if (isTxt) {
+        fileDebug.type = 'txt';
+        try {
+          const txt = fs.readFileSync(file.filepath, 'utf-8');
+          fileDebug.textLength = txt.length;
+          textContent += '\n\n--- PLIK TXT: ' + filename + ' ---\n' + txt;
+          console.log('[EXTRACT] TXT:', txt.length, 'chars');
+        } catch (e) {
+          console.error('[EXTRACT] TXT read error:', e.message);
+        }
+      } else {
+        fileDebug.type = 'unknown';
+        console.log('[EXTRACT] Skipping unknown file type:', filename, mime);
+        warnings.push('Pominięto plik "' + filename + '" — nieobsługiwany format.');
+      }
+
+      debugInfo.fileDetails.push(fileDebug);
+
       // Clean up temp file
       try { fs.unlinkSync(file.filepath); } catch (e) {}
     }
   } else {
     // JSON body (backward compatible)
-    const chunks = [];
-    for await (const chunk of req) chunks.push(chunk);
-    const body = JSON.parse(Buffer.concat(chunks).toString());
-    textContent = body.text || '';
+    console.log('[EXTRACT] JSON body mode');
+    try {
+      const chunks = [];
+      for await (const chunk of req) chunks.push(chunk);
+      const body = JSON.parse(Buffer.concat(chunks).toString());
+      textContent = body.text || '';
+    } catch (e) {
+      console.error('[EXTRACT] JSON parse error:', e.message);
+      return res.status(400).json({ error: 'Invalid JSON body' });
+    }
   }
+
+  console.log('[EXTRACT] Final text content length:', textContent.length, 'chars');
+  console.log('[EXTRACT] Images count:', imageContents.length);
+  console.log('[EXTRACT] Warnings:', warnings);
 
   if (!textContent.trim() && imageContents.length === 0) {
-    return res.status(400).json({ error: 'No content provided' });
+    return res.status(400).json({
+      error: 'No content provided',
+      warnings: warnings,
+      debug: debugInfo,
+    });
   }
 
-  // Build OpenAI message content array
+  // Build OpenAI message
   const userContent = [];
-
-  // Text prompt + extracted text
   let fullPrompt = PROMPT_TEMPLATE;
   if (textContent.trim()) {
     fullPrompt += '\n\nMateriał tekstowy do analizy:\n' + textContent;
@@ -206,9 +306,10 @@ export default async function handler(req, res) {
     fullPrompt += '\n\nDodatkowo załączono ' + imageContents.length + ' obraz(ów) — przeanalizuj je (OCR + ekstrakcja danych).';
   }
 
+  console.log('[EXTRACT] Final prompt length:', fullPrompt.length, 'chars');
+
   userContent.push({ type: 'text', text: fullPrompt });
 
-  // Add images for vision
   for (const img of imageContents) {
     userContent.push({
       type: 'image_url',
@@ -220,7 +321,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Use gpt-4o-mini for vision + text (supports images natively)
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -239,8 +339,9 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const err = await response.text();
-      return res.status(502).json({ error: 'OpenAI API error', details: err });
+      const errText = await response.text();
+      console.error('[EXTRACT] OpenAI error:', response.status, errText.substring(0, 500));
+      return res.status(502).json({ error: 'OpenAI API error', details: errText, warnings });
     }
 
     const data = await response.json();
@@ -251,11 +352,19 @@ export default async function handler(req, res) {
     try {
       parsed = JSON.parse(clean);
     } catch (e) {
-      return res.status(502).json({ error: 'Failed to parse AI response', raw: clean });
+      console.error('[EXTRACT] JSON parse failed:', clean.substring(0, 200));
+      return res.status(502).json({ error: 'Failed to parse AI response', raw: clean, warnings });
     }
 
+    // Add warnings to response
+    if (warnings.length > 0) {
+      parsed._warnings = warnings;
+    }
+
+    console.log('[EXTRACT] Success! Fields filled:', Object.values(parsed).filter(v => v && v !== '').length);
     return res.status(200).json(parsed);
   } catch (err) {
-    return res.status(500).json({ error: 'Server error', message: err.message });
+    console.error('[EXTRACT] Server error:', err.message, err.stack);
+    return res.status(500).json({ error: 'Server error', message: err.message, warnings });
   }
 }
