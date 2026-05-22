@@ -806,7 +806,8 @@ async function generatePptx() {
       }
     }
 
-    // ===== CURRENCY REPLACEMENT IN SLIDE MASTERS =====
+    // ===== CURRENCY REPLACEMENT — BRUTE FORCE =====
+    // Replace [CUR] in ALL XML files in the PPTX
     var askingCur = cur('asking_price') || 'PLN';
     var askingBuildingCur = cur('asking_price_building') || askingCur;
     var noiCur = cur('noi') || 'EUR';
@@ -815,103 +816,83 @@ async function generatePptx() {
     var scCur = cur('service_charge') || 'EUR';
     var giCur = cur('gross_income') || 'EUR';
 
-    console.log('[PPTX Generator] Selected currencies:', {
-      asking_price: askingCur,
-      asking_price_building: askingBuildingCur,
-      noi: noiCur,
-      price_sale: priceSaleCur,
-      rent_income: rentCur,
-      service_charge: scCur,
-      gross_income: giCur
+    console.log('[PPTX] Currencies:', { askingCur, askingBuildingCur, noiCur, priceSaleCur, rentCur, scCur, giCur });
+
+    // Get ALL xml files from the zip
+    var xmlFiles = [];
+    zip.forEach(function(relativePath, file) {
+      if (relativePath.endsWith('.xml') && !file.dir) {
+        xmlFiles.push(relativePath);
+      }
     });
+    console.log('[PPTX] Scanning ' + xmlFiles.length + ' XML files for [CUR]');
 
-    // slideMaster4 → slide2 (CENA OFERTOWA)
-    // slideMaster6 → slide3 (CENA OFERTOWA)
-    // slideMaster7 → slide4 (NOI, CENA, przychody)
-    var masterReplacements = {
-      'ppt/slideMasters/slideMaster4.xml': function(xml) {
-        // One currency: asking price
-        xml = replaceAll(xml, '[CUR]', '[' + askingCur + ']');
-        // Fallback: replace hardcoded currencies too
-        xml = xml.replace(/CENA OFERTOWA \[(PLN|EUR)\]/g, 'CENA OFERTOWA [' + askingCur + ']');
-        xml = xml.replace(/ASKING PRICE \[(PLN|EUR)\]/g, 'ASKING PRICE [' + askingCur + ']');
-        return xml;
-      },
-      'ppt/slideMasters/slideMaster6.xml': function(xml) {
-        // One currency: asking price building
-        xml = replaceAll(xml, '[CUR]', '[' + askingBuildingCur + ']');
-        xml = xml.replace(/CENA OFERTOWA \[(PLN|EUR)\]/g, 'CENA OFERTOWA [' + askingBuildingCur + ']');
-        xml = xml.replace(/ASKING PRICE \[(PLN|EUR)\]/g, 'ASKING PRICE [' + askingBuildingCur + ']');
-        return xml;
-      },
-      'ppt/slideMasters/slideMaster7.xml': function(xml) {
-        // Multiple currencies — replace specific labels
-        // NOI
-        xml = xml.replace(/DOCHÓD OPERACYJNY NETTO \[(CUR|PLN|EUR)\]/g, 'DOCHÓD OPERACYJNY NETTO [' + noiCur + ']');
-        xml = xml.replace(/NOI \[(CUR|PLN|EUR)\]/g, 'NOI [' + noiCur + ']');
-        // Cena ofertowa (sale)
-        xml = xml.replace(/CENA OFERTOWA \[(CUR|PLN|EUR)\]/g, 'CENA OFERTOWA [' + priceSaleCur + ']');
-        xml = xml.replace(/ASKING PRICE \[(CUR|PLN|EUR)\]/g, 'ASKING PRICE [' + priceSaleCur + ']');
-        // Rent income
-        xml = xml.replace(/ROCZNY PRZYCHÓD Z NAJMU/g, 'ROCZNY PRZYCHÓD Z NAJMU');
-        xml = xml.replace(/ANNUAL RENTAL INCOME \[(CUR|PLN|EUR) \/ m²\]/g, 'ANNUAL RENTAL INCOME [' + rentCur + ' / m²]');
-        // Service charge
-        xml = xml.replace(/ROCZNY PRZYCHÓD Z OPŁAT SERWISOWYCH \[(CUR|PLN|EUR) \/\]/g, 'ROCZNY PRZYCHÓD Z OPŁAT SERWISOWYCH [' + scCur + ' /]');
-        xml = xml.replace(/ANNUAL SERVICE CHARGE INCOME \[(CUR|PLN|EUR) \/ m²\]/g, 'ANNUAL SERVICE CHARGE INCOME [' + scCur + ' / m²]');
-        // Gross operating income
-        xml = xml.replace(/ŁĄCZNY ROCZNY PRZYCHÓD OPERACYJNY/g, 'ŁĄCZNY ROCZNY PRZYCHÓD OPERACYJNY');
-        xml = xml.replace(/GROSS OPERATING INCOME/g, 'GROSS OPERATING INCOME');
-        // Handle split [CUR /] and [CUR / m²] patterns
-        xml = xml.replace(/\[(CUR|PLN|EUR) \/\]/g, function(match, oldCur) {
-          // Determine which currency based on context — check what came before
-          return '[' + scCur + ' /]'; // default to service charge for split patterns
-        });
-        xml = xml.replace(/\[(CUR|PLN|EUR) \/ m²\]/g, function(match, oldCur) {
-          return '[' + giCur + ' / m²]';
-        });
-        // Catch any remaining standalone [CUR]
-        xml = replaceAll(xml, '[CUR]', '[' + priceSaleCur + ']');
-        return xml;
+    for (var xi = 0; xi < xmlFiles.length; xi++) {
+      var xmlPath = xmlFiles[xi];
+      var xmlFile = zip.file(xmlPath);
+      if (!xmlFile) continue;
+
+      var xmlStr = await xmlFile.async('string');
+      if (xmlStr.indexOf('CUR') === -1) continue; // skip files without CUR
+
+      var origCount = (xmlStr.match(/CUR/g) || []).length;
+      console.log('[PPTX] Found CUR in: ' + xmlPath + ' (' + origCount + ' occurrences)');
+
+      // Context-aware replacement based on surrounding text
+      // Replace specific full label patterns FIRST, then catch remaining [CUR]
+
+      // DOCHÓD OPERACYJNY NETTO [CUR] / NOI [CUR]
+      xmlStr = xmlStr.replace(/DOCHÓD OPERACYJNY NETTO \[CUR\]/g, 'DOCHÓD OPERACYJNY NETTO [' + noiCur + ']');
+      xmlStr = xmlStr.replace(/NOI \[CUR\]/g, 'NOI [' + noiCur + ']');
+
+      // ANNUAL RENTAL INCOME [CUR / m²]
+      xmlStr = xmlStr.replace(/ANNUAL RENTAL INCOME \[CUR/g, 'ANNUAL RENTAL INCOME [' + rentCur);
+      // ROCZNY PRZYCHÓD Z NAJMU ... [CUR
+      xmlStr = xmlStr.replace(/PRZYCHÓD Z NAJMU(.*?)\[CUR/g, 'PRZYCHÓD Z NAJMU$1[' + rentCur);
+
+      // ANNUAL SERVICE CHARGE INCOME [CUR / m²]
+      xmlStr = xmlStr.replace(/ANNUAL SERVICE CHARGE INCOME \[CUR/g, 'ANNUAL SERVICE CHARGE INCOME [' + scCur);
+      // ROCZNY PRZYCHÓD Z OPŁAT SERWISOWYCH [CUR
+      xmlStr = xmlStr.replace(/OPŁAT SERWISOWYCH(.*?)\[CUR/g, 'OPŁAT SERWISOWYCH$1[' + scCur);
+
+      // GROSS OPERATING INCOME ... [CUR
+      xmlStr = xmlStr.replace(/GROSS OPERATING INCOME(.*?)\[CUR/g, 'GROSS OPERATING INCOME$1[' + giCur);
+      // ŁĄCZNY ROCZNY PRZYCHÓD OPERACYJNY ... [CUR
+      xmlStr = xmlStr.replace(/PRZYCHÓD OPERACYJNY(.*?)\[CUR/g, 'PRZYCHÓD OPERACYJNY$1[' + giCur);
+
+      // CENA OFERTOWA [CUR] / ASKING PRICE [CUR]
+      // For slideMaster7 (slide4) this is price_sale, for others it's asking price
+      if (xmlPath.indexOf('slideMaster7') !== -1) {
+        xmlStr = xmlStr.replace(/CENA OFERTOWA \[CUR\]/g, 'CENA OFERTOWA [' + priceSaleCur + ']');
+        xmlStr = xmlStr.replace(/ASKING PRICE \[CUR\]/g, 'ASKING PRICE [' + priceSaleCur + ']');
+      } else if (xmlPath.indexOf('slideMaster6') !== -1) {
+        xmlStr = xmlStr.replace(/CENA OFERTOWA \[CUR\]/g, 'CENA OFERTOWA [' + askingBuildingCur + ']');
+        xmlStr = xmlStr.replace(/ASKING PRICE \[CUR\]/g, 'ASKING PRICE [' + askingBuildingCur + ']');
+      } else {
+        xmlStr = xmlStr.replace(/CENA OFERTOWA \[CUR\]/g, 'CENA OFERTOWA [' + askingCur + ']');
+        xmlStr = xmlStr.replace(/ASKING PRICE \[CUR\]/g, 'ASKING PRICE [' + askingCur + ']');
       }
-    };
 
-    // Also process slideLayouts that might contain labels
-    var layoutReplacements = {
-      'ppt/slideLayouts/slideLayout5.xml': masterReplacements['ppt/slideMasters/slideMaster4.xml'],
-      'ppt/slideLayouts/slideLayout7.xml': masterReplacements['ppt/slideMasters/slideMaster6.xml'],
-      'ppt/slideLayouts/slideLayout8.xml': masterReplacements['ppt/slideMasters/slideMaster7.xml'],
-    };
-
-    var allReplacements = Object.assign({}, masterReplacements, layoutReplacements);
-    var replacementCount = 0;
-
-    for (var masterPath in allReplacements) {
-      var masterFile = zip.file(masterPath);
-      if (masterFile) {
-        var masterXml = await masterFile.async('string');
-        var before = (masterXml.match(/\[CUR\]|\[PLN\]|\[EUR\]/g) || []).length;
-        masterXml = allReplacements[masterPath](masterXml);
-        var after = (masterXml.match(/\[CUR\]/g) || []).length;
-        replacementCount += (before - after);
-        console.log('[PPTX Generator] ' + masterPath + ': ' + before + ' currency placeholders found, ' + after + ' [CUR] remaining');
-        zip.file(masterPath, masterXml);
+      // Catch ANY remaining [CUR] (standalone or in unknown context)
+      while (xmlStr.indexOf('[CUR]') !== -1) {
+        xmlStr = xmlStr.replace('[CUR]', '[' + askingCur + ']');
       }
+      // Also catch [CUR / and CUR/ patterns (split across runs)
+      while (xmlStr.indexOf('[CUR /') !== -1) {
+        xmlStr = xmlStr.replace('[CUR /', '[' + askingCur + ' /');
+      }
+      while (xmlStr.indexOf('[CUR/') !== -1) {
+        xmlStr = xmlStr.replace('[CUR/', '[' + askingCur + '/');
+      }
+
+      var remaining = (xmlStr.match(/CUR/g) || []).length;
+      // Filter out "KURS" which contains CUR legitimately
+      var kursCount = (xmlStr.match(/KURS/g) || []).length;
+      var realRemaining = remaining - kursCount;
+      console.log('[PPTX] ' + xmlPath + ': done. Remaining CUR (excl KURS): ' + realRemaining);
+
+      zip.file(xmlPath, xmlStr);
     }
-
-    // GLOBAL FALLBACK: scan ALL XML files for any remaining [CUR]
-    var allFiles = zip.file(/\.xml$/);
-    for (var fi = 0; fi < allFiles.length; fi++) {
-      var xf = allFiles[fi];
-      var xxml = await xf.async('string');
-      if (xxml.indexOf('[CUR]') !== -1) {
-        console.log('[PPTX Generator] FALLBACK: Found remaining [CUR] in ' + xf.name);
-        xxml = replaceAll(xxml, '[CUR]', '[' + askingCur + ']');
-        zip.file(xf.name, xxml);
-        replacementCount++;
-      }
-    }
-
-    console.log('[PPTX Generator] Total currency replacements: ' + replacementCount);
 
     // Remove inactive slides from presentation.xml
     var presFile = zip.file('ppt/presentation.xml');
