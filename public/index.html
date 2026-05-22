@@ -58,6 +58,13 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .field-label { flex: 0 0 38%; min-width: 0; padding-right: 16px; }
 .field-label-pl { font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.2px; line-height: 1.3; }
 .field-label-en { font-size: 10px; font-weight: 400; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.3; margin-top: 1px; }
+.field-label-pl[contenteditable], .field-label-en[contenteditable] { cursor: text; border-radius: 2px; padding: 1px 3px; margin: -1px -3px; transition: background var(--transition), outline-color var(--transition); outline: 1.5px solid transparent; }
+.field-label-pl[contenteditable]:hover, .field-label-en[contenteditable]:hover { background: var(--navy-pale); }
+.field-label-pl[contenteditable]:focus, .field-label-en[contenteditable]:focus { background: #fff; outline-color: var(--navy); }
+.field-label .edit-hint { display: none; font-size: 9px; color: var(--text-tertiary); margin-left: 4px; opacity: 0; transition: opacity var(--transition); vertical-align: middle; }
+.field-label:hover .edit-hint { opacity: 1; display: inline; }
+.reset-labels-btn { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 10px; font-size: 10px; color: var(--text-tertiary); cursor: pointer; font-family: inherit; letter-spacing: 0.3px; transition: all var(--transition); }
+.reset-labels-btn:hover { border-color: var(--navy); color: var(--navy); }
 .field-value { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
 .field-row-wide .field-label { flex: 0 0 100%; padding-right: 0; margin-bottom: 8px; }
 .field-row-wide { flex-wrap: wrap; }
@@ -312,6 +319,7 @@ select:focus { box-shadow: 0 0 0 1.5px var(--focus); }
   </div>
 </div>
 
+<div style="display:flex;justify-content:flex-end;margin-bottom:4px"><button class="reset-labels-btn" onclick="resetAllLabels()">↺ Przywróć domyślne nazwy pól</button></div>
 <button class="gen-btn" id="gen-btn" onclick="generatePptx()">⬇ GENERUJ PPTX</button>
 <div class="status" id="status"></div>
 
@@ -323,6 +331,139 @@ select:focus { box-shadow: 0 0 0 1.5px var(--focus); }
 var templateBuffer = null;
 var slide4Active = true;
 var slide5Active = false;
+
+/* ===== EDITABLE LABELS SYSTEM ===== */
+var defaultLabels = {}; // { element_id: { pl: 'OBRĘB', en: 'PRECINCT' } }
+
+// Map of PPTX slideMaster label text → which form field it belongs to
+// Used during PPTX generation to replace labels in slideMasters
+var PPTX_LABEL_MAP = {
+  // slideMaster4 (slide 2: grunt)
+  'POWIERZCHNIA GRUNTU [m²]': { field: 'land_area', lang: 'pl' },
+  'LAND AREA [m²]': { field: 'land_area', lang: 'en' },
+  'NUMER DZIAŁKI': { field: 'plot_number', lang: 'pl' },
+  'PLOT NUMBER': { field: 'plot_number', lang: 'en' },
+  'OBRĘB': { field: 'precinct', lang: 'pl' },
+  'PRECINCT': { field: 'precinct', lang: 'en' },
+  'GMINA | MIASTO': { field: 'commune', lang: 'pl' },
+  'COMMUNE | CITY': { field: 'commune', lang: 'en' },
+  'POWIAT': { field: 'county', lang: 'pl' },
+  'COUNTY': { field: 'county', lang: 'en' },
+  'RODZAJ WŁASNOŚCI': { field: 'ownership', lang: 'pl' },
+  'TYPE OF OWNERSHIP': { field: 'ownership', lang: 'en' },
+  // slideMaster6 (slide 3: zabudowa)
+  'POWIERZCHNIA ZABUDOWY [m²]': { field: 'building_footprint', lang: 'pl' },
+  'BUILDING FOOTPRINT': { field: 'building_footprint', lang: 'en' },
+  'POWIERZCHNIA UŻYTKOWA [m²]': { field: 'total_area', lang: 'pl' },
+  'TOTAL AREA': { field: 'total_area', lang: 'en' },
+  'LICZBA MIEJSC PARKINGOWY': { field: 'parking_spots', lang: 'pl' },
+  'NUMBER OF PARKING SPOTS': { field: 'parking_spots', lang: 'en' },
+  'POWIERZCHNIA MAGAZYNOWA [m²]': { field: 'warehouse_area', lang: 'pl' },
+  'WAREHOUSE AREA': { field: 'warehouse_area', lang: 'en' },
+  'POWIERZCHNIA BIUROWA [m²]': { field: 'office_area', lang: 'pl' },
+  'OFFICE AREA': { field: 'office_area', lang: 'en' },
+  'ROK MODERNIZACJI': { field: 'year_modernization', lang: 'pl' },
+  'YEAR OF MODERNIZATION': { field: 'year_modernization', lang: 'en' },
+  // slideMaster7 (slide 4: dochody)
+  'LICZBA NAJEMCÓW': { field: 'num_tenants', lang: 'pl' },
+  'NUMBER OF TENANTS': { field: 'num_tenants', lang: 'en' },
+  'POZIOM WYNAJĘCIA': { field: 'occupancy', lang: 'pl' },
+  'OCCUPANCY RATE': { field: 'occupancy', lang: 'en' },
+  'STOPA KAPITALIZACJI [%]': { field: 'yield_pct', lang: 'pl' },
+  'YIELD [%]': { field: 'yield_pct', lang: 'en' },
+};
+
+function initEditableLabels() {
+  // Find all field-label containers and make their pl/en children editable
+  document.querySelectorAll('.field-label').forEach(function(container) {
+    var plEl = container.querySelector('.field-label-pl');
+    var enEl = container.querySelector('.field-label-en');
+    if (!plEl || !enEl) return;
+
+    // Find associated input to determine field key
+    var row = container.closest('.field-row, .dist-cell');
+    if (!row) return;
+    var input = row.querySelector('input, select, textarea');
+    if (!input || !input.id) return;
+    var fieldKey = input.id;
+
+    // Skip currency label IDs (they have dynamic labels managed by updateCurrencyLabel)
+    // But still make them editable — user edits the base name
+    var isCurrencyField = !!plEl.id && plEl.id.startsWith('label-');
+
+    // Store defaults
+    defaultLabels[fieldKey] = { pl: plEl.textContent.trim(), en: enEl.textContent.trim() };
+
+    // Make editable
+    plEl.setAttribute('contenteditable', 'true');
+    plEl.setAttribute('spellcheck', 'false');
+    plEl.setAttribute('data-field', fieldKey);
+    plEl.setAttribute('data-lang', 'pl');
+
+    enEl.setAttribute('contenteditable', 'true');
+    enEl.setAttribute('spellcheck', 'false');
+    enEl.setAttribute('data-field', fieldKey);
+    enEl.setAttribute('data-lang', 'en');
+
+    // Add edit hint
+    var hint = document.createElement('span');
+    hint.className = 'edit-hint';
+    hint.textContent = '✎';
+    container.appendChild(hint);
+
+    // Blur handlers — uppercase + prevent newlines
+    function onBlur(el) {
+      var text = el.textContent.replace(/\n/g, ' ').trim();
+      // Auto-uppercase (except description field)
+      if (fieldKey !== 'description') text = text.toUpperCase();
+      el.textContent = text;
+    }
+    plEl.addEventListener('blur', function() { onBlur(this); });
+    enEl.addEventListener('blur', function() { onBlur(this); });
+
+    // Prevent Enter key (no newlines in labels)
+    function onKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } }
+    plEl.addEventListener('keydown', onKeydown);
+    enEl.addEventListener('keydown', onKeydown);
+  });
+}
+
+function getLabel(fieldKey, lang) {
+  var selector = '.field-label-' + lang + '[data-field="' + fieldKey + '"]';
+  var el = document.querySelector(selector);
+  if (el) return el.textContent.trim();
+  // Fallback to defaults
+  if (defaultLabels[fieldKey]) return defaultLabels[fieldKey][lang];
+  return '';
+}
+
+function resetAllLabels() {
+  Object.keys(defaultLabels).forEach(function(fieldKey) {
+    var plEl = document.querySelector('.field-label-pl[data-field="' + fieldKey + '"]');
+    var enEl = document.querySelector('.field-label-en[data-field="' + fieldKey + '"]');
+    if (plEl) plEl.textContent = defaultLabels[fieldKey].pl;
+    if (enEl) enEl.textContent = defaultLabels[fieldKey].en;
+  });
+  setStatus('Przywrócono domyślne nazwy pól.');
+  setTimeout(function() { setStatus(''); }, 3000);
+}
+
+// Replace labels in PPTX slideMaster XML
+function replacePptxLabels(xml) {
+  Object.keys(PPTX_LABEL_MAP).forEach(function(originalLabel) {
+    var mapping = PPTX_LABEL_MAP[originalLabel];
+    var newLabel = getLabel(mapping.field, mapping.lang);
+    if (newLabel && newLabel !== originalLabel) {
+      // Only replace if actually changed
+      xml = xml.split(originalLabel).join(newLabel);
+      console.log('[PPTX Labels] ' + originalLabel + ' → ' + newLabel);
+    }
+  });
+  return xml;
+}
+
+// Init on DOM ready
+document.addEventListener('DOMContentLoaded', initEditableLabels);
 
 /* ===== CURRENCY LABEL UPDATER ===== */
 function updateCurrencyLabel(fieldId, baseName, suffix) {
@@ -855,7 +996,20 @@ async function generatePptx() {
       if (!xmlFile) continue;
 
       var xmlStr = await xmlFile.async('string');
-      if (xmlStr.indexOf('CUR') === -1) continue; // skip files without CUR
+      var modified = false;
+      
+      // Replace custom labels in slideMasters (always, regardless of CUR)
+      if (xmlPath.indexOf('slideMaster') !== -1) {
+        var before = xmlStr;
+        xmlStr = replacePptxLabels(xmlStr);
+        if (xmlStr !== before) modified = true;
+      }
+      
+      if (xmlStr.indexOf('CUR') === -1) {
+        // No CUR but might have label changes
+        if (modified) zip.file(xmlPath, xmlStr);
+        continue;
+      }
 
       var origCount = (xmlStr.match(/CUR/g) || []).length;
       console.log('[PPTX] Found CUR in: ' + xmlPath + ' (' + origCount + ' occurrences)');
