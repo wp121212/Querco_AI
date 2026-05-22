@@ -75,23 +75,22 @@ select{font-size:12px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;
 
 <div class="main">
 
-<!-- SZABLON PPTX UPLOAD -->
-<div id="upload-area">
-  <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-       ondragover="event.preventDefault();this.style.borderColor='#102A3D'"
-       ondragleave="this.style.borderColor=''"
-       ondrop="handleDrop(event)">
-    <div style="font-size:28px;margin-bottom:8px">📁</div>
-    <div style="font-size:14px;color:#555">Przeciągnij szablon PPTX lub kliknij</div>
-    <div style="font-size:11px;color:#999;margin-top:4px">Magazyn_wzorzec_ai.pptx</div>
+<!-- SZABLON PPTX SELECTOR -->
+<div class="section" style="margin-bottom:16px">
+  <div class="sec-head" style="margin-bottom:10px">
+    <div class="sec-title" style="gap:8px">
+      <span style="font-size:18px">📋</span> Wybierz szablon oferty
+    </div>
   </div>
-  <input type="file" id="file-input" accept=".pptx" style="display:none" onchange="loadTemplate(this.files[0])">
-</div>
-
-<div id="loaded-bar" style="display:none" class="upload-loaded">
-  <span>✓</span>
-  <span id="loaded-name"></span>
-  <button onclick="resetTemplate()" style="margin-left:auto;background:none;border:1px solid #2e6b2e;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:11px;color:#2e6b2e;font-family:inherit">Zmień</button>
+  <select id="template-select" onchange="loadSelectedTemplate()" style="width:100%;font-size:14px;padding:10px 12px;border:1px solid #dde1e6;border-radius:6px;background:#fafbfc;color:#1a1a2e;font-family:inherit;cursor:pointer">
+    <option value="">— wybierz szablon —</option>
+    <option value="magazyn-sprzedaz">Magazyn — sprzedaż</option>
+  </select>
+  <div id="template-status" style="display:none;margin-top:8px;font-size:12px;color:#666;display:flex;align-items:center;gap:6px"></div>
+  <div id="template-loaded" style="display:none;margin-top:8px" class="upload-loaded">
+    <span>✓</span>
+    <span id="template-loaded-name"></span>
+  </div>
 </div>
 
 <div id="form-area" style="display:none">
@@ -519,33 +518,47 @@ async function aiExtract() {
   statusEl.style.display = 'none';
 }
 
+/* ===== TEMPLATE MAP ===== */
+var TEMPLATE_MAP = {
+  'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' }
+  // Dodaj kolejne szablony tutaj:
+  // 'biuro-wynajem': { path: '/templates/biuro-wynajem.pptx', label: 'Biuro — wynajem' },
+  // 'grunt-sprzedaz': { path: '/templates/grunt-sprzedaz.pptx', label: 'Grunt — sprzedaż' },
+};
+
 /* ===== TEMPLATE HANDLING ===== */
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('drop-zone').style.borderColor = '';
-  var f = e.dataTransfer.files[0];
-  if (f) loadTemplate(f);
-}
+async function loadSelectedTemplate() {
+  var select = document.getElementById('template-select');
+  var key = select.value;
+  if (!key) {
+    templateBuffer = null;
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('template-loaded').style.display = 'none';
+    return;
+  }
 
-function loadTemplate(file) {
-  if (!file || !file.name.endsWith('.pptx')) { setStatus('Wrzuć plik .pptx'); return; }
-  var r = new FileReader();
-  r.onload = function(e) {
-    templateBuffer = e.target.result;
-    document.getElementById('upload-area').style.display = 'none';
-    document.getElementById('loaded-bar').style.display = 'flex';
-    document.getElementById('loaded-name').textContent = file.name;
+  var tmpl = TEMPLATE_MAP[key];
+  if (!tmpl) return;
+
+  var statusEl = document.getElementById('template-status');
+  statusEl.style.display = 'flex';
+  statusEl.innerHTML = '<div class="spinner"></div> Ładowanie szablonu...';
+  document.getElementById('template-loaded').style.display = 'none';
+
+  try {
+    var resp = await fetch(tmpl.path);
+    if (!resp.ok) throw new Error('Nie znaleziono szablonu (' + resp.status + ')');
+    templateBuffer = await resp.arrayBuffer();
+
+    statusEl.style.display = 'none';
+    document.getElementById('template-loaded').style.display = 'flex';
+    document.getElementById('template-loaded-name').textContent = tmpl.label;
     document.getElementById('form-area').style.display = 'block';
-  };
-  r.readAsArrayBuffer(file);
-}
-
-function resetTemplate() {
-  templateBuffer = null;
-  document.getElementById('upload-area').style.display = 'block';
-  document.getElementById('loaded-bar').style.display = 'none';
-  document.getElementById('form-area').style.display = 'none';
-  document.getElementById('file-input').value = '';
+  } catch (err) {
+    statusEl.innerHTML = '<span style="color:#cc3333">Błąd: ' + err.message + '</span>';
+    templateBuffer = null;
+    document.getElementById('form-area').style.display = 'none';
+  }
 }
 
 function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
