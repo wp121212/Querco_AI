@@ -697,6 +697,18 @@ select:focus {
   box-shadow: none;
 }
 
+/* === PHOTO SLOTS === */
+.photo-slot-drop{border:2px dashed var(--q-line);border-radius:2px;padding:22px;text-align:center;cursor:pointer;transition:all 160ms ease;background:#fafbfc;font-size:13px;color:var(--q-steel);font-weight:600}
+.photo-slot-drop:hover,.photo-slot-drop.psd-over{border-color:var(--q-navy);background:#f0f3f6;color:var(--q-navy)}
+.photo-slot-drop span{font-size:20px;margin-right:8px;vertical-align:-2px}
+.photo-slot-preview{display:flex;align-items:center;gap:14px;padding:8px 0}
+.photo-slot-thumb{width:120px;height:75px;object-fit:cover;border-radius:2px;border:1px solid var(--q-line);flex-shrink:0}
+.photo-slot-info{flex:1;min-width:0}
+.photo-slot-name{font-size:12px;font-weight:700;color:var(--q-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo-slot-size{font-size:11px;color:var(--q-soft);margin-top:2px}
+.photo-slot-remove{background:none;border:1px solid var(--q-line);border-radius:2px;padding:6px 12px;cursor:pointer;font-size:10px;color:var(--q-steel);font-family:inherit;font-weight:700;letter-spacing:.08em;transition:all 160ms ease;flex-shrink:0}
+.photo-slot-remove:hover{border-color:#b42318;color:#b42318}
+
 .ai-status {
   display: none;
   align-items: center;
@@ -1125,37 +1137,98 @@ select:focus {
       </div>
     </div>
   </div>
-  <div class="card-body">
-    <div style="padding:20px 26px">
-      <div style="margin-bottom:10px">
-        <div class="field-label-pl">Zdjęcie główne</div>
-        <div class="field-label-en">Main Property Photo</div>
-      </div>
-      <div id="photo-upload-area">
-        <div id="photo-drop-zone" style="border:2px dashed var(--q-line);border-radius:2px;padding:32px;text-align:center;cursor:pointer;transition:all 160ms ease;background:#fafbfc"
-             onclick="document.getElementById('photo-input').click()"
-             onmouseover="this.style.borderColor='var(--q-navy)';this.style.background='#f0f3f6'"
-             onmouseout="this.style.borderColor='';this.style.background=''"
-             ondragover="event.preventDefault();this.style.borderColor='var(--q-navy)';this.style.background='#f0f3f6'"
-             ondragleave="this.style.borderColor='';this.style.background=''"
-             ondrop="handlePhotoDrop(event)">
-          <div style="font-size:32px;margin-bottom:8px">🏢</div>
-          <div style="font-size:14px;color:var(--q-text);font-weight:700">Dodaj zdjęcie główne nieruchomości</div>
-          <div style="font-size:11px;color:var(--q-soft);margin-top:4px">JPG, PNG, WEBP — max 10 MB</div>
+  <div class="card-body" id="photo-slots">
+
+    <div class="field-row field-row-wide" style="padding:16px 26px" data-photo-slot="slide2_photo">
+      <div class="field-label" style="flex:0 0 100%;margin-bottom:8px"><div class="field-label-pl">Zdjęcie — Slajd „Lokalizacja"</div><div class="field-label-en">Photo — Location Slide</div></div>
+      <div class="field-value" style="flex:0 0 100%">
+        <div class="photo-slot-drop" onclick="document.getElementById('pi_slide2_photo').click()" ondragover="event.preventDefault();this.classList.add('psd-over')" ondragleave="this.classList.remove('psd-over')" ondrop="photoSlotDrop(event,'slide2_photo')">
+          <span>🏢</span> Dodaj zdjęcie nieruchomości
         </div>
-        <input type="file" id="photo-input" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="handlePhotoSelect(this.files[0])">
-        <div id="photo-preview" style="display:none">
-          <div style="display:flex;align-items:center;gap:16px;padding:12px 0">
-            <img id="photo-thumb" style="width:140px;height:90px;object-fit:cover;border-radius:2px;border:1px solid var(--q-line)" alt="">
-            <div style="flex:1;min-width:0">
-              <div id="photo-name" style="font-size:13px;font-weight:700;color:var(--q-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
-              <div id="photo-size-info" style="font-size:11px;color:var(--q-soft);margin-top:3px"></div>
-            </div>
-            <button onclick="removePhoto()" style="background:none;border:1px solid var(--q-line);border-radius:2px;padding:8px 14px;cursor:pointer;font-size:11px;color:var(--q-steel);font-family:inherit;font-weight:700;letter-spacing:0.05em;transition:all 160ms ease" onmouseover="this.style.borderColor='#b42318';this.style.color='#b42318'" onmouseout="this.style.borderColor='';this.style.color=''">USUŃ</button>
-          </div>
+        <input type="file" id="pi_slide2_photo" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="photoSlotSelect(this,'slide2_photo')">
+        <div class="photo-slot-preview" id="pp_slide2_photo" style="display:none">
+          <img class="photo-slot-thumb" id="pt_slide2_photo" alt="">
+          <div class="photo-slot-info"><div class="photo-slot-name" id="pn_slide2_photo"></div><div class="photo-slot-size" id="ps_slide2_photo"></div></div>
+          <button class="photo-slot-remove" onclick="photoSlotRemove('slide2_photo')">USUŃ</button>
         </div>
       </div>
     </div>
+
+    <div class="field-row field-row-wide" style="padding:16px 26px" data-photo-slot="slide3_photo">
+      <div class="field-label" style="flex:0 0 100%;margin-bottom:8px"><div class="field-label-pl">Zdjęcie — Slajd „Zabudowa"</div><div class="field-label-en">Photo — Building Slide</div></div>
+      <div class="field-value" style="flex:0 0 100%">
+        <div class="photo-slot-drop" onclick="document.getElementById('pi_slide3_photo').click()" ondragover="event.preventDefault();this.classList.add('psd-over')" ondragleave="this.classList.remove('psd-over')" ondrop="photoSlotDrop(event,'slide3_photo')">
+          <span>🏗️</span> Dodaj zdjęcie zabudowy
+        </div>
+        <input type="file" id="pi_slide3_photo" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="photoSlotSelect(this,'slide3_photo')">
+        <div class="photo-slot-preview" id="pp_slide3_photo" style="display:none">
+          <img class="photo-slot-thumb" id="pt_slide3_photo" alt="">
+          <div class="photo-slot-info"><div class="photo-slot-name" id="pn_slide3_photo"></div><div class="photo-slot-size" id="ps_slide3_photo"></div></div>
+          <button class="photo-slot-remove" onclick="photoSlotRemove('slide3_photo')">USUŃ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-row field-row-wide" style="padding:16px 26px" data-photo-slot="slide4_photo">
+      <div class="field-label" style="flex:0 0 100%;margin-bottom:8px"><div class="field-label-pl">Zdjęcie — Slajd „Dochody / Najemcy"</div><div class="field-label-en">Photo — Income / Tenants Slide</div></div>
+      <div class="field-value" style="flex:0 0 100%">
+        <div class="photo-slot-drop" onclick="document.getElementById('pi_slide4_photo').click()" ondragover="event.preventDefault();this.classList.add('psd-over')" ondragleave="this.classList.remove('psd-over')" ondrop="photoSlotDrop(event,'slide4_photo')">
+          <span>📊</span> Dodaj zdjęcie
+        </div>
+        <input type="file" id="pi_slide4_photo" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="photoSlotSelect(this,'slide4_photo')">
+        <div class="photo-slot-preview" id="pp_slide4_photo" style="display:none">
+          <img class="photo-slot-thumb" id="pt_slide4_photo" alt="">
+          <div class="photo-slot-info"><div class="photo-slot-name" id="pn_slide4_photo"></div><div class="photo-slot-size" id="ps_slide4_photo"></div></div>
+          <button class="photo-slot-remove" onclick="photoSlotRemove('slide4_photo')">USUŃ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-row field-row-wide" style="padding:16px 26px" data-photo-slot="slide6_rzut">
+      <div class="field-label" style="flex:0 0 100%;margin-bottom:8px"><div class="field-label-pl">Rzut powierzchni</div><div class="field-label-en">Floor Plan</div></div>
+      <div class="field-value" style="flex:0 0 100%">
+        <div class="photo-slot-drop" onclick="document.getElementById('pi_slide6_rzut').click()" ondragover="event.preventDefault();this.classList.add('psd-over')" ondragleave="this.classList.remove('psd-over')" ondrop="photoSlotDrop(event,'slide6_rzut')">
+          <span>📐</span> Dodaj rzut powierzchni
+        </div>
+        <input type="file" id="pi_slide6_rzut" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="photoSlotSelect(this,'slide6_rzut')">
+        <div class="photo-slot-preview" id="pp_slide6_rzut" style="display:none">
+          <img class="photo-slot-thumb" id="pt_slide6_rzut" alt="">
+          <div class="photo-slot-info"><div class="photo-slot-name" id="pn_slide6_rzut"></div><div class="photo-slot-size" id="ps_slide6_rzut"></div></div>
+          <button class="photo-slot-remove" onclick="photoSlotRemove('slide6_rzut')">USUŃ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-row field-row-wide" style="padding:16px 26px" data-photo-slot="slide5_mpzp">
+      <div class="field-label" style="flex:0 0 100%;margin-bottom:8px"><div class="field-label-pl">Obrys Geoportal / MPZP</div><div class="field-label-en">Geoportal Outline / Zoning Plan</div></div>
+      <div class="field-value" style="flex:0 0 100%">
+        <div class="photo-slot-drop" onclick="document.getElementById('pi_slide5_mpzp').click()" ondragover="event.preventDefault();this.classList.add('psd-over')" ondragleave="this.classList.remove('psd-over')" ondrop="photoSlotDrop(event,'slide5_mpzp')">
+          <span>🗺️</span> Dodaj obrys / mapkę MPZP
+        </div>
+        <input type="file" id="pi_slide5_mpzp" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="photoSlotSelect(this,'slide5_mpzp')">
+        <div class="photo-slot-preview" id="pp_slide5_mpzp" style="display:none">
+          <img class="photo-slot-thumb" id="pt_slide5_mpzp" alt="">
+          <div class="photo-slot-info"><div class="photo-slot-name" id="pn_slide5_mpzp"></div><div class="photo-slot-size" id="ps_slide5_mpzp"></div></div>
+          <button class="photo-slot-remove" onclick="photoSlotRemove('slide5_mpzp')">USUŃ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-row field-row-wide" style="padding:16px 26px" data-photo-slot="slide7_photo">
+      <div class="field-label" style="flex:0 0 100%;margin-bottom:8px"><div class="field-label-pl">Zdjęcie dodatkowe</div><div class="field-label-en">Additional Photo</div></div>
+      <div class="field-value" style="flex:0 0 100%">
+        <div class="photo-slot-drop" onclick="document.getElementById('pi_slide7_photo').click()" ondragover="event.preventDefault();this.classList.add('psd-over')" ondragleave="this.classList.remove('psd-over')" ondrop="photoSlotDrop(event,'slide7_photo')">
+          <span>📷</span> Dodaj zdjęcie dodatkowe
+        </div>
+        <input type="file" id="pi_slide7_photo" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="photoSlotSelect(this,'slide7_photo')">
+        <div class="photo-slot-preview" id="pp_slide7_photo" style="display:none">
+          <img class="photo-slot-thumb" id="pt_slide7_photo" alt="">
+          <div class="photo-slot-info"><div class="photo-slot-name" id="pn_slide7_photo"></div><div class="photo-slot-size" id="ps_slide7_photo"></div></div>
+          <button class="photo-slot-remove" onclick="photoSlotRemove('slide7_photo')">USUŃ</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2406,8 +2479,8 @@ async function generatePptx() {
       zip.file(xmlPath, xmlStr);
     }
 
-    // ===== INSERT PROPERTY PHOTO INTO SLIDE 2 =====
-    await insertPhotoIntoPptx(zip);
+    // ===== INSERT ALL PHOTOS =====
+    await insertAllPhotos(zip);
 
     // Remove inactive slides from presentation.xml
     var presFile = zip.file('ppt/presentation.xml');
@@ -2444,101 +2517,119 @@ async function generatePptx() {
   btn.innerHTML = '⬇ Generuj PPTX';
 }
 
-/* ===== PHOTO UPLOAD ===== */
-var propertyPhoto = null;
+/* ===== PHOTO SLOTS SYSTEM ===== */
+var photoSlots = {};
 
-function handlePhotoDrop(e) {
+// Photo slot config: slotId -> { slideNum, slideXmlPath, x, y, cx, cy, mediaName }
+var PHOTO_CONFIG = {
+  slide2_photo: { slide: 2, path: 'ppt/slides/slide2.xml', x: 381000, y: 404812, cx: 5114925, cy: 3415158, media: 'photo_slide2' },
+  slide3_photo: { slide: 3, path: 'ppt/slides/slide3.xml', x: 381000, y: 404812, cx: 5114925, cy: 3415158, media: 'photo_slide3' },
+  slide4_photo: { slide: 4, path: 'ppt/slides/slide4.xml', x: 381000, y: 404812, cx: 5114925, cy: 3415158, media: 'photo_slide4' },
+  slide6_rzut:  { slide: 6, path: 'ppt/slides/slide6.xml', x: 300000, y: 750000, cx: 9300000, cy: 5800000, media: 'photo_slide6' },
+  slide5_mpzp:  { slide: 5, path: 'ppt/slides/slide5.xml', x: 3873501, y: 2744788, cx: 5651500, cy: 3708400, media: 'photo_slide5' },
+  slide7_photo: { slide: 7, path: 'ppt/slides/slide7.xml', x: 300000, y: 750000, cx: 9300000, cy: 5800000, media: 'photo_slide7' },
+};
+
+function photoSlotDrop(e, slotId) {
   e.preventDefault();
-  var dz = document.getElementById('photo-drop-zone');
-  dz.style.borderColor = '';
-  dz.style.background = '';
+  e.currentTarget.classList.remove('psd-over');
   var file = e.dataTransfer.files[0];
-  if (file) handlePhotoSelect(file);
+  if (file) photoSlotLoad(slotId, file);
 }
 
-function handlePhotoSelect(file) {
-  if (!file) return;
+function photoSlotSelect(input, slotId) {
+  var file = input.files[0];
+  if (file) photoSlotLoad(slotId, file);
+  input.value = '';
+}
+
+function photoSlotLoad(slotId, file) {
   var ext = file.name.toLowerCase().split('.').pop();
-  if (['jpg','jpeg','png','webp'].indexOf(ext) === -1) {
-    setStatus('Nieobsługiwany format. Użyj JPG, PNG lub WEBP.');
-    return;
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    setStatus('Zdjęcie za duże — max 10 MB.');
-    return;
-  }
+  if (['jpg','jpeg','png','webp'].indexOf(ext) === -1) { setStatus('Format: JPG, PNG, WEBP'); return; }
+  if (file.size > 10*1024*1024) { setStatus('Max 10 MB'); return; }
   var r1 = new FileReader();
   r1.onload = function(e) {
-    var dataUrl = e.target.result;
+    var url = e.target.result;
     var r2 = new FileReader();
     r2.onload = function(e2) {
-      propertyPhoto = { file: file, dataUrl: dataUrl, buf: e2.target.result };
-      document.getElementById('photo-drop-zone').style.display = 'none';
-      document.getElementById('photo-preview').style.display = 'block';
-      document.getElementById('photo-thumb').src = dataUrl;
-      document.getElementById('photo-name').textContent = file.name;
-      document.getElementById('photo-size-info').textContent = (file.size / (1024*1024)).toFixed(1) + ' MB';
+      photoSlots[slotId] = { file: file, dataUrl: url, buf: e2.target.result };
+      var row = document.querySelector('[data-photo-slot="'+slotId+'"]');
+      row.querySelector('.photo-slot-drop').style.display = 'none';
+      var prev = document.getElementById('pp_'+slotId);
+      prev.style.display = 'flex';
+      document.getElementById('pt_'+slotId).src = url;
+      document.getElementById('pn_'+slotId).textContent = file.name;
+      document.getElementById('ps_'+slotId).textContent = (file.size/(1024*1024)).toFixed(1)+' MB';
     };
     r2.readAsArrayBuffer(file);
   };
   r1.readAsDataURL(file);
-  document.getElementById('photo-input').value = '';
 }
 
-function removePhoto() {
-  propertyPhoto = null;
-  document.getElementById('photo-drop-zone').style.display = '';
-  document.getElementById('photo-preview').style.display = 'none';
+function photoSlotRemove(slotId) {
+  delete photoSlots[slotId];
+  var row = document.querySelector('[data-photo-slot="'+slotId+'"]');
+  row.querySelector('.photo-slot-drop').style.display = '';
+  document.getElementById('pp_'+slotId).style.display = 'none';
 }
 
-async function insertPhotoIntoPptx(zip) {
-  if (!propertyPhoto || !propertyPhoto.buf) return;
-  console.log('[PPTX Photo] Inserting: ' + propertyPhoto.file.name);
+async function insertAllPhotos(zip) {
+  var slots = Object.keys(photoSlots);
+  if (!slots.length) return;
+  console.log('[PPTX Photos] Inserting ' + slots.length + ' photos');
 
-  var ext = propertyPhoto.file.name.toLowerCase().split('.').pop();
-  if (ext === 'jpg') ext = 'jpeg';
-  var mediaPath = 'ppt/media/property_photo.' + ext;
-  var mime = ext === 'webp' ? 'image/webp' : 'image/' + ext;
+  for (var si = 0; si < slots.length; si++) {
+    var slotId = slots[si];
+    var photo = photoSlots[slotId];
+    var cfg = PHOTO_CONFIG[slotId];
+    if (!photo || !photo.buf || !cfg) continue;
 
-  zip.file(mediaPath, propertyPhoto.buf);
+    var ext = photo.file.name.toLowerCase().split('.').pop();
+    if (ext === 'jpg') ext = 'jpeg';
+    var mediaPath = 'ppt/media/' + cfg.media + '.' + ext;
+    var mime = ext === 'webp' ? 'image/webp' : 'image/' + ext;
 
-  // Add relationship
-  var relsPath = 'ppt/slides/_rels/slide2.xml.rels';
-  var rf = zip.file(relsPath);
-  var relsXml = rf ? await rf.async('string') : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
-  var maxId = 0;
-  (relsXml.match(/Id="rId(\d+)"/g) || []).forEach(function(m) {
-    var n = parseInt(m.match(/\d+/)[0]);
-    if (n > maxId) maxId = n;
-  });
-  var rid = 'rId' + (maxId + 1);
-  relsXml = relsXml.replace('</Relationships>', '<Relationship Id="' + rid + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/property_photo.' + ext + '"/></Relationships>');
-  zip.file(relsPath, relsXml);
+    // 1. Add media
+    zip.file(mediaPath, photo.buf);
 
-  // Content_Types
-  var ctf = zip.file('[Content_Types].xml');
-  if (ctf) {
-    var ct = await ctf.async('string');
-    if (ct.indexOf('Extension="' + ext + '"') === -1) {
-      ct = ct.replace('</Types>', '<Default Extension="' + ext + '" ContentType="' + mime + '"/></Types>');
-      zip.file('[Content_Types].xml', ct);
+    // 2. Add relationship
+    var relsPath = 'ppt/slides/_rels/slide' + cfg.slide + '.xml.rels';
+    var rf = zip.file(relsPath);
+    var relsXml = rf ? await rf.async('string') : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+    var maxId = 0;
+    (relsXml.match(/Id="rId(\d+)"/g) || []).forEach(function(m) {
+      var n = parseInt(m.match(/\d+/)[0]);
+      if (n > maxId) maxId = n;
+    });
+    var rid = 'rId' + (maxId + 1);
+    relsXml = relsXml.replace('</Relationships>', '<Relationship Id="' + rid + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/' + cfg.media + '.' + ext + '"/></Relationships>');
+    zip.file(relsPath, relsXml);
+
+    // 3. Content_Types
+    var ctf = zip.file('[Content_Types].xml');
+    if (ctf) {
+      var ct = await ctf.async('string');
+      if (ct.indexOf('Extension="' + ext + '"') === -1) {
+        ct = ct.replace('</Types>', '<Default Extension="' + ext + '" ContentType="' + mime + '"/></Types>');
+        zip.file('[Content_Types].xml', ct);
+      }
     }
-  }
 
-  // Insert <p:pic> into slide2.xml
-  var picXml =
-    '<p:pic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
-    '<p:nvPicPr><p:cNvPr id="9999" name="Property Photo"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>' +
-    '<p:blipFill><a:blip r:embed="' + rid + '"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>' +
-    '<p:spPr><a:xfrm><a:off x="381000" y="404812"/><a:ext cx="5114925" cy="3415158"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>' +
-    '</p:pic>';
+    // 4. Insert <p:pic> into slide XML
+    var picXml =
+      '<p:pic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      '<p:nvPicPr><p:cNvPr id="' + (9900 + si) + '" name="Photo ' + slotId + '"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>' +
+      '<p:blipFill><a:blip r:embed="' + rid + '"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>' +
+      '<p:spPr><a:xfrm><a:off x="' + cfg.x + '" y="' + cfg.y + '"/><a:ext cx="' + cfg.cx + '" cy="' + cfg.cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>' +
+      '</p:pic>';
 
-  var sf = zip.file('ppt/slides/slide2.xml');
-  if (sf) {
-    var sx = await sf.async('string');
-    sx = sx.replace('</p:spTree>', picXml + '</p:spTree>');
-    zip.file('ppt/slides/slide2.xml', sx);
-    console.log('[PPTX Photo] Done — ' + rid);
+    var sf = zip.file(cfg.path);
+    if (sf) {
+      var sx = await sf.async('string');
+      sx = sx.replace('</p:spTree>', picXml + '</p:spTree>');
+      zip.file(cfg.path, sx);
+      console.log('[PPTX Photos] ' + slotId + ' -> slide' + cfg.slide + ' (' + rid + ')');
+    }
   }
 }
 </script>
