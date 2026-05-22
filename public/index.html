@@ -1166,6 +1166,58 @@ function escapeXmlText(value) {
     .replace(/>/g, '&gt;');
 }
 
+var BUILDING_TABLE_ROW_HEIGHT = '338400'; // 0,94 cm in PowerPoint EMU units
+
+function setTableRowHeight(rowXml, height) {
+  if (/<a:tr[^>]*h="[^"]*"/.test(rowXml)) {
+    return rowXml.replace(/<a:tr([^>]*)h="[^"]*"([^>]*)>/, '<a:tr$1h="' + height + '"$2>');
+  }
+  return rowXml.replace(/<a:tr([^>]*)>/, '<a:tr$1 h="' + height + '">');
+}
+
+function setTableRowHeights(tableXml, height) {
+  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+    return setTableRowHeight(rowXml, height);
+  });
+}
+
+function setCellBorder(rowXml, borderTag, visible) {
+  var re = new RegExp('<a:' + borderTag + '([^>]*)>[\s\S]*?<\/a:' + borderTag + '>', 'g');
+  return rowXml.replace(re, function(match, attrs) {
+    if (visible) {
+      return '<a:' + borderTag + attrs + '><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:prstDash val="solid"/><a:round/><a:headEnd type="none" w="med" len="med"/><a:tailEnd type="none" w="med" len="med"/></a:' + borderTag + '>';
+    }
+    return '<a:' + borderTag + attrs + '><a:noFill/></a:' + borderTag + '>';
+  });
+}
+
+function setBuildingMasterRowBorders(rowXml, rowIndex, activeCount) {
+  // Requirement: no top or bottom border for the whole dynamic block.
+  // Show horizontal lines only BETWEEN active text rows.
+  var hasNextActiveRow = rowIndex < activeCount - 1;
+  rowXml = setCellBorder(rowXml, 'lnT', false);
+  rowXml = setCellBorder(rowXml, 'lnB', hasNextActiveRow);
+  return rowXml;
+}
+
+function replaceBuildingMasterRows(tableXml, rowsValues, activeCount) {
+  var rowIndex = 0;
+  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+    var values = rowsValues[rowIndex] || [];
+    rowXml = setTableRowHeight(rowXml, BUILDING_TABLE_ROW_HEIGHT);
+    rowXml = setBuildingMasterRowBorders(rowXml, rowIndex, activeCount);
+
+    var textIndex = 0;
+    rowXml = rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(textXml) {
+      var replacement = textIndex < values.length ? values[textIndex] : '';
+      textIndex++;
+      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
+    });
+    rowIndex++;
+    return rowXml;
+  });
+}
+
 function replaceTableByIndex(xml, targetIndex, callback) {
   var tableIndex = -1;
   return xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(tableXml) {
@@ -1205,7 +1257,7 @@ function processBuildingMasterLabels(xml) {
   }
 
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceTableRowsText(tableXml, rows);
+    return replaceBuildingMasterRows(tableXml, rows, active.length);
   });
 
   if (!isBuildingFieldEnabled(BUILDING_PRICE_FIELD)) {
@@ -1773,7 +1825,8 @@ function processSlide3(xml) {
     for (var i = 0; i < 6; i++) {
       rows.push([activeFields[i] ? activeFields[i].value : '']);
     }
-    return replaceTableRowsText(tableXml, rows);
+    tableXml = replaceTableRowsText(tableXml, rows);
+    return setTableRowHeights(tableXml, BUILDING_TABLE_ROW_HEIGHT);
   });
 
   xml = replaceTableByIndex(xml, 1, function(tableXml) {
