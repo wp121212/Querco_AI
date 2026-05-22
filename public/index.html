@@ -454,28 +454,43 @@ select:focus {
 
 
 /* === BROKER PROFILE SELECTOR === */
-.broker-profile-row { background: linear-gradient(90deg, rgba(16,42,61,0.035), rgba(242,242,242,0.45)); }
+.card-header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 340px;
+}
 .broker-profile-select {
   width: 100%;
-  max-width: 360px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--navy);
+  max-width: 430px;
+  height: 46px;
+  padding: 0 46px 0 18px;
   background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  font-family: inherit;
+  border: 1px solid #cfd6dd;
+  border-radius: 2px;
+  color: var(--q-navy);
+  font-family: 'Lato', 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
   cursor: pointer;
   appearance: auto;
   -webkit-appearance: auto;
+  box-shadow: 0 1px 2px rgba(16,42,61,0.05);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
 }
-.broker-profile-note {
-  font-size: 10px;
-  color: var(--text-tertiary);
-  margin-left: 8px;
-  white-space: nowrap;
+.broker-profile-select:hover {
+  border-color: var(--q-navy);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(16,42,61,0.07);
 }
+.broker-profile-select:focus {
+  border-color: var(--q-navy);
+  box-shadow: 0 0 0 3px rgba(16,42,61,0.08);
+}
+.broker-profile-note { display: none; }
 
 /* === TEMPLATE SELECTOR === */
 .tmpl-label {
@@ -886,9 +901,16 @@ select:focus {
       <span class="card-num">01</span>
       <div class="card-title-block"><div class="card-title">Okładka</div><div class="card-title-en">Cover Page</div></div>
     </div>
+    <div class="card-header-right">
+      <select id="broker_profile" class="broker-profile-select" onchange="selectBrokerProfile(this.value)">
+        <option value="">WYBIERZ BROKERA Z LISTY</option>
+        <option value="piotr_wrobel">PIOTR WRÓBEL</option>
+        <option value="karolina_bomba">KAROLINA BOMBA</option>
+        <option value="lidia_szczepanska">LIDIA SZCZEPAŃSKA</option>
+      </select>
+    </div>
   </div>
   <div class="card-body">
-    <div class="field-row no-label-edit broker-profile-row"><div class="field-label"><div class="field-label-pl">Wybierz brokera</div><div class="field-label-en">Broker Profile</div></div><div class="field-value"><select id="broker_profile" class="broker-profile-select" onchange="selectBrokerProfile(this.value)"><option value="">— wpisz ręcznie albo wybierz z listy —</option><option value="piotr_wrobel">Piotr Wróbel</option><option value="karolina_bomba">Karolina Bomba</option><option value="lidia_szczepanska">Lidia Szczepańska</option></select><span class="broker-profile-note">opcjonalne</span></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Imię i nazwisko brokera</div><div class="field-label-en">Broker Name</div></div><div class="field-value"><input id="broker_name" placeholder="Jan Kowalski"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Email</div><div class="field-label-en">Email Address</div></div><div class="field-value"><input id="broker_email" placeholder="jan@querco.pl"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Telefon</div><div class="field-label-en">Phone Number</div></div><div class="field-value"><input id="broker_phone" placeholder="+48 500 123 456"></div></div>
