@@ -58,11 +58,12 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .field-label { flex: 0 0 38%; min-width: 0; padding-right: 16px; }
 .field-label-pl { font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.2px; line-height: 1.3; }
 .field-label-en { font-size: 10px; font-weight: 400; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.3; margin-top: 1px; }
-.field-label-pl[contenteditable], .field-label-en[contenteditable] { cursor: text; border-radius: 2px; padding: 1px 3px; margin: -1px -3px; transition: background var(--transition), outline-color var(--transition); outline: 1.5px solid transparent; }
-.field-label-pl[contenteditable]:hover, .field-label-en[contenteditable]:hover { background: var(--navy-pale); }
-.field-label-pl[contenteditable]:focus, .field-label-en[contenteditable]:focus { background: #fff; outline-color: var(--navy); }
-.field-label .edit-hint { display: none; font-size: 9px; color: var(--text-tertiary); margin-left: 4px; opacity: 0; transition: opacity var(--transition); vertical-align: middle; }
-.field-label:hover .edit-hint { opacity: 1; display: inline; }
+.field-label-pl.editing, .field-label-en.editing { cursor: text; border-radius: 2px; padding: 1px 3px; margin: -1px -3px; background: #fff; outline: 1.5px solid var(--navy); }
+.field-label .edit-btn { display: none; background: none; border: none; font-size: 11px; color: var(--text-tertiary); cursor: pointer; padding: 2px 4px; border-radius: 3px; transition: all var(--transition); flex-shrink: 0; position: absolute; right: 0; top: 2px; font-family: inherit; }
+.field-label { position: relative; }
+.field-label:hover .edit-btn { display: inline-flex; }
+.field-label .edit-btn:hover { color: var(--navy); background: var(--navy-pale); }
+.field-label .edit-btn.active { display: inline-flex; color: var(--green); }
 .reset-labels-btn { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 10px; font-size: 10px; color: var(--text-tertiary); cursor: pointer; font-family: inherit; letter-spacing: 0.3px; transition: all var(--transition); }
 .reset-labels-btn:hover { border-color: var(--navy); color: var(--navy); }
 .field-value { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
@@ -374,67 +375,106 @@ var PPTX_LABEL_MAP = {
 };
 
 function initEditableLabels() {
-  // Find all field-label containers and make their pl/en children editable
   document.querySelectorAll('.field-label').forEach(function(container) {
     var plEl = container.querySelector('.field-label-pl');
     var enEl = container.querySelector('.field-label-en');
     if (!plEl || !enEl) return;
 
-    // Find associated input to determine field key
     var row = container.closest('.field-row, .dist-cell');
     if (!row) return;
     var input = row.querySelector('input, select, textarea');
     if (!input || !input.id) return;
     var fieldKey = input.id;
 
-    // Skip currency label IDs (they have dynamic labels managed by updateCurrencyLabel)
-    // But still make them editable — user edits the base name
-    var isCurrencyField = !!plEl.id && plEl.id.startsWith('label-');
+    // Store defaults (uppercase)
+    defaultLabels[fieldKey] = { pl: plEl.textContent.trim().toUpperCase(), en: enEl.textContent.trim().toUpperCase() };
 
-    // Store defaults
-    defaultLabels[fieldKey] = { pl: plEl.textContent.trim(), en: enEl.textContent.trim() };
-
-    // Make editable
-    plEl.setAttribute('contenteditable', 'true');
-    plEl.setAttribute('spellcheck', 'false');
+    // Set data attributes (but NOT contenteditable yet)
     plEl.setAttribute('data-field', fieldKey);
     plEl.setAttribute('data-lang', 'pl');
-
-    enEl.setAttribute('contenteditable', 'true');
-    enEl.setAttribute('spellcheck', 'false');
+    plEl.setAttribute('spellcheck', 'false');
     enEl.setAttribute('data-field', fieldKey);
     enEl.setAttribute('data-lang', 'en');
+    enEl.setAttribute('spellcheck', 'false');
 
-    // Add edit hint
-    var hint = document.createElement('span');
-    hint.className = 'edit-hint';
-    hint.textContent = '✎';
-    container.appendChild(hint);
+    // Add edit button
+    var editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn';
+    editBtn.innerHTML = '✎';
+    editBtn.title = 'Edytuj nazwę pola';
+    editBtn.setAttribute('data-field', fieldKey);
+    editBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var isActive = this.classList.contains('active');
+      if (isActive) {
+        // Save and lock
+        finishEditing(fieldKey, plEl, enEl, this);
+      } else {
+        // Enable editing
+        startEditing(fieldKey, plEl, enEl, this);
+      }
+    });
+    container.appendChild(editBtn);
 
-    // Blur handlers — uppercase + prevent newlines
-    function onBlur(el) {
-      var text = el.textContent.replace(/\n/g, ' ').trim();
-      // Auto-uppercase (except description field)
-      if (fieldKey !== 'description') text = text.toUpperCase();
-      el.textContent = text;
+    // Blur handlers — when user clicks away, finish editing
+    function onBlurCheck() {
+      setTimeout(function() {
+        var btn = container.querySelector('.edit-btn');
+        if (!btn || !btn.classList.contains('active')) return;
+        // Check if focus is still inside this label container
+        var active = document.activeElement;
+        if (active !== plEl && active !== enEl) {
+          finishEditing(fieldKey, plEl, enEl, btn);
+        }
+      }, 150);
     }
-    plEl.addEventListener('blur', function() { onBlur(this); });
-    enEl.addEventListener('blur', function() { onBlur(this); });
+    plEl.addEventListener('blur', onBlurCheck);
+    enEl.addEventListener('blur', onBlurCheck);
 
-    // Prevent Enter key (no newlines in labels)
+    // Prevent Enter key
     function onKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } }
     plEl.addEventListener('keydown', onKeydown);
     enEl.addEventListener('keydown', onKeydown);
   });
 }
 
+function startEditing(fieldKey, plEl, enEl, btn) {
+  plEl.setAttribute('contenteditable', 'true');
+  enEl.setAttribute('contenteditable', 'true');
+  plEl.classList.add('editing');
+  enEl.classList.add('editing');
+  btn.classList.add('active');
+  btn.innerHTML = '✓';
+  btn.title = 'Zapisz';
+  plEl.focus();
+}
+
+function finishEditing(fieldKey, plEl, enEl, btn) {
+  // Uppercase (except description)
+  if (fieldKey !== 'description') {
+    plEl.textContent = plEl.textContent.replace(/\n/g, ' ').trim().toUpperCase();
+    enEl.textContent = enEl.textContent.replace(/\n/g, ' ').trim().toUpperCase();
+  }
+  plEl.setAttribute('contenteditable', 'false');
+  enEl.setAttribute('contenteditable', 'false');
+  plEl.classList.remove('editing');
+  enEl.classList.remove('editing');
+  btn.classList.remove('active');
+  btn.innerHTML = '✎';
+  btn.title = 'Edytuj nazwę pola';
+}
+
 function getLabel(fieldKey, lang) {
   var selector = '.field-label-' + lang + '[data-field="' + fieldKey + '"]';
   var el = document.querySelector(selector);
-  if (el) return el.textContent.trim();
-  // Fallback to defaults
-  if (defaultLabels[fieldKey]) return defaultLabels[fieldKey][lang];
-  return '';
+  var text = '';
+  if (el) {
+    text = el.textContent.trim();
+  } else if (defaultLabels[fieldKey]) {
+    text = defaultLabels[fieldKey][lang];
+  }
+  // Always return uppercase for PPTX
+  return text.toUpperCase();
 }
 
 function resetAllLabels() {
@@ -443,18 +483,22 @@ function resetAllLabels() {
     var enEl = document.querySelector('.field-label-en[data-field="' + fieldKey + '"]');
     if (plEl) plEl.textContent = defaultLabels[fieldKey].pl;
     if (enEl) enEl.textContent = defaultLabels[fieldKey].en;
+    // Make sure editing is off
+    if (plEl) { plEl.setAttribute('contenteditable', 'false'); plEl.classList.remove('editing'); }
+    if (enEl) { enEl.setAttribute('contenteditable', 'false'); enEl.classList.remove('editing'); }
+    var btn = plEl ? plEl.closest('.field-label').querySelector('.edit-btn') : null;
+    if (btn) { btn.classList.remove('active'); btn.innerHTML = '✎'; }
   });
   setStatus('Przywrócono domyślne nazwy pól.');
   setTimeout(function() { setStatus(''); }, 3000);
 }
 
-// Replace labels in PPTX slideMaster XML
+// Replace labels in PPTX slideMaster XML — always uppercase
 function replacePptxLabels(xml) {
   Object.keys(PPTX_LABEL_MAP).forEach(function(originalLabel) {
     var mapping = PPTX_LABEL_MAP[originalLabel];
-    var newLabel = getLabel(mapping.field, mapping.lang);
+    var newLabel = getLabel(mapping.field, mapping.lang); // getLabel returns uppercase
     if (newLabel && newLabel !== originalLabel) {
-      // Only replace if actually changed
       xml = xml.split(originalLabel).join(newLabel);
       console.log('[PPTX Labels] ' + originalLabel + ' → ' + newLabel);
     }
@@ -725,6 +769,7 @@ async function loadSelectedTemplate() {
 }
 
 function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function valUpper(id) { var v = val(id); return v ? v.toUpperCase() : ''; }
 function cur(id) { return val(id + '_currency'); }
 
 function replaceAll(str, find, rep) {
@@ -748,13 +793,13 @@ function processSlide1(xml) {
 }
 
 function processSlide2(xml) {
-  var city = val('city');
-  var street = val('street');
+  var city = valUpper('city');
+  var street = valUpper('street');
   xml = xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g, city);
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
 
-  var tbl1 = [val('land_area'), val('plot_number'), val('precinct'), val('commune'), val('county'), val('ownership')];
+  var tbl1 = [valUpper('land_area'), valUpper('plot_number'), valUpper('precinct'), valUpper('commune'), valUpper('county'), valUpper('ownership')];
   var tblIdx = 0;
   var priceCur = cur('asking_price');
   xml = xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(m) {
@@ -793,8 +838,8 @@ function processSlide2(xml) {
 }
 
 function processSlide3(xml) {
-  var city = val('city');
-  var street = val('street');
+  var city = valUpper('city');
+  var street = valUpper('street');
   xml = xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g, city);
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
@@ -823,8 +868,8 @@ function processSlide3(xml) {
 }
 
 function processSlide4(xml) {
-  var city = val('city');
-  var street = val('street');
+  var city = valUpper('city');
+  var street = valUpper('street');
   xml = xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g, city);
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
@@ -885,8 +930,8 @@ function processSlide4(xml) {
 }
 
 function processSlide5(xml) {
-  var res = val('mpzp_resolution');
-  var card = val('terrain_card');
+  var res = valUpper('mpzp_resolution');
+  var card = valUpper('terrain_card');
   if (res) {
     xml = xml.replace(/UCHWAŁA NR y z dnia xx[^<]*/, res);
     xml = xml.replace(/>UCHWAŁA NR y[^<]*/, '>' + res);
@@ -899,8 +944,8 @@ function processSlide5(xml) {
   var fnCount = 0;
   xml = xml.replace(/>tekst</g, function() {
     fnCount++;
-    if (fnCount === 1) return '>' + (val('terrain_function') || '') + '<';
-    if (fnCount === 2) return '>' + (val('excluded_functions') || '') + '<';
+    if (fnCount === 1) return '>' + (valUpper('terrain_function') || '') + '<';
+    if (fnCount === 2) return '>' + (valUpper('excluded_functions') || '') + '<';
     return '><';
   });
   var tblIdx = 0;
