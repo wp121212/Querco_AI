@@ -956,13 +956,13 @@ select:focus {
     </div>
   </div>
   <div class="card-body">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia zabudowy [m²]</div><div class="field-label-en">Building Footprint</div></div><div class="field-value"><input id="building_footprint" placeholder="12 000"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia użytkowa [m²]</div><div class="field-label-en">Total Area</div></div><div class="field-value"><input id="total_area" placeholder="15 000"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba miejsc parkingowych</div><div class="field-label-en">Parking Spots</div></div><div class="field-value"><input id="parking_spots" placeholder="50"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia magazynowa [m²]</div><div class="field-label-en">Warehouse Area</div></div><div class="field-value"><input id="warehouse_area" placeholder="13 500"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia biurowa [m²]</div><div class="field-label-en">Office Area</div></div><div class="field-value"><input id="office_area" placeholder="1 500"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Rok modernizacji</div><div class="field-label-en">Year of Modernization</div></div><div class="field-value"><input id="year_modernization" placeholder="2020"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price-building">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price (Slide 3)</div></div><div class="field-value"><input id="asking_price_building" placeholder="32 000 000"><select id="asking_price_building_currency" onchange="updateCurrencyLabel('asking_price_building','Cena ofertowa','(slajd 3)')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+    <div class="field-row field-row-optional" data-ppt-field="building_footprint"><div class="field-label"><div class="field-label-pl">Powierzchnia zabudowy [m²]</div><div class="field-label-en">Building Footprint</div></div><div class="field-value"><input id="building_footprint" placeholder="12 000"></div><button type="button" class="field-visibility-toggle" onclick="togglePptField('building_footprint')" title="Pokaż/ukryj pole w prezentacji"><span class="field-visibility-toggle-label">ON</span></button></div>
+    <div class="field-row field-row-optional" data-ppt-field="total_area"><div class="field-label"><div class="field-label-pl">Powierzchnia użytkowa [m²]</div><div class="field-label-en">Total Area</div></div><div class="field-value"><input id="total_area" placeholder="15 000"></div><button type="button" class="field-visibility-toggle" onclick="togglePptField('total_area')" title="Pokaż/ukryj pole w prezentacji"><span class="field-visibility-toggle-label">ON</span></button></div>
+    <div class="field-row field-row-optional" data-ppt-field="parking_spots"><div class="field-label"><div class="field-label-pl">Liczba miejsc parkingowych</div><div class="field-label-en">Parking Spots</div></div><div class="field-value"><input id="parking_spots" placeholder="50"></div><button type="button" class="field-visibility-toggle" onclick="togglePptField('parking_spots')" title="Pokaż/ukryj pole w prezentacji"><span class="field-visibility-toggle-label">ON</span></button></div>
+    <div class="field-row field-row-optional" data-ppt-field="warehouse_area"><div class="field-label"><div class="field-label-pl">Powierzchnia magazynowa [m²]</div><div class="field-label-en">Warehouse Area</div></div><div class="field-value"><input id="warehouse_area" placeholder="13 500"></div><button type="button" class="field-visibility-toggle" onclick="togglePptField('warehouse_area')" title="Pokaż/ukryj pole w prezentacji"><span class="field-visibility-toggle-label">ON</span></button></div>
+    <div class="field-row field-row-optional" data-ppt-field="office_area"><div class="field-label"><div class="field-label-pl">Powierzchnia biurowa [m²]</div><div class="field-label-en">Office Area</div></div><div class="field-value"><input id="office_area" placeholder="1 500"></div><button type="button" class="field-visibility-toggle" onclick="togglePptField('office_area')" title="Pokaż/ukryj pole w prezentacji"><span class="field-visibility-toggle-label">ON</span></button></div>
+    <div class="field-row field-row-optional" data-ppt-field="year_modernization"><div class="field-label"><div class="field-label-pl">Rok modernizacji</div><div class="field-label-en">Year of Modernization</div></div><div class="field-value"><input id="year_modernization" placeholder="2020"></div><button type="button" class="field-visibility-toggle" onclick="togglePptField('year_modernization')" title="Pokaż/ukryj pole w prezentacji"><span class="field-visibility-toggle-label">ON</span></button></div>
+    <div class="field-row field-row-optional" data-ppt-field="asking_price_building"><div class="field-label"><div class="field-label-pl" id="label-asking-price-building">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price (Slide 3)</div></div><div class="field-value"><input id="asking_price_building" placeholder="32 000 000"><select id="asking_price_building_currency" onchange="updateCurrencyLabel('asking_price_building','Cena ofertowa','(slajd 3)')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div><button type="button" class="field-visibility-toggle" onclick="togglePptField('asking_price_building')" title="Pokaż/ukryj pole w prezentacji"><span class="field-visibility-toggle-label">ON</span></button></div>
   </div>
 </div>
 
@@ -1030,6 +1030,55 @@ select:focus {
 var templateBuffer = null;
 var slide4Active = true;
 var slide5Active = false;
+
+var disabledPptFields = {};
+
+var BUILDING_SLIDE_FIELDS = [
+  { field: 'building_footprint', originalsPl: ['POWIERZCHNIA ZABUDOWY [m²]', 'POWIERZCHNIA ZABUDOWY [M²]'], originalsEn: ['BUILDING FOOTPRINT'] },
+  { field: 'total_area', originalsPl: ['POWIERZCHNIA UŻYTKOWA [m²]', 'POWIERZCHNIA UŻYTKOWA [M²]'], originalsEn: ['TOTAL AREA'] },
+  { field: 'parking_spots', originalsPl: ['LICZBA MIEJSC PARKINGOWY', 'LICZBA MIEJSC PARKINGOWYCH'], originalsEn: ['NUMBER OF PARKING SPOTS', 'PARKING SPOTS'] },
+  { field: 'warehouse_area', originalsPl: ['POWIERZCHNIA MAGAZYNOWA [m²]', 'POWIERZCHNIA MAGAZYNOWA [M²]'], originalsEn: ['WAREHOUSE AREA'] },
+  { field: 'office_area', originalsPl: ['POWIERZCHNIA BIUROWA [m²]', 'POWIERZCHNIA BIUROWA [M²]'], originalsEn: ['OFFICE AREA'] },
+  { field: 'year_modernization', originalsPl: ['ROK MODERNIZACJI'], originalsEn: ['YEAR OF MODERNIZATION'] }
+];
+
+function isPptFieldEnabled(fieldId) {
+  return disabledPptFields[fieldId] !== true;
+}
+
+function togglePptField(fieldId) {
+  disabledPptFields[fieldId] = isPptFieldEnabled(fieldId);
+  updatePptFieldToggle(fieldId);
+}
+
+function updatePptFieldToggle(fieldId) {
+  var row = document.querySelector('[data-ppt-field="' + fieldId + '"]');
+  if (!row) return;
+  var btn = row.querySelector('.field-visibility-toggle');
+  var label = row.querySelector('.field-visibility-toggle-label');
+  var enabled = isPptFieldEnabled(fieldId);
+  row.classList.toggle('field-disabled', !enabled);
+  if (btn) btn.classList.toggle('off', !enabled);
+  if (label) label.textContent = enabled ? 'ON' : 'OFF';
+}
+
+function getActiveBuildingSlideFields() {
+  return BUILDING_SLIDE_FIELDS.filter(function(cfg) { return isPptFieldEnabled(cfg.field); });
+}
+
+function replaceKnownBuildingLabels(row, targetField) {
+  var targetPl = getLabel(targetField.field, 'pl');
+  var targetEn = getLabel(targetField.field, 'en');
+  BUILDING_SLIDE_FIELDS.forEach(function(cfg) {
+    (cfg.originalsPl || []).forEach(function(label) {
+      row = replaceAll(row, label, targetPl);
+    });
+    (cfg.originalsEn || []).forEach(function(label) {
+      row = replaceAll(row, label, targetEn);
+    });
+  });
+  return row;
+}
 
 /* ===== BROKER PROFILE SELECTOR ===== */
 var BROKER_PROFILES = {
@@ -1579,7 +1628,7 @@ function processSlide3(xml) {
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
 
-  var tbl1 = [val('building_footprint'), val('total_area'), val('parking_spots'), val('warehouse_area'), val('office_area'), val('year_modernization')];
+  var activeFields = getActiveBuildingSlideFields();
   var tblIdx = 0;
   var priceCur = cur('asking_price_building') || cur('asking_price');
   xml = xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(m) {
@@ -1587,15 +1636,22 @@ function processSlide3(xml) {
     if (tblIdx === 1) {
       var ri = 0;
       return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = tbl1[ri++];
-        if (v) return row.replace(/>TEKST</, '>' + v + '<');
-        return row;
+        var cfg = activeFields[ri++];
+        if (!cfg) {
+          return '';
+        }
+        row = replaceKnownBuildingLabels(row, cfg);
+        var v = val(cfg.field);
+        return row.replace(/>TEKST</, '>' + (v || '') + '<');
       });
     }
     if (tblIdx === 2) {
+      if (!isPptFieldEnabled('asking_price_building')) {
+        return '';
+      }
       var priceVal = val('asking_price_building') || val('asking_price');
       m = replaceAll(m, '[CUR]', '[' + priceCur + ']');
-      return m.replace(/>TEKST</, '>' + priceVal + '<');
+      return m.replace(/>TEKST</, '>' + (priceVal || '') + '<');
     }
     return m;
   });
