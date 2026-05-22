@@ -52,19 +52,18 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .toggle-dot { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left var(--transition); box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
 
 /* === FIELD ROWS === */
-.field-row { display: flex; align-items: center; padding: 10px 24px; border-bottom: 1px solid var(--border-light); transition: background var(--transition); min-height: 48px; }
+.field-row { display: flex; align-items: center; padding: 10px 24px; border-bottom: 1px solid var(--border-light); transition: background var(--transition); min-height: 48px; gap: 0; }
 .field-row:last-child { border-bottom: none; }
 .field-row:hover { background: #fafbfc; }
-.field-label { flex: 0 0 38%; min-width: 0; padding-right: 16px; }
+.field-label { flex: 0 0 36%; min-width: 0; padding-right: 8px; }
 .field-label-pl { font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.2px; line-height: 1.3; }
 .field-label-en { font-size: 10px; font-weight: 400; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.3; margin-top: 1px; }
 .field-label-pl.editing, .field-label-en.editing { cursor: text; border-radius: 2px; padding: 1px 3px; margin: -1px -3px; background: #fff; outline: 1.5px solid var(--navy); }
-.field-label .edit-btn { display: none; background: none; border: none; font-size: 11px; color: var(--text-tertiary); cursor: pointer; padding: 2px 4px; border-radius: 3px; transition: all var(--transition); flex-shrink: 0; position: absolute; right: 0; top: 2px; font-family: inherit; }
-.field-label { position: relative; }
-.field-label:hover .edit-btn { display: inline-flex; }
-.field-label .edit-btn:hover { color: var(--navy); background: var(--navy-pale); }
-.field-label .edit-btn.active { display: inline-flex; color: var(--green); }
-.reset-labels-btn { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 10px; font-size: 10px; color: var(--text-tertiary); cursor: pointer; font-family: inherit; letter-spacing: 0.3px; transition: all var(--transition); }
+.edit-btn { flex: 0 0 28px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: none; border: 1px solid transparent; border-radius: 4px; font-size: 13px; color: var(--text-tertiary); cursor: pointer; transition: all var(--transition); opacity: 0; margin: 0 4px; }
+.field-row:hover .edit-btn, .dist-cell:hover .edit-btn { opacity: 0.5; }
+.field-row:hover .edit-btn:hover, .dist-cell:hover .edit-btn:hover { opacity: 1; color: var(--navy); border-color: var(--border); background: var(--navy-pale); }
+.edit-btn.active { opacity: 1 !important; color: #fff; background: var(--navy); border-color: var(--navy); }
+.reset-labels-btn { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; font-size: 10px; color: var(--text-tertiary); cursor: pointer; font-family: inherit; letter-spacing: 0.3px; transition: all var(--transition); }
 .reset-labels-btn:hover { border-color: var(--navy); color: var(--navy); }
 .field-value { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
 .field-row-wide .field-label { flex: 0 0 100%; padding-right: 0; margin-bottom: 8px; }
@@ -203,6 +202,8 @@ select:focus { box-shadow: 0 0 0 1.5px var(--focus); }
   <div class="ai-hint">AI przeanalizuje tekst i załączone pliki, następnie wypełni formularz.</div>
 </div>
 
+<div style="margin-bottom:12px"><button class="reset-labels-btn" onclick="resetAllLabels()">↺ Przywróć domyślne nazwy pól</button></div>
+
 <!-- SECTION 1: OKŁADKA -->
 <div class="card">
   <div class="card-header">
@@ -320,7 +321,6 @@ select:focus { box-shadow: 0 0 0 1.5px var(--focus); }
   </div>
 </div>
 
-<div style="display:flex;justify-content:flex-end;margin-bottom:4px"><button class="reset-labels-btn" onclick="resetAllLabels()">↺ Przywróć domyślne nazwy pól</button></div>
 <button class="gen-btn" id="gen-btn" onclick="generatePptx()">⬇ GENERUJ PPTX</button>
 <div class="status" id="status"></div>
 
@@ -397,7 +397,7 @@ function initEditableLabels() {
     enEl.setAttribute('data-lang', 'en');
     enEl.setAttribute('spellcheck', 'false');
 
-    // Add edit button
+    // Add edit button — inserted into the ROW between label and value
     var editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
     editBtn.innerHTML = '✎';
@@ -407,21 +407,24 @@ function initEditableLabels() {
       e.stopPropagation();
       var isActive = this.classList.contains('active');
       if (isActive) {
-        // Save and lock
         finishEditing(fieldKey, plEl, enEl, this);
       } else {
-        // Enable editing
         startEditing(fieldKey, plEl, enEl, this);
       }
     });
-    container.appendChild(editBtn);
+    // Insert button AFTER field-label, BEFORE field-value
+    var valueEl = row.querySelector('.field-value');
+    if (valueEl) {
+      row.insertBefore(editBtn, valueEl);
+    } else {
+      container.after(editBtn);
+    }
 
     // Blur handlers — when user clicks away, finish editing
     function onBlurCheck() {
       setTimeout(function() {
-        var btn = container.querySelector('.edit-btn');
+        var btn = row.querySelector('.edit-btn');
         if (!btn || !btn.classList.contains('active')) return;
-        // Check if focus is still inside this label container
         var active = document.activeElement;
         if (active !== plEl && active !== enEl) {
           finishEditing(fieldKey, plEl, enEl, btn);
@@ -486,7 +489,8 @@ function resetAllLabels() {
     // Make sure editing is off
     if (plEl) { plEl.setAttribute('contenteditable', 'false'); plEl.classList.remove('editing'); }
     if (enEl) { enEl.setAttribute('contenteditable', 'false'); enEl.classList.remove('editing'); }
-    var btn = plEl ? plEl.closest('.field-label').querySelector('.edit-btn') : null;
+    var row = plEl ? plEl.closest('.field-row, .dist-cell') : null;
+    var btn = row ? row.querySelector('.edit-btn') : null;
     if (btn) { btn.classList.remove('active'); btn.innerHTML = '✎'; }
   });
   setStatus('Przywrócono domyślne nazwy pól.');
