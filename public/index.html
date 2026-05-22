@@ -770,7 +770,7 @@ select:focus {
 }
 
 
-/* === FIELD VISIBILITY TOGGLES (SECTION 03) === */
+/* === FIELD VISIBILITY TOGGLES === */
 .field-visible-switch {
   flex: 0 0 44px;
   width: 44px;
@@ -1305,6 +1305,199 @@ function processBuildingMasterLabels(xml) {
 }
 
 
+/* ===== SECTION 02 FIELD VISIBILITY ===== */
+var LAND_FIELD_CONFIG = [
+  { key: 'land_area', plFallback: 'POWIERZCHNIA GRUNTU [m²]', enFallback: 'LAND AREA [m²]' },
+  { key: 'plot_number', plFallback: 'NUMER DZIAŁKI', enFallback: 'PLOT NUMBER' },
+  { key: 'precinct', plFallback: 'OBRĘB', enFallback: 'PRECINCT' },
+  { key: 'commune', plFallback: 'GMINA | MIASTO', enFallback: 'COMMUNE | CITY' },
+  { key: 'county', plFallback: 'POWIAT', enFallback: 'COUNTY' },
+  { key: 'ownership', plFallback: 'RODZAJ WŁASNOŚCI', enFallback: 'TYPE OF OWNERSHIP' }
+];
+var LAND_PRICE_FIELD = 'asking_price';
+var landFieldState = {};
+
+function initLandFieldToggles() {
+  LAND_FIELD_CONFIG.concat([{ key: LAND_PRICE_FIELD }]).forEach(function(cfg) {
+    var input = document.getElementById(cfg.key);
+    if (!input) return;
+    var row = input.closest('.field-row');
+    if (!row || row.getAttribute('data-land-visibility-toggle-ready') === '1') return;
+
+    row.setAttribute('data-land-visibility-toggle-ready', '1');
+    row.setAttribute('data-land-field', cfg.key);
+    landFieldState[cfg.key] = true;
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'field-visible-switch';
+    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
+    toggle.title = 'Pokaż / ukryj pole w prezentacji';
+    toggle.setAttribute('data-land-toggle', cfg.key);
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleLandField(cfg.key);
+    });
+    row.appendChild(toggle);
+  });
+}
+
+function toggleLandField(key) {
+  landFieldState[key] = !landFieldState[key];
+  var row = document.querySelector('[data-land-field="' + key + '"]');
+  var toggle = document.querySelector('[data-land-toggle="' + key + '"]');
+  if (row) row.classList.toggle('field-disabled', !landFieldState[key]);
+  if (toggle) toggle.classList.toggle('off', !landFieldState[key]);
+}
+
+function isLandFieldEnabled(key) {
+  return landFieldState[key] !== false;
+}
+
+function getLandFieldLabel(key, lang, fallback) {
+  var custom = getLabel(key, lang);
+  return (custom || fallback || '').toUpperCase();
+}
+
+function getActiveLandFields() {
+  var active = [];
+  LAND_FIELD_CONFIG.forEach(function(cfg) {
+    if (!isLandFieldEnabled(cfg.key)) return;
+    active.push({
+      key: cfg.key,
+      label_pl: getLandFieldLabel(cfg.key, 'pl', cfg.plFallback),
+      label_en: getLandFieldLabel(cfg.key, 'en', cfg.enFallback),
+      value: valUpper(cfg.key)
+    });
+  });
+  return active;
+}
+
+function processLandMasterLabels(xml) {
+  var active = getActiveLandFields();
+  var rows = [];
+  active.forEach(function(field) {
+    rows.push([field.label_pl, field.label_en]);
+  });
+
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    return replaceBuildingMasterRows(tableXml, rows, active.length);
+  });
+
+  if (!isLandFieldEnabled(LAND_PRICE_FIELD)) {
+    xml = replaceTableByIndex(xml, 1, function(tableXml) {
+      return replaceTableRowsText(tableXml, [[''], ['']]);
+    });
+  }
+
+  return xml;
+}
+
+/* ===== SECTION 04 FIELD VISIBILITY ===== */
+var INCOME_TENANT_FIELD_CONFIG = [
+  { key: 'num_tenants', plFallback: 'LICZBA NAJEMCÓW', enFallback: 'NUMBER OF TENANTS' },
+  { key: 'occupancy', plFallback: 'POZIOM WYNAJĘCIA', enFallback: 'OCCUPANCY RATE' }
+];
+var INCOME_FINANCIAL_FIELD_CONFIG = [
+  { key: 'noi', plFallback: 'DOCHÓD OPERACYJNY NETTO [CUR]', enFallback: 'NOI [CUR]' },
+  { key: 'yield_pct', plFallback: 'STOPA KAPITALIZACJI [%]', enFallback: 'YIELD [%]' },
+  { key: 'price_sale', plFallback: 'CENA OFERTOWA [CUR]', enFallback: 'ASKING PRICE [CUR]' }
+];
+var incomeFieldState = {};
+
+function initIncomeFieldToggles() {
+  INCOME_TENANT_FIELD_CONFIG.concat(INCOME_FINANCIAL_FIELD_CONFIG).forEach(function(cfg) {
+    var input = document.getElementById(cfg.key);
+    if (!input) return;
+    var row = input.closest('.field-row');
+    if (!row || row.getAttribute('data-income-visibility-toggle-ready') === '1') return;
+
+    row.setAttribute('data-income-visibility-toggle-ready', '1');
+    row.setAttribute('data-income-field', cfg.key);
+    incomeFieldState[cfg.key] = true;
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'field-visible-switch';
+    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
+    toggle.title = 'Pokaż / ukryj pole w prezentacji';
+    toggle.setAttribute('data-income-toggle', cfg.key);
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleIncomeField(cfg.key);
+    });
+    row.appendChild(toggle);
+  });
+}
+
+function toggleIncomeField(key) {
+  incomeFieldState[key] = !incomeFieldState[key];
+  var row = document.querySelector('[data-income-field="' + key + '"]');
+  var toggle = document.querySelector('[data-income-toggle="' + key + '"]');
+  if (row) row.classList.toggle('field-disabled', !incomeFieldState[key]);
+  if (toggle) toggle.classList.toggle('off', !incomeFieldState[key]);
+}
+
+function isIncomeFieldEnabled(key) {
+  return incomeFieldState[key] !== false;
+}
+
+function getIncomeFieldLabel(key, lang, fallback) {
+  var custom = getLabel(key, lang);
+  return (custom || fallback || '').toUpperCase();
+}
+
+function getActiveIncomeTenantFields() {
+  var active = [];
+  INCOME_TENANT_FIELD_CONFIG.forEach(function(cfg) {
+    if (!isIncomeFieldEnabled(cfg.key)) return;
+    active.push({
+      key: cfg.key,
+      label_pl: getIncomeFieldLabel(cfg.key, 'pl', cfg.plFallback),
+      label_en: getIncomeFieldLabel(cfg.key, 'en', cfg.enFallback),
+      value: val(cfg.key)
+    });
+  });
+  return active;
+}
+
+function getActiveIncomeFinancialFields() {
+  var active = [];
+  INCOME_FINANCIAL_FIELD_CONFIG.forEach(function(cfg) {
+    if (!isIncomeFieldEnabled(cfg.key)) return;
+    active.push({
+      key: cfg.key,
+      label_pl: getIncomeFieldLabel(cfg.key, 'pl', cfg.plFallback),
+      label_en: getIncomeFieldLabel(cfg.key, 'en', cfg.enFallback),
+      value: val(cfg.key)
+    });
+  });
+  return active;
+}
+
+function processIncomeMasterLabels(xml) {
+  var tenantRows = [];
+  getActiveIncomeTenantFields().forEach(function(field) {
+    tenantRows.push([field.label_pl, field.label_en]);
+  });
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    return replaceBuildingMasterRows(tableXml, tenantRows, tenantRows.length);
+  });
+
+  var financialRows = [];
+  getActiveIncomeFinancialFields().forEach(function(field) {
+    financialRows.push([field.label_pl, field.label_en]);
+  });
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    return replaceBuildingMasterRows(tableXml, financialRows, financialRows.length);
+  });
+
+  return xml;
+}
+
+
 /* ===== BROKER PROFILE SELECTOR ===== */
 var BROKER_PROFILES = {
   piotr_wrobel: {
@@ -1516,7 +1709,7 @@ function replacePptxLabels(xml) {
 }
 
 // Init on DOM ready
-document.addEventListener('DOMContentLoaded', function() { initEditableLabels(); initBuildingFieldToggles(); });
+document.addEventListener('DOMContentLoaded', function() { initEditableLabels(); initLandFieldToggles(); initBuildingFieldToggles(); initIncomeFieldToggles(); });
 
 /* ===== CURRENCY LABEL UPDATER ===== */
 function updateCurrencyLabel(fieldId, baseName, suffix) {
@@ -1808,26 +2001,25 @@ function processSlide2(xml) {
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
 
-  var tbl1 = [valUpper('land_area'), valUpper('plot_number'), valUpper('precinct'), valUpper('commune'), valUpper('county'), valUpper('ownership')];
-  var tblIdx = 0;
-  var priceCur = cur('asking_price');
-  xml = xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(m) {
-    tblIdx++;
-    if (tblIdx === 1) {
-      var ri = 0;
-      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = tbl1[ri++];
-        if (v) return row.replace(/>TEKST</, '>' + v + '<');
-        return row;
-      });
+  var activeFields = getActiveLandFields();
+
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    var rows = [];
+    activeFields.forEach(function(field) {
+      rows.push([field.value || '']);
+    });
+    return replaceTableRowsTextCompact(tableXml, rows);
+  });
+
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    if (!isLandFieldEnabled(LAND_PRICE_FIELD)) {
+      return replaceTableRowsText(tableXml, [['']]);
     }
-    if (tblIdx === 2) {
-      // Replace [CUR] with selected currency
-      var priceVal = val('asking_price');
-      m = replaceAll(m, '[CUR]', '[' + priceCur + ']');
-      return m.replace(/>TEKST</, '>' + priceVal + '<');
-    }
-    return m;
+
+    var priceCur = cur('asking_price');
+    var priceVal = val('asking_price');
+    tableXml = replaceAll(tableXml, '[CUR]', '[' + priceCur + ']');
+    return replaceTableRowsText(tableXml, [[priceVal]]);
   });
 
   var di = 0;
@@ -1884,54 +2076,39 @@ function processSlide4(xml) {
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
 
-  // Get currencies for each financial field
   var noiCur = cur('noi') || 'PLN';
   var priceSaleCur = cur('price_sale') || 'PLN';
   var rentCur = cur('rent_income') || 'PLN';
   var scCur = cur('service_charge') || 'PLN';
   var giCur = cur('gross_income') || 'PLN';
 
-  var tblIdx = 0;
-  xml = xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(m) {
-    tblIdx++;
-    if (tblIdx === 1) {
-      // Bottom table: rent_income, service_charge, gross_income — each row has its own [CUR]
-      var fields = [val('rent_income'), val('service_charge'), val('gross_income')];
-      var currencies = [rentCur, scCur, giCur];
-      var ri = 0;
-      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = fields[ri];
-        var c = currencies[ri];
-        ri++;
-        row = replaceAll(row, '[CUR]', '[' + c + ']');
-        return row.replace(/>5t<|>tak<|>TEKST</, '>' + (v || '') + '<');
-      });
-    }
-    if (tblIdx === 2) {
-      // num_tenants, occupancy — no currency
-      var f = [val('num_tenants'), val('occupancy')];
-      var ri2 = 0;
-      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = f[ri2++];
-        if (v) return row.replace(/>TEKST</, '>' + v + '<');
-        return row;
-      });
-    }
-    if (tblIdx === 3) {
-      // noi, yield_pct, price_sale — each row has its own [CUR]
-      var f2 = [val('noi'), val('yield_pct'), val('price_sale')];
-      var currencies2 = [noiCur, 'PLN', priceSaleCur]; // yield has no currency
-      var ri3 = 0;
-      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = f2[ri3];
-        var c = currencies2[ri3];
-        ri3++;
-        row = replaceAll(row, '[CUR]', '[' + c + ']');
-        if (v) return row.replace(/>TEKST</, '>' + v + '<');
-        return row;
-      });
-    }
-    return m;
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    var fields = [val('rent_income'), val('service_charge'), val('gross_income')];
+    var currencies = [rentCur, scCur, giCur];
+    var ri = 0;
+    return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
+      var v = fields[ri];
+      var c = currencies[ri];
+      ri++;
+      row = replaceAll(row, '[CUR]', '[' + c + ']');
+      return row.replace(/>5t<|>tak<|>TEKST</, '>' + (v || '') + '<');
+    });
+  });
+
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    var rows = [];
+    getActiveIncomeTenantFields().forEach(function(field) {
+      rows.push([field.value || '']);
+    });
+    return replaceTableRowsTextCompact(tableXml, rows);
+  });
+
+  xml = replaceTableByIndex(xml, 2, function(tableXml) {
+    var rows = [];
+    getActiveIncomeFinancialFields().forEach(function(field) {
+      rows.push([field.value || '']);
+    });
+    return replaceTableRowsTextCompact(tableXml, rows);
   });
 
   var rate = val('eur_pln_rate');
@@ -2056,8 +2233,14 @@ async function generatePptx() {
       // Replace custom labels in slideMasters (always, regardless of CUR)
       if (xmlPath.indexOf('slideMaster') !== -1) {
         var before = xmlStr;
+        if (xmlPath.indexOf('slideMaster4') !== -1) {
+          xmlStr = processLandMasterLabels(xmlStr);
+        }
         if (xmlPath.indexOf('slideMaster6') !== -1) {
           xmlStr = processBuildingMasterLabels(xmlStr);
+        }
+        if (xmlPath.indexOf('slideMaster7') !== -1) {
+          xmlStr = processIncomeMasterLabels(xmlStr);
         }
         xmlStr = replacePptxLabels(xmlStr);
         if (xmlStr !== before) modified = true;
