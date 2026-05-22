@@ -697,6 +697,21 @@ select:focus {
   box-shadow: none;
 }
 
+/* === PHOTO UPLOAD === */
+.photo-drop {
+  border: 2px dashed var(--q-line);
+  border-radius: 2px;
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 160ms ease;
+  background: #fafbfc;
+}
+.photo-drop:hover, .photo-drop.drag-over {
+  border-color: var(--q-navy);
+  background: #f0f3f6;
+}
+
 .ai-status {
   display: none;
   align-items: center;
@@ -1110,6 +1125,48 @@ select:focus {
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Intensywność MAX</div><div class="field-label-en">Intensity Max</div></div><div class="field-value"><input id="intensity_max" placeholder="1,5"></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Wysokość zabudowy MAX</div><div class="field-label-en">Max Height</div></div><div class="field-value"><input id="height_max" placeholder="25 m"></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. biol. czynna MIN</div><div class="field-label-en">Biologically Active Min</div></div><div class="field-value"><input id="bio_surface_min" placeholder="15%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: ZDJĘCIA -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">06</span>
+      <div class="card-title-block"><div class="card-title">Zdjęcia</div><div class="card-title-en">Photos</div></div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="field-row field-row-wide" style="padding:20px 26px">
+      <div class="field-label" style="flex:0 0 100%;margin-bottom:12px">
+        <div class="field-label-pl">Zdjęcie główne</div>
+        <div class="field-label-en">Main Property Photo</div>
+      </div>
+      <div class="field-value" style="flex:0 0 100%">
+        <div id="photo-upload-area" style="width:100%">
+          <div id="photo-drop-zone" class="photo-drop"
+               onclick="document.getElementById('photo-input').click()"
+               ondragover="event.preventDefault();this.classList.add('drag-over')"
+               ondragleave="this.classList.remove('drag-over')"
+               ondrop="handlePhotoDrop(event)">
+            <div style="font-size:28px;margin-bottom:6px">🏢</div>
+            <div style="font-size:13px;color:var(--q-text);font-weight:600">Dodaj zdjęcie główne nieruchomości</div>
+            <div style="font-size:11px;color:var(--q-soft);margin-top:3px">JPG, PNG, WEBP — max 10 MB</div>
+          </div>
+          <input type="file" id="photo-input" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="handlePhotoSelect(this.files[0])">
+          <div id="photo-preview" style="display:none">
+            <div style="display:flex;align-items:center;gap:14px;padding:4px 0">
+              <img id="photo-thumb" style="width:120px;height:80px;object-fit:cover;border-radius:2px;border:1px solid var(--q-line)" alt="">
+              <div style="flex:1;min-width:0">
+                <div id="photo-name" style="font-size:12px;font-weight:700;color:var(--q-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+                <div id="photo-size-info" style="font-size:11px;color:var(--q-soft);margin-top:2px"></div>
+              </div>
+              <button onclick="removePhoto()" style="background:none;border:1px solid var(--q-line);border-radius:2px;padding:6px 12px;cursor:pointer;font-size:11px;color:var(--q-soft);font-family:inherit;font-weight:600;transition:all var(--transition)" onmouseover="this.style.borderColor='var(--q-danger)';this.style.color='var(--q-danger)'" onmouseout="this.style.borderColor='var(--q-line)';this.style.color='var(--q-soft)'">Usuń</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2361,6 +2418,9 @@ async function generatePptx() {
       zip.file(xmlPath, xmlStr);
     }
 
+    // ===== INSERT PROPERTY PHOTO =====
+    await insertPhotoIntoPptx(zip);
+
     // Remove inactive slides from presentation.xml
     var presFile = zip.file('ppt/presentation.xml');
     if (presFile) {
@@ -2395,8 +2455,141 @@ async function generatePptx() {
   btn.disabled = false;
   btn.innerHTML = '⬇ Generuj PPTX';
 }
+
+/* ===== PHOTO UPLOAD ===== */
+var propertyPhoto = null; // { file: File, dataUrl: string, arrayBuffer: ArrayBuffer }
+
+function handlePhotoDrop(e) {
+  e.preventDefault();
+  document.getElementById('photo-drop-zone').classList.remove('drag-over');
+  var file = e.dataTransfer.files[0];
+  if (file) handlePhotoSelect(file);
+}
+
+function handlePhotoSelect(file) {
+  if (!file) return;
+  var ext = file.name.toLowerCase().split('.').pop();
+  if (['jpg','jpeg','png','webp'].indexOf(ext) === -1) {
+    setStatus('Nieobsługiwany format zdjęcia. Użyj JPG, PNG lub WEBP.');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    setStatus('Zdjęcie za duże. Maksymalnie 10 MB.');
+    return;
+  }
+  // Read as both dataURL (preview) and ArrayBuffer (PPTX insertion)
+  var readerUrl = new FileReader();
+  readerUrl.onload = function(e) {
+    var dataUrl = e.target.result;
+    var readerBuf = new FileReader();
+    readerBuf.onload = function(e2) {
+      propertyPhoto = { file: file, dataUrl: dataUrl, arrayBuffer: e2.target.result };
+      showPhotoPreview();
+    };
+    readerBuf.readAsArrayBuffer(file);
+  };
+  readerUrl.readAsDataURL(file);
+  document.getElementById('photo-input').value = '';
+}
+
+function showPhotoPreview() {
+  document.getElementById('photo-drop-zone').style.display = 'none';
+  document.getElementById('photo-preview').style.display = 'block';
+  document.getElementById('photo-thumb').src = propertyPhoto.dataUrl;
+  document.getElementById('photo-name').textContent = propertyPhoto.file.name;
+  var sizeMb = (propertyPhoto.file.size / (1024*1024)).toFixed(1);
+  document.getElementById('photo-size-info').textContent = sizeMb + ' MB';
+}
+
+function removePhoto() {
+  propertyPhoto = null;
+  document.getElementById('photo-drop-zone').style.display = '';
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-thumb').src = '';
+}
+
+// Insert photo into PPTX ZIP
+async function insertPhotoIntoPptx(zip) {
+  if (!propertyPhoto || !propertyPhoto.arrayBuffer) return;
+  console.log('[PPTX Photo] Inserting photo: ' + propertyPhoto.file.name);
+
+  var ext = propertyPhoto.file.name.toLowerCase().split('.').pop();
+  if (ext === 'jpg') ext = 'jpeg';
+  var mediaPath = 'ppt/media/property_photo.' + ext;
+  var contentType = 'image/' + ext;
+  if (ext === 'webp') contentType = 'image/webp';
+
+  // 1. Add image to ppt/media/
+  zip.file(mediaPath, propertyPhoto.arrayBuffer);
+
+  // 2. Add relationship to slide2.xml.rels
+  var relsPath = 'ppt/slides/_rels/slide2.xml.rels';
+  var relsFile = zip.file(relsPath);
+  var relsXml = '';
+  var newRid = 'rId99'; // Use high number to avoid conflicts
+  if (relsFile) {
+    relsXml = await relsFile.async('string');
+    // Find highest existing rId
+    var ridMatches = relsXml.match(/Id="rId(\d+)"/g);
+    if (ridMatches) {
+      var maxId = 0;
+      ridMatches.forEach(function(m) {
+        var num = parseInt(m.match(/\d+/)[0]);
+        if (num > maxId) maxId = num;
+      });
+      newRid = 'rId' + (maxId + 1);
+    }
+    // Insert before closing tag
+    var newRel = '<Relationship Id="' + newRid + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/property_photo.' + ext + '"/>';
+    relsXml = relsXml.replace('</Relationships>', newRel + '</Relationships>');
+  } else {
+    relsXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="' + newRid + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/property_photo.' + ext + '"/></Relationships>';
+  }
+  zip.file(relsPath, relsXml);
+
+  // 3. Add [Content_Types] entry if needed
+  var ctPath = '[Content_Types].xml';
+  var ctFile = zip.file(ctPath);
+  if (ctFile) {
+    var ctXml = await ctFile.async('string');
+    if (ctXml.indexOf('Extension="' + ext + '"') === -1) {
+      var ctEntry = '<Default Extension="' + ext + '" ContentType="' + contentType + '"/>';
+      ctXml = ctXml.replace('<Types ', '<Types ').replace('</Types>', ctEntry + '</Types>');
+      zip.file(ctPath, ctXml);
+    }
+  }
+
+  // 4. Insert <p:pic> into slide2.xml
+  // Position: from slideLayout5 "Symbol zastępczy obrazu 2"
+  // x=381000 y=404812 cx=5114925 cy=3415158
+  var picXml = '<p:pic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+    '<p:nvPicPr>' +
+    '<p:cNvPr id="9999" name="Property Photo"/>' +
+    '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>' +
+    '<p:nvPr/>' +
+    '</p:nvPicPr>' +
+    '<p:blipFill>' +
+    '<a:blip r:embed="' + newRid + '"/>' +
+    '<a:stretch><a:fillRect/></a:stretch>' +
+    '</p:blipFill>' +
+    '<p:spPr>' +
+    '<a:xfrm>' +
+    '<a:off x="381000" y="404812"/>' +
+    '<a:ext cx="5114925" cy="3415158"/>' +
+    '</a:xfrm>' +
+    '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>' +
+    '</p:spPr>' +
+    '</p:pic>';
+
+  var slideFile = zip.file('ppt/slides/slide2.xml');
+  if (slideFile) {
+    var slideXml = await slideFile.async('string');
+    // Insert before </p:spTree>
+    slideXml = slideXml.replace('</p:spTree>', picXml + '</p:spTree>');
+    zip.file('ppt/slides/slide2.xml', slideXml);
+    console.log('[PPTX Photo] Inserted photo into slide2 at position (381000,404812) size (5114925,3415158) with ' + newRid);
+  }
+}
 </script>
-</body>
-</html>
 </body>
 </html>
