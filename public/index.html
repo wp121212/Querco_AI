@@ -452,6 +452,31 @@ select:focus {
   border-bottom-color: var(--q-success) !important;
 }
 
+
+/* === BROKER PROFILE SELECTOR === */
+.broker-profile-row { background: linear-gradient(90deg, rgba(16,42,61,0.035), rgba(242,242,242,0.45)); }
+.broker-profile-select {
+  width: 100%;
+  max-width: 360px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+.broker-profile-note {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
 /* === TEMPLATE SELECTOR === */
 .tmpl-label {
   font-size: 11px;
@@ -863,6 +888,7 @@ select:focus {
     </div>
   </div>
   <div class="card-body">
+    <div class="field-row no-label-edit broker-profile-row"><div class="field-label"><div class="field-label-pl">Wybierz brokera</div><div class="field-label-en">Broker Profile</div></div><div class="field-value"><select id="broker_profile" class="broker-profile-select" onchange="selectBrokerProfile(this.value)"><option value="">— wpisz ręcznie albo wybierz z listy —</option><option value="piotr_wrobel">Piotr Wróbel</option><option value="karolina_bomba">Karolina Bomba</option><option value="lidia_szczepanska">Lidia Szczepańska</option></select><span class="broker-profile-note">opcjonalne</span></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Imię i nazwisko brokera</div><div class="field-label-en">Broker Name</div></div><div class="field-value"><input id="broker_name" placeholder="Jan Kowalski"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Email</div><div class="field-label-en">Email Address</div></div><div class="field-value"><input id="broker_email" placeholder="jan@querco.pl"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Telefon</div><div class="field-label-en">Phone Number</div></div><div class="field-value"><input id="broker_phone" placeholder="+48 500 123 456"></div></div>
@@ -983,6 +1009,38 @@ var templateBuffer = null;
 var slide4Active = true;
 var slide5Active = false;
 
+/* ===== BROKER PROFILE SELECTOR ===== */
+var BROKER_PROFILES = {
+  piotr_wrobel: {
+    name: 'Piotr Wróbel',
+    email: 'piotr.wrobel@quercoproperty.pl',
+    phone: '538 395 952'
+  },
+  karolina_bomba: {
+    name: 'Karolina Bomba',
+    email: 'karolina.bomba@quercoproperty.pl',
+    phone: '509 778 879'
+  },
+  lidia_szczepanska: {
+    name: 'Lidia Szczepańska',
+    email: 'lidia.szczepanska@quercoproperty.pl',
+    phone: '882 732 212'
+  }
+};
+
+function selectBrokerProfile(key) {
+  if (!key || !BROKER_PROFILES[key]) return;
+  var broker = BROKER_PROFILES[key];
+  var nameEl = document.getElementById('broker_name');
+  var emailEl = document.getElementById('broker_email');
+  var phoneEl = document.getElementById('broker_phone');
+  if (nameEl) { nameEl.value = broker.name; nameEl.classList.add('ai-filled'); }
+  if (emailEl) { emailEl.value = broker.email; emailEl.classList.add('ai-filled'); }
+  if (phoneEl) { phoneEl.value = broker.phone; phoneEl.classList.add('ai-filled'); }
+  setStatus('Uzupełniono dane brokera: ' + broker.name);
+  setTimeout(function() { setStatus(''); }, 2500);
+}
+
 /* ===== EDITABLE LABELS SYSTEM ===== */
 var defaultLabels = {}; // { element_id: { pl: 'OBRĘB', en: 'PRECINCT' } }
 
@@ -1032,6 +1090,7 @@ function initEditableLabels() {
 
     var row = container.closest('.field-row, .dist-cell');
     if (!row) return;
+    if (row.classList.contains('no-label-edit')) return;
     var input = row.querySelector('input, select, textarea');
     if (!input || !input.id) return;
     var fieldKey = input.id;
