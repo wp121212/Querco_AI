@@ -4,293 +4,315 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Querco — Generator Ofert</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f6f8;color:#1a1a2e}
-.header{background:#102A3D;padding:14px 20px;display:flex;align-items:center;gap:12px}
-.logo{color:#fff;font-size:17px;font-weight:500;letter-spacing:-0.3px}
-.logo span{font-weight:400;color:#8ba3b8}
-.badge{background:#1a3f5c;color:#7fb5d5;font-size:11px;padding:3px 9px;border-radius:4px;font-weight:500}
-.main{max-width:900px;margin:0 auto;padding:16px}
-.upload-zone{border:1.5px dashed #bfc8d2;border-radius:10px;padding:32px;text-align:center;cursor:pointer;margin-bottom:16px;transition:all 0.2s;background:#fff}
-.upload-zone:hover{border-color:#102A3D;background:#fafbfc}
-.upload-loaded{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#edf7ed;border-radius:8px;margin-bottom:16px;font-size:13px;color:#2e6b2e}
-.section{background:#fff;border:1px solid #e5e8ec;border-radius:10px;padding:16px 20px;margin-bottom:10px}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sec-title{font-size:14px;font-weight:600;color:#102A3D;display:flex;align-items:center;gap:8px}
-.sec-num{background:#102A3D;color:#fff;width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
-.opt-label{font-size:11px;color:#999}
-.toggle{width:38px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0}
-.toggle-dot{position:absolute;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
-.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
-.field-full{grid-column:1/-1}
-label{display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:4px;letter-spacing:0.1px}
-input,textarea{width:100%;font-size:13px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;border-radius:6px;padding:8px 10px;font-family:inherit;transition:border-color 0.15s;outline:none}
-input:focus,textarea:focus{border-color:#102A3D}
-textarea{min-height:80px;resize:vertical}
-select{font-size:12px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;border-radius:6px;padding:7px 6px;font-family:inherit;outline:none;cursor:pointer;min-width:62px}
-.gen-btn{display:block;width:100%;margin-top:8px;padding:13px;background:#102A3D;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s;font-family:inherit}
-.gen-btn:hover{background:#1a3f5c}
-.gen-btn:disabled{background:#8ba3b8;cursor:not-allowed}
-.status{text-align:center;font-size:12px;color:#666;padding:8px;margin-top:4px}
-.ai-section{background:#fff;border:1px solid #e5e8ec;border-radius:10px;padding:20px;margin-bottom:16px}
-.ai-section-title{font-size:14px;font-weight:600;color:#102A3D;display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.ai-textarea{width:100%;min-height:100px;font-size:13px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;border-radius:6px;padding:10px 12px;font-family:inherit;resize:vertical;outline:none;transition:border-color 0.15s}
-.ai-textarea:focus{border-color:#102A3D}
-.ai-btn-row{display:flex;gap:8px;margin-top:10px;align-items:center}
-.ai-btn{padding:9px 18px;background:#102A3D;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px}
-.ai-btn:hover{background:#1a3f5c}
-.ai-btn:disabled{background:#8ba3b8;cursor:not-allowed}
-.ai-status{font-size:12px;color:#666;display:none;align-items:center;gap:8px}
-.spinner{width:14px;height:14px;border:2px solid #dde1e6;border-top-color:#102A3D;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ai-hint{font-size:11px;color:#999;margin-top:6px}
-.ai-filled{border-color:#2e9e2e!important;background:#f8fdf8!important}
-.currency-row{display:flex;gap:6px;align-items:flex-end}
-.currency-row input{flex:1}
-.currency-row select{flex:0 0 62px}
-.sec-fields-off{opacity:0.4;pointer-events:none}
-.file-drop{border:1.5px dashed #bfc8d2;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafbfc;margin-top:10px}
-.file-drop:hover,.file-drop.drag-over{border-color:#102A3D;background:#f0f4f8}
-.file-drop-icon{font-size:24px;margin-bottom:4px}
-.file-drop-text{font-size:13px;color:#555}
-.file-drop-sub{font-size:11px;color:#999;margin-top:3px}
-.file-list{margin-top:10px}
-.file-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fafbfc;border:1px solid #e5e8ec;border-radius:6px;margin-bottom:5px;font-size:12px}
-.file-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a1a2e}
-.file-item-size{color:#999;font-size:11px;flex-shrink:0}
-.file-item-icon{font-size:16px;flex-shrink:0}
-.file-item-remove{background:none;border:none;color:#cc3333;cursor:pointer;font-size:16px;padding:0 2px;flex-shrink:0;font-family:inherit}
-.file-item-remove:hover{color:#990000}
-.file-limit{font-size:11px;color:#999;margin-top:6px;display:flex;justify-content:space-between}
-.file-limit-warn{color:#cc3333}
+:root {
+  --navy: #102A3D;
+  --navy-light: #1a3f5c;
+  --navy-pale: #f0f3f6;
+  --text: #0f1729;
+  --text-secondary: #5a6578;
+  --text-tertiary: #8f99a8;
+  --border: #e2e6ec;
+  --border-light: #eef1f5;
+  --bg: #f7f8fa;
+  --bg-card: #ffffff;
+  --green: #1a7a3a;
+  --green-bg: #edf7f0;
+  --focus: #102A3D;
+  --radius: 4px;
+  --transition: 0.15s ease;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+/* === HEADER === */
+.header { background: var(--navy); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo { color: #fff; font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+.logo span { font-weight: 300; color: #8ba3b8; }
+.badge { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); font-size: 10px; padding: 4px 10px; border-radius: 3px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; }
+
+/* === LAYOUT === */
+.main { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+
+/* === CARDS === */
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 12px; overflow: hidden; }
+.card-header { padding: 16px 24px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; }
+.card-header-left { display: flex; align-items: baseline; gap: 12px; }
+.card-num { font-size: 11px; font-weight: 600; color: var(--text-tertiary); background: var(--navy-pale); width: 24px; height: 24px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.card-title-block {}
+.card-title { font-size: 14px; font-weight: 600; color: var(--navy); letter-spacing: -0.2px; text-transform: uppercase; }
+.card-title-en { font-size: 11px; font-weight: 400; color: var(--text-tertiary); letter-spacing: 0.3px; text-transform: uppercase; margin-top: 1px; }
+.card-body { padding: 0; }
+.opt-label { font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.5px; text-transform: uppercase; margin-right: 8px; }
+
+/* === TOGGLE === */
+.toggle { width: 36px; height: 20px; border-radius: 10px; border: none; cursor: pointer; position: relative; transition: background var(--transition); flex-shrink: 0; }
+.toggle-dot { position: absolute; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left var(--transition); box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+
+/* === FIELD ROWS === */
+.field-row { display: flex; align-items: center; padding: 10px 24px; border-bottom: 1px solid var(--border-light); transition: background var(--transition); min-height: 48px; }
+.field-row:last-child { border-bottom: none; }
+.field-row:hover { background: #fafbfc; }
+.field-label { flex: 0 0 38%; min-width: 0; padding-right: 16px; }
+.field-label-pl { font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.2px; line-height: 1.3; }
+.field-label-en { font-size: 10px; font-weight: 400; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.3; margin-top: 1px; }
+.field-value { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
+.field-row-wide .field-label { flex: 0 0 100%; padding-right: 0; margin-bottom: 8px; }
+.field-row-wide { flex-wrap: wrap; }
+.field-row-wide .field-value { flex: 0 0 100%; }
+
+/* Distance grid */
+.dist-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid var(--border-light); }
+.dist-cell { padding: 10px 24px; border-bottom: 1px solid var(--border-light); border-right: 1px solid var(--border-light); display: flex; align-items: center; }
+.dist-cell:nth-child(3n) { border-right: none; }
+.dist-cell .field-label { flex: 0 0 55%; }
+.dist-cell .field-value { flex: 1; }
+
+/* Two-col grid for MPZP params */
+.param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.param-grid .field-row { border-right: 1px solid var(--border-light); }
+.param-grid .field-row:nth-child(2n) { border-right: none; }
+
+/* === INPUTS === */
+input, textarea {
+  width: 100%; font-size: 13px; font-weight: 500; color: var(--text); font-family: 'Inter', system-ui, sans-serif;
+  background: transparent; border: none; border-bottom: 1px solid var(--border-light);
+  padding: 6px 0; outline: none; transition: border-color var(--transition);
+}
+input:focus, textarea:focus { border-bottom-color: var(--focus); }
+input::placeholder, textarea::placeholder { color: var(--text-tertiary); font-weight: 400; }
+textarea { min-height: 72px; resize: vertical; border: 1px solid var(--border-light); border-radius: var(--radius); padding: 10px 12px; background: #fafbfc; }
+textarea:focus { border-color: var(--focus); }
+select {
+  font-size: 11px; font-weight: 500; color: var(--text-secondary); font-family: 'Inter', system-ui, sans-serif;
+  background: var(--navy-pale); border: none; border-radius: 3px;
+  padding: 4px 6px; outline: none; cursor: pointer; min-width: 54px; text-align: center;
+  appearance: none; -webkit-appearance: none;
+}
+select:focus { box-shadow: 0 0 0 1.5px var(--focus); }
+.select-ownership { font-size: 12px; font-weight: 500; padding: 6px 8px; background: transparent; border-bottom: 1px solid var(--border-light); min-width: 200px; appearance: auto; -webkit-appearance: auto; }
+.ai-filled { border-bottom-color: var(--green) !important; background: var(--green-bg) !important; }
+
+/* === TEMPLATE SELECTOR === */
+.tmpl-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; margin-bottom: 12px; }
+.tmpl-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.tmpl-select { width: 100%; font-size: 14px; font-weight: 500; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); font-family: inherit; cursor: pointer; appearance: auto; }
+.tmpl-loaded { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--green); font-weight: 500; }
+
+/* === AI SECTION === */
+.ai-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; margin-bottom: 12px; }
+.ai-title { font-size: 13px; font-weight: 600; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.ai-textarea { width: 100%; min-height: 88px; font-size: 13px; color: var(--text); background: #fafbfc; border: 1px solid var(--border-light); border-radius: var(--radius); padding: 12px 14px; font-family: inherit; resize: vertical; outline: none; transition: border-color var(--transition); }
+.ai-textarea:focus { border-color: var(--focus); }
+.file-drop { border: 1.5px dashed var(--border); border-radius: var(--radius); padding: 16px; text-align: center; cursor: pointer; transition: all var(--transition); background: #fafbfc; margin-top: 10px; }
+.file-drop:hover, .file-drop.drag-over { border-color: var(--navy); background: var(--navy-pale); }
+.file-drop-icon { font-size: 20px; margin-bottom: 2px; }
+.file-drop-text { font-size: 12px; color: var(--text-secondary); }
+.file-drop-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+.file-list { margin-top: 8px; }
+.file-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #fafbfc; border: 1px solid var(--border-light); border-radius: var(--radius); margin-bottom: 4px; font-size: 11px; }
+.file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.file-item-size { color: var(--text-tertiary); font-size: 10px; flex-shrink: 0; }
+.file-item-icon { font-size: 14px; flex-shrink: 0; }
+.file-item-remove { background: none; border: none; color: #c44; cursor: pointer; font-size: 14px; padding: 0 2px; flex-shrink: 0; }
+.file-limit { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; display: flex; justify-content: space-between; }
+.file-limit-warn { color: #c44; }
+.ai-btn-row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+.ai-btn { padding: 8px 18px; background: var(--navy); color: #fff; border: none; border-radius: var(--radius); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background var(--transition); display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
+.ai-btn:hover { background: var(--navy-light); }
+.ai-btn:disabled { background: #8ba3b8; cursor: not-allowed; }
+.ai-status { font-size: 11px; color: var(--text-tertiary); display: none; align-items: center; gap: 6px; }
+.spinner { width: 13px; height: 13px; border: 2px solid var(--border); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ai-hint { font-size: 10px; color: var(--text-tertiary); margin-top: 8px; letter-spacing: 0.2px; }
+
+/* === GENERATE BUTTON === */
+.gen-btn { display: block; width: 100%; margin-top: 12px; padding: 14px; background: var(--navy); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; transition: background var(--transition); font-family: inherit; letter-spacing: 0.4px; text-transform: uppercase; }
+.gen-btn:hover { background: var(--navy-light); }
+.gen-btn:disabled { background: #8ba3b8; cursor: not-allowed; }
+.status { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 8px; margin-top: 4px; }
+.sec-fields-off { opacity: 0.35; pointer-events: none; }
+.upload-loaded { display: none; }
+
+/* === RESPONSIVE === */
+@media (max-width: 640px) {
+  .field-row { flex-direction: column; align-items: flex-start; padding: 10px 16px; }
+  .field-label { flex: none; width: 100%; padding-right: 0; margin-bottom: 4px; }
+  .field-value { width: 100%; }
+  .dist-grid { grid-template-columns: 1fr 1fr; }
+  .dist-cell:nth-child(3n) { border-right: 1px solid var(--border-light); }
+  .dist-cell:nth-child(2n) { border-right: none; }
+  .card-header, .ai-card, .tmpl-card { padding: 14px 16px; }
+  .param-grid { grid-template-columns: 1fr; }
+  .param-grid .field-row { border-right: none; }
+}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">QUERCO <span>property</span></div>
-  <span class="badge">AI GENERATOR OFERT</span>
+  <div class="header-left">
+    <div class="logo">QUERCO <span>property</span></div>
+  </div>
+  <span class="badge">Generator Ofert</span>
 </div>
 
 <div class="main">
 
-<!-- SZABLON PPTX SELECTOR -->
-<div class="section" style="margin-bottom:16px">
-  <div class="sec-head" style="margin-bottom:10px">
-    <div class="sec-title" style="gap:8px">
-      <span style="font-size:18px">📋</span> Wybierz szablon oferty
-    </div>
-  </div>
-  <select id="template-select" onchange="loadSelectedTemplate()" style="width:100%;font-size:14px;padding:10px 12px;border:1px solid #dde1e6;border-radius:6px;background:#fafbfc;color:#1a1a2e;font-family:inherit;cursor:pointer">
+<!-- TEMPLATE SELECTOR -->
+<div class="tmpl-card">
+  <div class="tmpl-label">Szablon oferty</div>
+  <select id="template-select" onchange="loadSelectedTemplate()" class="tmpl-select">
     <option value="">— wybierz szablon —</option>
     <option value="magazyn-sprzedaz">Magazyn — sprzedaż</option>
   </select>
-  <div id="template-status" style="display:none;margin-top:8px;font-size:12px;color:#666;display:flex;align-items:center;gap:6px"></div>
-  <div id="template-loaded" style="display:none;margin-top:8px" class="upload-loaded">
-    <span>✓</span>
-    <span id="template-loaded-name"></span>
+  <div id="template-status" style="display:none;margin-top:8px;font-size:11px;color:var(--text-tertiary);align-items:center;gap:6px"></div>
+  <div id="template-loaded" style="display:none" class="tmpl-loaded">
+    <span>✓</span> <span id="template-loaded-name"></span>
   </div>
 </div>
 
 <div id="form-area" style="display:none">
 
 <!-- AI EXTRACTION -->
-<div class="ai-section">
-  <div class="ai-section-title"><span>✨</span> AI uzupełnianie pól</div>
+<div class="ai-card">
+  <div class="ai-title"><span>✦</span> AI Extraction</div>
   <textarea class="ai-textarea" id="ai-source" placeholder="Wklej treść maila, notatki, opis z oferty developera..."></textarea>
-
-  <!-- FILE UPLOAD -->
-  <div class="file-drop" id="file-drop-zone"
-       onclick="document.getElementById('ai-file-input').click()"
-       ondragover="event.preventDefault();this.classList.add('drag-over')"
-       ondragleave="this.classList.remove('drag-over')"
-       ondrop="handleFileDrop(event)">
+  <div class="file-drop" id="file-drop-zone" onclick="document.getElementById('ai-file-input').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleFileDrop(event)">
     <div class="file-drop-icon">📎</div>
     <div class="file-drop-text">Przeciągnij pliki lub kliknij</div>
-    <div class="file-drop-sub">PDF, zdjęcia (JPG/PNG/WEBP), TXT — max 10 plików, 25 MB</div>
+    <div class="file-drop-sub">PDF, JPG, PNG, WEBP, TXT — max 10 plików, 25 MB</div>
   </div>
   <input type="file" id="ai-file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.txt" style="display:none" onchange="handleFileSelect(this.files)">
-
   <div class="file-list" id="file-list"></div>
-  <div class="file-limit" id="file-limit" style="display:none">
-    <span id="file-count">0 / 10 plików</span>
-    <span id="file-size">0 / 25 MB</span>
-  </div>
-
+  <div class="file-limit" id="file-limit" style="display:none"><span id="file-count">0 / 10</span><span id="file-size">0 / 25 MB</span></div>
   <div class="ai-btn-row">
-    <button class="ai-btn" id="ai-btn" onclick="aiExtract()">✨ AI uzupełnij pola</button>
+    <button class="ai-btn" id="ai-btn" onclick="aiExtract()">✦ AI uzupełnij pola</button>
     <div class="ai-status" id="ai-status"><div class="spinner"></div><span id="ai-status-text">Analizuję...</span></div>
   </div>
-  <div class="ai-hint">AI przeanalizuje tekst oraz wszystkie załączone pliki i wypełni formularz.</div>
+  <div class="ai-hint">AI przeanalizuje tekst i załączone pliki, następnie wypełni formularz.</div>
 </div>
 
-<!-- SLIDE 1: OKŁADKA -->
-<div class="section">
-  <div class="sec-head"><div class="sec-title"><span class="sec-num">1</span> Okładka</div></div>
-  <div class="field-grid">
-    <div class="field-full"><label>Imię i nazwisko brokera</label><input id="broker_name" placeholder="Jan Kowalski"></div>
-    <div><label>Email</label><input id="broker_email" placeholder="jan@querco.pl"></div>
-    <div><label>Telefon</label><input id="broker_phone" placeholder="+48 500 123 456"></div>
+<!-- SECTION 1: OKŁADKA -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">01</span>
+      <div class="card-title-block"><div class="card-title">Okładka</div><div class="card-title-en">Cover Page</div></div>
+    </div>
   </div>
-</div>
-
-<!-- SLIDE 2: GRUNT / LOKALIZACJA -->
-<div class="section">
-  <div class="sec-head"><div class="sec-title"><span class="sec-num">2</span> Grunt / Lokalizacja</div></div>
-  <div class="field-grid">
-    <div><label>Miasto</label><input id="city" placeholder="GDAŃSK"></div>
-    <div><label>Ulica</label><input id="street" placeholder="UL. MARYNARKI POLSKIEJ 1"></div>
-    <div><label>Powierzchnia gruntu [m²]</label><input id="land_area" placeholder="25 000"></div>
-    <div><label>Numer działki</label><input id="plot_number" placeholder="12/5, 12/6"></div>
-    <div><label>Obręb</label><input id="precinct" placeholder="0042"></div>
-    <div><label>Gmina / Miasto</label><input id="commune" placeholder="GDAŃSK"></div>
-    <div><label>Powiat</label><input id="county" placeholder="M. GDAŃSK"></div>
-    <div><label>Rodzaj własności</label>
-      <select id="ownership">
-        <option value="">— wybierz —</option>
-        <option value="WŁASNOŚĆ">WŁASNOŚĆ</option>
-        <option value="UŻYTKOWANIE WIECZYSTE">UŻYTKOWANIE WIECZYSTE</option>
-      </select>
-    </div>
-    <div class="field-full">
-      <label id="label-asking-price">Cena ofertowa [PLN]</label>
-      <div class="currency-row">
-        <input id="asking_price" placeholder="32 000 000">
-        <select id="asking_price_currency" onchange="updateCurrencyLabel('asking_price','Cena ofertowa')">
-          <option value="PLN">PLN</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </div>
-    </div>
-    <div><label>Lotnisko [km]</label><input id="dist_airport" placeholder="15"></div>
-    <div><label>Ekspresowa [km]</label><input id="dist_expressway" placeholder="3"></div>
-    <div><label>Port [km]</label><input id="dist_port" placeholder="8"></div>
-    <div><label>Droga krajowa [km]</label><input id="dist_highway" placeholder="2"></div>
-    <div><label>Kolej [km]</label><input id="dist_railway" placeholder="5"></div>
-    <div><label>Komunikacja miejska [m]</label><input id="dist_transit" placeholder="200"></div>
-    <div class="field-full"><label>Opis nieruchomości (3 akapity, każdy w nowej linii)</label><textarea id="description" placeholder="Działka 1,2 ha przy ul. Marynarki...&#10;Obiekt położony w doskonałej lokalizacji...&#10;Zabudowa: hala magazynowa z częścią biurową..."></textarea></div>
+  <div class="card-body">
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Imię i nazwisko brokera</div><div class="field-label-en">Broker Name</div></div><div class="field-value"><input id="broker_name" placeholder="Jan Kowalski"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Email</div><div class="field-label-en">Email Address</div></div><div class="field-value"><input id="broker_email" placeholder="jan@querco.pl"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Telefon</div><div class="field-label-en">Phone Number</div></div><div class="field-value"><input id="broker_phone" placeholder="+48 500 123 456"></div></div>
   </div>
 </div>
 
-<!-- SLIDE 3: ZABUDOWA -->
-<div class="section">
-  <div class="sec-head"><div class="sec-title"><span class="sec-num">3</span> Zabudowa</div></div>
-  <div class="field-grid">
-    <div><label>Powierzchnia zabudowy [m²]</label><input id="building_footprint" placeholder="12 000"></div>
-    <div><label>Powierzchnia użytkowa [m²]</label><input id="total_area" placeholder="15 000"></div>
-    <div><label>Liczba miejsc parkingowych</label><input id="parking_spots" placeholder="50"></div>
-    <div><label>Pow. magazynowa [m²]</label><input id="warehouse_area" placeholder="13 500"></div>
-    <div><label>Pow. biurowa [m²]</label><input id="office_area" placeholder="1 500"></div>
-    <div><label>Rok modernizacji</label><input id="year_modernization" placeholder="2020"></div>
-    <div class="field-full">
-      <label id="label-asking-price-building">Cena ofertowa [PLN] (slajd 3)</label>
-      <div class="currency-row">
-        <input id="asking_price_building" placeholder="32 000 000">
-        <select id="asking_price_building_currency" onchange="updateCurrencyLabel('asking_price_building','Cena ofertowa','(slajd 3)')">
-          <option value="PLN">PLN</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </div>
+<!-- SECTION 2: GRUNT / LOKALIZACJA -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">02</span>
+      <div class="card-title-block"><div class="card-title">Grunt / Lokalizacja</div><div class="card-title-en">Land / Location</div></div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. MARYNARKI POLSKIEJ 1"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="25 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Numer działki</div><div class="field-label-en">Plot Number</div></div><div class="field-value"><input id="plot_number" placeholder="12/5, 12/6"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Obręb</div><div class="field-label-en">Precinct</div></div><div class="field-value"><input id="precinct" placeholder="0042"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Gmina / Miasto</div><div class="field-label-en">Commune / City</div></div><div class="field-value"><input id="commune" placeholder="GDAŃSK"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powiat</div><div class="field-label-en">County</div></div><div class="field-value"><input id="county" placeholder="M. GDAŃSK"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Rodzaj własności</div><div class="field-label-en">Type of Ownership</div></div><div class="field-value"><select id="ownership" class="select-ownership"><option value="">— wybierz —</option><option value="WŁASNOŚĆ">WŁASNOŚĆ</option><option value="UŻYTKOWANIE WIECZYSTE">UŻYTKOWANIE WIECZYSTE</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="asking_price" placeholder="32 000 000"><select id="asking_price_currency" onchange="updateCurrencyLabel('asking_price','Cena ofertowa')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+    <div class="dist-grid">
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Lotnisko [km]</div><div class="field-label-en">Airport</div></div><div class="field-value"><input id="dist_airport" placeholder="15"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Autostrada [km]</div><div class="field-label-en">Expressway</div></div><div class="field-value"><input id="dist_expressway" placeholder="3"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Port [km]</div><div class="field-label-en">Port</div></div><div class="field-value"><input id="dist_port" placeholder="8"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Droga krajowa [km]</div><div class="field-label-en">Highway</div></div><div class="field-value"><input id="dist_highway" placeholder="2"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Kolej [km]</div><div class="field-label-en">Railway</div></div><div class="field-value"><input id="dist_railway" placeholder="5"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Komunikacja [m]</div><div class="field-label-en">Mass Transit</div></div><div class="field-value"><input id="dist_transit" placeholder="200"></div></div>
+    </div>
+    <div class="field-row field-row-wide"><div class="field-label"><div class="field-label-pl">Opis nieruchomości</div><div class="field-label-en">Property Description</div></div><div class="field-value"><textarea id="description" placeholder="Akapit 1: działki, powierzchnia w ha&#10;Akapit 2: lokalizacja&#10;Akapit 3: zabudowa"></textarea></div></div>
+  </div>
+</div>
+
+<!-- SECTION 3: ZABUDOWA -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">03</span>
+      <div class="card-title-block"><div class="card-title">Zabudowa</div><div class="card-title-en">Building</div></div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia zabudowy [m²]</div><div class="field-label-en">Building Footprint</div></div><div class="field-value"><input id="building_footprint" placeholder="12 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia użytkowa [m²]</div><div class="field-label-en">Total Area</div></div><div class="field-value"><input id="total_area" placeholder="15 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba miejsc parkingowych</div><div class="field-label-en">Parking Spots</div></div><div class="field-value"><input id="parking_spots" placeholder="50"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia magazynowa [m²]</div><div class="field-label-en">Warehouse Area</div></div><div class="field-value"><input id="warehouse_area" placeholder="13 500"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia biurowa [m²]</div><div class="field-label-en">Office Area</div></div><div class="field-value"><input id="office_area" placeholder="1 500"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Rok modernizacji</div><div class="field-label-en">Year of Modernization</div></div><div class="field-value"><input id="year_modernization" placeholder="2020"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price-building">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price (Slide 3)</div></div><div class="field-value"><input id="asking_price_building" placeholder="32 000 000"><select id="asking_price_building_currency" onchange="updateCurrencyLabel('asking_price_building','Cena ofertowa','(slajd 3)')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+  </div>
+</div>
+
+<!-- SECTION 4: DOCHODY -->
+<div class="card" id="sec-slide4">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">04</span>
+      <div class="card-title-block"><div class="card-title">Dochody / Najemcy</div><div class="card-title-en">Income / Tenants</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="opt-label">opcjonalny</span>
+      <button class="toggle" id="toggle4" onclick="toggleSection('slide4')" style="background:#102A3D"><div class="toggle-dot" style="left:18px"></div></button>
+    </div>
+  </div>
+  <div class="card-body" id="sec4-fields">
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba najemców</div><div class="field-label-en">Number of Tenants</div></div><div class="field-value"><input id="num_tenants" placeholder="5"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Poziom wynajęcia</div><div class="field-label-en">Occupancy Rate</div></div><div class="field-value"><input id="occupancy" placeholder="95%"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-noi">NOI [EUR]</div><div class="field-label-en">Net Operating Income</div></div><div class="field-value"><input id="noi" placeholder="1 200 000"><select id="noi_currency" onchange="updateCurrencyLabel('noi','NOI')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Stopa kapitalizacji [%]</div><div class="field-label-en">Yield [%]</div></div><div class="field-value"><input id="yield_pct" placeholder="7,5%"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-price-sale">Cena ofertowa [EUR]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="price_sale" placeholder="7 500 000"><select id="price_sale_currency" onchange="updateCurrencyLabel('price_sale','Cena ofertowa')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-rent-income">Przychód z najmu [PLN/m²]</div><div class="field-label-en">Annual Rental Income</div></div><div class="field-value"><input id="rent_income" placeholder="180"><select id="rent_income_currency" onchange="updateCurrencyLabel('rent_income','Przychód z najmu','/m²')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-service-charge">Opłaty serwisowe [EUR/m²]</div><div class="field-label-en">Annual Service Charge</div></div><div class="field-value"><input id="service_charge" placeholder="12"><select id="service_charge_currency" onchange="updateCurrencyLabel('service_charge','Opłaty serwisowe','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-gross-income">Łączny przychód op. [EUR/m²]</div><div class="field-label-en">Gross Operating Income</div></div><div class="field-value"><input id="gross_income" placeholder="85"><select id="gross_income_currency" onchange="updateCurrencyLabel('gross_income','Łączny przychód op.','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Kurs EUR/PLN</div><div class="field-label-en">EUR/PLN Exchange Rate</div></div><div class="field-value"><input id="eur_pln_rate" placeholder="4,24"></div></div>
+  </div>
+</div>
+
+<!-- SECTION 5: MPZP -->
+<div class="card" id="sec-slide5">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">05</span>
+      <div class="card-title-block"><div class="card-title">MPZP</div><div class="card-title-en">Local Spatial Development Plan</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="opt-label">opcjonalny</span>
+      <button class="toggle" id="toggle5" onclick="toggleSection('slide5')" style="background:#ccc"><div class="toggle-dot" style="left:2px"></div></button>
+    </div>
+  </div>
+  <div class="card-body sec-fields-off" id="sec5-fields">
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Nr uchwały MPZP</div><div class="field-label-en">Resolution Number</div></div><div class="field-value"><input id="mpzp_resolution" placeholder="UCHWAŁA NR XXIII/456/2020"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Karta terenu</div><div class="field-label-en">Terrain Card</div></div><div class="field-value"><input id="terrain_card" placeholder="P/U"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcja terenu</div><div class="field-label-en">Terrain Function</div></div><div class="field-value"><input id="terrain_function" placeholder="PRODUKCJA, SKŁADY, MAGAZYNY"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcje wyłączone</div><div class="field-label-en">Excluded Functions</div></div><div class="field-value"><input id="excluded_functions" placeholder="MIESZKANIOWA, HANDLOWA"></div></div>
+    <div class="param-grid">
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. zabudowy MIN</div><div class="field-label-en">Building Area Min</div></div><div class="field-value"><input id="building_area_min" placeholder="-"></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. zabudowy MAX</div><div class="field-label-en">Building Area Max</div></div><div class="field-value"><input id="building_area_max" placeholder="60%"></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Intensywność MIN</div><div class="field-label-en">Intensity Min</div></div><div class="field-value"><input id="intensity_min" placeholder="0,1"></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Intensywność MAX</div><div class="field-label-en">Intensity Max</div></div><div class="field-value"><input id="intensity_max" placeholder="1,5"></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Wysokość zabudowy MAX</div><div class="field-label-en">Max Height</div></div><div class="field-value"><input id="height_max" placeholder="25 m"></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. biol. czynna MIN</div><div class="field-label-en">Biologically Active Min</div></div><div class="field-value"><input id="bio_surface_min" placeholder="15%"></div></div>
     </div>
   </div>
 </div>
 
-<!-- SLIDE 4: DOCHODY (OPCJONALNY) -->
-<div class="section" id="sec-slide4">
-  <div class="sec-head">
-    <div class="sec-title">
-      <span class="sec-num">4</span> Dochody / Najemcy
-      <span class="opt-label">(opcjonalny)</span>
-    </div>
-    <button class="toggle" id="toggle4" onclick="toggleSection('slide4')" style="background:#102A3D">
-      <div class="toggle-dot" style="left:20px"></div>
-    </button>
-  </div>
-  <div id="sec4-fields" class="field-grid">
-    <div><label>Liczba najemców</label><input id="num_tenants" placeholder="5"></div>
-    <div><label>Poziom wynajęcia</label><input id="occupancy" placeholder="95%"></div>
-    <div>
-      <label id="label-noi">NOI [EUR]</label>
-      <div class="currency-row">
-        <input id="noi" placeholder="1 200 000">
-        <select id="noi_currency" onchange="updateCurrencyLabel('noi','NOI')">
-          <option value="EUR">EUR</option>
-          <option value="PLN">PLN</option>
-        </select>
-      </div>
-    </div>
-    <div><label>Stopa kapitalizacji [%]</label><input id="yield_pct" placeholder="7,5%"></div>
-    <div>
-      <label id="label-price-sale">Cena ofertowa [EUR]</label>
-      <div class="currency-row">
-        <input id="price_sale" placeholder="7 500 000">
-        <select id="price_sale_currency" onchange="updateCurrencyLabel('price_sale','Cena ofertowa')">
-          <option value="EUR">EUR</option>
-          <option value="PLN">PLN</option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label id="label-rent-income">Przychód z najmu [PLN/m²]</label>
-      <div class="currency-row">
-        <input id="rent_income" placeholder="180">
-        <select id="rent_income_currency" onchange="updateCurrencyLabel('rent_income','Przychód z najmu','/m²')">
-          <option value="PLN">PLN</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label id="label-service-charge">Opłaty serwisowe [EUR/m²]</label>
-      <div class="currency-row">
-        <input id="service_charge" placeholder="12">
-        <select id="service_charge_currency" onchange="updateCurrencyLabel('service_charge','Opłaty serwisowe','/m²')">
-          <option value="EUR">EUR</option>
-          <option value="PLN">PLN</option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label id="label-gross-income">Łączny przychód op. [EUR/m²]</label>
-      <div class="currency-row">
-        <input id="gross_income" placeholder="85">
-        <select id="gross_income_currency" onchange="updateCurrencyLabel('gross_income','Łączny przychód op.','/m²')">
-          <option value="EUR">EUR</option>
-          <option value="PLN">PLN</option>
-        </select>
-      </div>
-    </div>
-    <div class="field-full"><label>Kurs EUR/PLN</label><input id="eur_pln_rate" placeholder="4,24"></div>
-  </div>
-</div>
-
-<!-- SLIDE 5: MPZP (OPCJONALNY) -->
-<div class="section" id="sec-slide5">
-  <div class="sec-head">
-    <div class="sec-title">
-      <span class="sec-num">5</span> MPZP
-      <span class="opt-label">(opcjonalny)</span>
-    </div>
-    <button class="toggle" id="toggle5" onclick="toggleSection('slide5')" style="background:#ccc">
-      <div class="toggle-dot" style="left:2px"></div>
-    </button>
-  </div>
-  <div id="sec5-fields" class="field-grid sec-fields-off">
-    <div class="field-full"><label>Nr uchwały MPZP</label><input id="mpzp_resolution" placeholder="UCHWAŁA NR XXIII/456/2020 Z DNIA 15 WRZEŚNIA 2020 R."></div>
-    <div class="field-full"><label>Karta terenu</label><input id="terrain_card" placeholder="P/U"></div>
-    <div class="field-full"><label>Funkcja terenu</label><input id="terrain_function" placeholder="PRODUKCJA, SKŁADY, MAGAZYNY"></div>
-    <div class="field-full"><label>Funkcje wyłączone</label><input id="excluded_functions" placeholder="MIESZKANIOWA, HANDLOWA WIELKOPOWIERZCHNIOWA"></div>
-    <div><label>Pow. zabudowy MIN</label><input id="building_area_min" placeholder="-"></div>
-    <div><label>Pow. zabudowy MAX</label><input id="building_area_max" placeholder="60%"></div>
-    <div><label>Intensywność MIN</label><input id="intensity_min" placeholder="0,1"></div>
-    <div><label>Intensywność MAX</label><input id="intensity_max" placeholder="1,5"></div>
-    <div><label>Wysokość zabudowy MAX</label><input id="height_max" placeholder="25 m"></div>
-    <div><label>Pow. biologicznie czynna MIN</label><input id="bio_surface_min" placeholder="15%"></div>
-  </div>
-</div>
-
-<button class="gen-btn" id="gen-btn" onclick="generatePptx()">⬇ Generuj PPTX</button>
+<button class="gen-btn" id="gen-btn" onclick="generatePptx()">⬇ GENERUJ PPTX</button>
 <div class="status" id="status"></div>
 
 </div><!-- /form-area -->
@@ -929,5 +951,7 @@ async function generatePptx() {
   btn.innerHTML = '⬇ Generuj PPTX';
 }
 </script>
+</body>
+</html>
 </body>
 </html>
