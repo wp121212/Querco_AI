@@ -771,48 +771,90 @@ select:focus {
 
 
 /* === FIELD VISIBILITY TOGGLES === */
+.field-row.has-visibility-toggle {
+  position: relative;
+}
+
+.field-row.has-visibility-toggle .field-value {
+  padding-right: 4px;
+}
+
 .field-visible-switch {
-  flex: 0 0 44px;
-  width: 44px;
-  height: 24px;
-  border: 1px solid rgba(16,42,61,0.18);
+  flex: 0 0 68px;
+  width: 68px;
+  height: 28px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(16,42,61,0.20);
   border-radius: 999px;
   background: var(--q-navy);
   cursor: pointer;
   position: relative;
-  margin-left: 10px;
-  transition: background var(--transition), border-color var(--transition), opacity var(--transition);
+  margin-left: 14px;
+  padding: 0;
+  color: #fff;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  line-height: 1;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16,42,61,.10);
+  transition: background var(--transition), border-color var(--transition), opacity var(--transition), box-shadow var(--transition);
+  z-index: 5;
+}
+
+.field-visible-switch::before {
+  content: 'ON';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  pointer-events: none;
 }
 
 .field-visible-switch::after {
   content: '';
   position: absolute;
-  top: 3px;
-  left: 22px;
-  width: 16px;
-  height: 16px;
+  top: 4px;
+  left: 43px;
+  width: 18px;
+  height: 18px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0,0,0,.18);
+  box-shadow: 0 1px 4px rgba(0,0,0,.22);
   transition: left var(--transition);
+  pointer-events: none;
 }
 
 .field-visible-switch.off {
-  background: #c9d0d6;
-  border-color: #c9d0d6;
+  background: #cfd6dd;
+  border-color: #c3cbd3;
+  color: var(--q-steel);
+  box-shadow: none;
+}
+
+.field-visible-switch.off::before {
+  content: 'OFF';
+  left: 31px;
+  color: #5f6b76;
 }
 
 .field-visible-switch.off::after {
-  left: 4px;
+  left: 5px;
 }
 
 .field-visible-switch:hover {
-  opacity: .86;
+  opacity: .92;
+  box-shadow: 0 3px 8px rgba(16,42,61,.12);
 }
 
 .field-row.field-disabled {
   background: #f4f6f7;
-  opacity: .58;
+  opacity: .62;
 }
 
 .field-row.field-disabled .field-label-pl,
@@ -1107,6 +1149,7 @@ function initBuildingFieldToggles() {
 
     row.setAttribute('data-visibility-toggle-ready', '1');
     row.setAttribute('data-building-field', cfg.key);
+    row.classList.add('has-visibility-toggle');
     buildingFieldState[cfg.key] = true;
 
     var toggle = document.createElement('button');
@@ -1326,6 +1369,7 @@ function initLandFieldToggles() {
 
     row.setAttribute('data-land-visibility-toggle-ready', '1');
     row.setAttribute('data-land-field', cfg.key);
+    row.classList.add('has-visibility-toggle');
     landFieldState[cfg.key] = true;
 
     var toggle = document.createElement('button');
@@ -1415,6 +1459,7 @@ function initIncomeFieldToggles() {
 
     row.setAttribute('data-income-visibility-toggle-ready', '1');
     row.setAttribute('data-income-field', cfg.key);
+    row.classList.add('has-visibility-toggle');
     incomeFieldState[cfg.key] = true;
 
     var toggle = document.createElement('button');
@@ -1709,7 +1754,12 @@ function replacePptxLabels(xml) {
 }
 
 // Init on DOM ready
-document.addEventListener('DOMContentLoaded', function() { initEditableLabels(); initLandFieldToggles(); initBuildingFieldToggles(); initIncomeFieldToggles(); });
+document.addEventListener('DOMContentLoaded', function() {
+  try { initEditableLabels(); } catch (e) { console.error('initEditableLabels failed', e); }
+  try { initLandFieldToggles(); } catch (e) { console.error('initLandFieldToggles failed', e); }
+  try { initBuildingFieldToggles(); } catch (e) { console.error('initBuildingFieldToggles failed', e); }
+  try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
+});
 
 /* ===== CURRENCY LABEL UPDATER ===== */
 function updateCurrencyLabel(fieldId, baseName, suffix) {
