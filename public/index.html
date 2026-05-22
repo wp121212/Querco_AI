@@ -1201,11 +1201,23 @@ function setBuildingMasterRowBorders(rowXml, rowIndex, activeCount) {
 }
 
 function replaceBuildingMasterRows(tableXml, rowsValues, activeCount) {
+  // Compact mode: keep ONLY active rows. Empty/disabled rows are removed from the
+  // PowerPoint table instead of being moved to the bottom as blank rows.
+  // This prevents the empty rows from expanding and leaving horizontal border lines.
   var rowIndex = 0;
+  var rowsToRender = rowsValues.length ? rowsValues : [['', '']];
+  var renderCount = rowsToRender.length;
+
   return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
-    var values = rowsValues[rowIndex] || [];
+    if (rowIndex >= renderCount) {
+      rowIndex++;
+      return '';
+    }
+
+    var values = rowsToRender[rowIndex] || [];
+    var visibleRows = activeCount || 0;
     rowXml = setTableRowHeight(rowXml, BUILDING_TABLE_ROW_HEIGHT);
-    rowXml = setBuildingMasterRowBorders(rowXml, rowIndex, activeCount);
+    rowXml = setBuildingMasterRowBorders(rowXml, rowIndex, visibleRows);
 
     var textIndex = 0;
     rowXml = rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(textXml) {
@@ -1244,17 +1256,40 @@ function replaceTableRowsText(tableXml, rowsValues) {
   });
 }
 
+function replaceTableRowsTextCompact(tableXml, rowsValues) {
+  // Same as replaceTableRowsText, but removes disabled rows completely.
+  // Used for slide 3 values table so hidden rows do not leave empty borders.
+  var rowIndex = 0;
+  var rowsToRender = rowsValues.length ? rowsValues : [['']];
+  var renderCount = rowsToRender.length;
+
+  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+    if (rowIndex >= renderCount) {
+      rowIndex++;
+      return '';
+    }
+
+    var values = rowsToRender[rowIndex] || [];
+    rowXml = setTableRowHeight(rowXml, BUILDING_TABLE_ROW_HEIGHT);
+
+    var textIndex = 0;
+    rowXml = rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(textXml) {
+      var replacement = textIndex < values.length ? values[textIndex] : '';
+      textIndex++;
+      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
+    });
+    rowIndex++;
+    return rowXml;
+  });
+}
+
 function processBuildingMasterLabels(xml) {
   var active = getActiveBuildingFields();
   var rows = [];
 
-  for (var i = 0; i < 6; i++) {
-    if (active[i]) {
-      rows.push([active[i].label_pl, active[i].label_en]);
-    } else {
-      rows.push(['', '']);
-    }
-  }
+  active.forEach(function(field) {
+    rows.push([field.label_pl, field.label_en]);
+  });
 
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
     return replaceBuildingMasterRows(tableXml, rows, active.length);
@@ -1822,11 +1857,10 @@ function processSlide3(xml) {
 
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
     var rows = [];
-    for (var i = 0; i < 6; i++) {
-      rows.push([activeFields[i] ? activeFields[i].value : '']);
-    }
-    tableXml = replaceTableRowsText(tableXml, rows);
-    return setTableRowHeights(tableXml, BUILDING_TABLE_ROW_HEIGHT);
+    activeFields.forEach(function(field) {
+      rows.push([field.value || '']);
+    });
+    return replaceTableRowsTextCompact(tableXml, rows);
   });
 
   xml = replaceTableByIndex(xml, 1, function(tableXml) {
