@@ -769,6 +769,59 @@ select:focus {
   transition: left var(--transition);
 }
 
+
+/* === FIELD VISIBILITY TOGGLES (SECTION 03) === */
+.field-visible-switch {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 24px;
+  border: 1px solid rgba(16,42,61,0.18);
+  border-radius: 999px;
+  background: var(--q-navy);
+  cursor: pointer;
+  position: relative;
+  margin-left: 10px;
+  transition: background var(--transition), border-color var(--transition), opacity var(--transition);
+}
+
+.field-visible-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 22px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,.18);
+  transition: left var(--transition);
+}
+
+.field-visible-switch.off {
+  background: #c9d0d6;
+  border-color: #c9d0d6;
+}
+
+.field-visible-switch.off::after {
+  left: 4px;
+}
+
+.field-visible-switch:hover {
+  opacity: .86;
+}
+
+.field-row.field-disabled {
+  background: #f4f6f7;
+  opacity: .58;
+}
+
+.field-row.field-disabled .field-label-pl,
+.field-row.field-disabled .field-label-en,
+.field-row.field-disabled input,
+.field-row.field-disabled select {
+  color: #9aa5b1 !important;
+}
+
 /* === GENERATE BUTTON === */
 .gen-btn {
   display: block;
@@ -1031,6 +1084,140 @@ var templateBuffer = null;
 var slide4Active = true;
 var slide5Active = false;
 
+/* ===== SECTION 03 FIELD VISIBILITY ===== */
+var BUILDING_FIELD_CONFIG = [
+  { key: 'building_footprint', plFallback: 'POWIERZCHNIA ZABUDOWY [m²]', enFallback: 'BUILDING FOOTPRINT' },
+  { key: 'total_area', plFallback: 'POWIERZCHNIA UŻYTKOWA [m²]', enFallback: 'TOTAL AREA' },
+  { key: 'parking_spots', plFallback: 'LICZBA MIEJSC PARKINGOWYCH', enFallback: 'PARKING SPOTS' },
+  { key: 'warehouse_area', plFallback: 'POWIERZCHNIA MAGAZYNOWA [m²]', enFallback: 'WAREHOUSE AREA' },
+  { key: 'office_area', plFallback: 'POWIERZCHNIA BIUROWA [m²]', enFallback: 'OFFICE AREA' },
+  { key: 'year_modernization', plFallback: 'ROK MODERNIZACJI', enFallback: 'YEAR OF MODERNIZATION' }
+];
+
+var BUILDING_PRICE_FIELD = 'asking_price_building';
+var buildingFieldState = {};
+
+function initBuildingFieldToggles() {
+  BUILDING_FIELD_CONFIG.concat([{ key: BUILDING_PRICE_FIELD }]).forEach(function(cfg) {
+    var input = document.getElementById(cfg.key);
+    if (!input) return;
+
+    var row = input.closest('.field-row');
+    if (!row || row.getAttribute('data-visibility-toggle-ready') === '1') return;
+
+    row.setAttribute('data-visibility-toggle-ready', '1');
+    row.setAttribute('data-building-field', cfg.key);
+    buildingFieldState[cfg.key] = true;
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'field-visible-switch';
+    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
+    toggle.title = 'Pokaż / ukryj pole w prezentacji';
+    toggle.setAttribute('data-building-toggle', cfg.key);
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleBuildingField(cfg.key);
+    });
+
+    row.appendChild(toggle);
+  });
+}
+
+function toggleBuildingField(key) {
+  buildingFieldState[key] = !buildingFieldState[key];
+
+  var row = document.querySelector('[data-building-field="' + key + '"]');
+  var toggle = document.querySelector('[data-building-toggle="' + key + '"]');
+
+  if (row) row.classList.toggle('field-disabled', !buildingFieldState[key]);
+  if (toggle) toggle.classList.toggle('off', !buildingFieldState[key]);
+}
+
+function isBuildingFieldEnabled(key) {
+  return buildingFieldState[key] !== false;
+}
+
+function getBuildingFieldLabel(key, lang, fallback) {
+  var custom = getLabel(key, lang);
+  return (custom || fallback || '').toUpperCase();
+}
+
+function getActiveBuildingFields() {
+  var active = [];
+  BUILDING_FIELD_CONFIG.forEach(function(cfg) {
+    if (!isBuildingFieldEnabled(cfg.key)) return;
+
+    active.push({
+      key: cfg.key,
+      label_pl: getBuildingFieldLabel(cfg.key, 'pl', cfg.plFallback),
+      label_en: getBuildingFieldLabel(cfg.key, 'en', cfg.enFallback),
+      value: val(cfg.key)
+    });
+  });
+  return active;
+}
+
+function escapeXmlText(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function replaceTableByIndex(xml, targetIndex, callback) {
+  var tableIndex = -1;
+  return xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(tableXml) {
+    tableIndex++;
+    if (tableIndex === targetIndex) {
+      return callback(tableXml);
+    }
+    return tableXml;
+  });
+}
+
+function replaceTableRowsText(tableXml, rowsValues) {
+  var rowIndex = 0;
+  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+    var values = rowsValues[rowIndex] || [];
+    rowIndex++;
+
+    var textIndex = 0;
+    return rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(textXml) {
+      var replacement = textIndex < values.length ? values[textIndex] : '';
+      textIndex++;
+      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
+    });
+  });
+}
+
+function processBuildingMasterLabels(xml) {
+  var active = getActiveBuildingFields();
+  var rows = [];
+
+  for (var i = 0; i < 6; i++) {
+    if (active[i]) {
+      rows.push([active[i].label_pl, active[i].label_en]);
+    } else {
+      rows.push(['', '']);
+    }
+  }
+
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    return replaceTableRowsText(tableXml, rows);
+  });
+
+  if (!isBuildingFieldEnabled(BUILDING_PRICE_FIELD)) {
+    xml = replaceTableByIndex(xml, 1, function(tableXml) {
+      return replaceTableRowsText(tableXml, [[''], ['']]);
+    });
+  }
+
+  return xml;
+}
+
+
 /* ===== BROKER PROFILE SELECTOR ===== */
 var BROKER_PROFILES = {
   piotr_wrobel: {
@@ -1242,7 +1429,7 @@ function replacePptxLabels(xml) {
 }
 
 // Init on DOM ready
-document.addEventListener('DOMContentLoaded', initEditableLabels);
+document.addEventListener('DOMContentLoaded', function() { initEditableLabels(); initBuildingFieldToggles(); });
 
 /* ===== CURRENCY LABEL UPDATER ===== */
 function updateCurrencyLabel(fieldId, baseName, suffix) {
@@ -1579,26 +1766,27 @@ function processSlide3(xml) {
   xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
   xml = xml.replace(/UL\. „ulica[^<]*/g, street);
 
-  var tbl1 = [val('building_footprint'), val('total_area'), val('parking_spots'), val('warehouse_area'), val('office_area'), val('year_modernization')];
-  var tblIdx = 0;
-  var priceCur = cur('asking_price_building') || cur('asking_price');
-  xml = xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(m) {
-    tblIdx++;
-    if (tblIdx === 1) {
-      var ri = 0;
-      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = tbl1[ri++];
-        if (v) return row.replace(/>TEKST</, '>' + v + '<');
-        return row;
-      });
+  var activeFields = getActiveBuildingFields();
+
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    var rows = [];
+    for (var i = 0; i < 6; i++) {
+      rows.push([activeFields[i] ? activeFields[i].value : '']);
     }
-    if (tblIdx === 2) {
-      var priceVal = val('asking_price_building') || val('asking_price');
-      m = replaceAll(m, '[CUR]', '[' + priceCur + ']');
-      return m.replace(/>TEKST</, '>' + priceVal + '<');
-    }
-    return m;
+    return replaceTableRowsText(tableXml, rows);
   });
+
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    if (!isBuildingFieldEnabled(BUILDING_PRICE_FIELD)) {
+      return replaceTableRowsText(tableXml, [['']]);
+    }
+
+    var priceCur = cur('asking_price_building') || cur('asking_price');
+    var priceVal = val('asking_price_building') || val('asking_price');
+    tableXml = replaceAll(tableXml, '[CUR]', '[' + priceCur + ']');
+    return replaceTableRowsText(tableXml, [[priceVal]]);
+  });
+
   return xml;
 }
 
@@ -1781,6 +1969,9 @@ async function generatePptx() {
       // Replace custom labels in slideMasters (always, regardless of CUR)
       if (xmlPath.indexOf('slideMaster') !== -1) {
         var before = xmlStr;
+        if (xmlPath.indexOf('slideMaster6') !== -1) {
+          xmlStr = processBuildingMasterLabels(xmlStr);
+        }
         xmlStr = replacePptxLabels(xmlStr);
         if (xmlStr !== before) modified = true;
       }
