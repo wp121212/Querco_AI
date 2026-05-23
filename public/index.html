@@ -1832,6 +1832,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initLandFieldToggles(); } catch (e) { console.error('initLandFieldToggles failed', e); }
   try { initBuildingFieldToggles(); } catch (e) { console.error('initBuildingFieldToggles failed', e); }
   try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
+  try { initNumberFormatting(); } catch (e) { console.error('initNumberFormatting failed', e); }
   try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
 });
 
@@ -1843,6 +1844,89 @@ function updateCurrencyLabel(fieldId, baseName, suffix) {
   if (el) {
     el.textContent = baseName + ' [' + cur + (suffix || '') + ']' + (fieldId === 'asking_price_building' ? ' (slajd 3)' : '');
   }
+}
+
+
+/* ===== NUMBER FORMATTING ===== */
+// Formatuje najważniejsze pola liczbowe do standardu: 1 000 / 25 800 / 1 180 000.
+// Nie dotykamy pól typu działka, obręb, procenty, kurs EUR/PLN, uchwały MPZP itp.
+// Wersja naprawcza: number-format-2026-05-24
+var NUMBER_FORMAT_FIELDS = [
+  'land_area',
+  'asking_price',
+  'dist_airport', 'dist_expressway', 'dist_port', 'dist_highway', 'dist_railway', 'dist_transit',
+  'building_footprint', 'total_area', 'parking_spots', 'warehouse_area', 'office_area',
+  'asking_price_building',
+  'num_tenants', 'noi', 'price_sale', 'rent_income', 'service_charge', 'gross_income'
+];
+
+function isNumberFormatField(id) {
+  return NUMBER_FORMAT_FIELDS.indexOf(id) !== -1;
+}
+
+function formatIntegerGroups(intPart) {
+  var sign = '';
+  intPart = String(intPart || '');
+  if (intPart.charAt(0) === '-') {
+    sign = '-';
+    intPart = intPart.slice(1);
+  }
+  intPart = intPart.replace(/^0+(?=\d)/, '');
+  return sign + intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+function formatReadableNumber(raw) {
+  var value = String(raw || '').trim();
+  if (!value) return '';
+
+  // Nie formatuj wartości opisowych / procentowych / z jednostką lub znakiem slash.
+  // Takie pola powinny zostać dokładnie jak w źródle.
+  if (/[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż%\/]/.test(value)) return value;
+
+  // Usuwamy spacje tysięcy i normalizujemy separator dziesiętny.
+  var compact = value.replace(/\s+/g, '').replace(/,/g, '.');
+  if (!/^-?\d+(\.\d+)?$/.test(compact)) return value;
+
+  var parts = compact.split('.');
+  var intPart = formatIntegerGroups(parts[0]);
+  if (parts.length > 1) {
+    return intPart + ',' + parts[1];
+  }
+  return intPart;
+}
+
+function formatNumericFieldById(id) {
+  if (!isNumberFormatField(id)) return;
+  var el = document.getElementById(id);
+  if (!el || typeof el.value === 'undefined') return;
+  var formatted = formatReadableNumber(el.value);
+  if (formatted !== el.value) {
+    el.value = formatted;
+  }
+}
+
+function initNumberFormatting() {
+  NUMBER_FORMAT_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el || el.getAttribute('data-number-format-ready') === '1') return;
+    el.setAttribute('data-number-format-ready', '1');
+
+    el.addEventListener('input', function() {
+      var before = el.value;
+      formatNumericFieldById(id);
+      // Po formatowaniu ustawiamy kursor na końcu — proste i stabilne dla pól liczbowych.
+      if (el.value !== before && typeof el.setSelectionRange === 'function') {
+        var len = el.value.length;
+        try { el.setSelectionRange(len, len); } catch (e) {}
+      }
+    });
+
+    el.addEventListener('change', function() {
+      formatNumericFieldById(id);
+    });
+
+    formatNumericFieldById(id);
+  });
 }
 
 /* ===== ASKING PRICE SYNC: SLIDE 02 / 03 / 04 ===== */
@@ -1864,6 +1948,7 @@ function syncAskingPriceGroup(sourceValueId) {
   var sourceCurrencyEl = document.getElementById(sourceCfg.cur);
   if (!sourceValueEl || !sourceCurrencyEl) return;
 
+  formatNumericFieldById(sourceCfg.val);
   var sourceValue = sourceValueEl.value || '';
   var sourceCurrency = sourceCurrencyEl.value || '';
 
@@ -2355,7 +2440,7 @@ async function aiExtract() {
     function fillField(id, value) {
       if (!value || value === 'null' || value === 'brak danych' || !value.trim()) return;
       var el = document.getElementById(id);
-      if (el) { el.value = value; el.classList.add('ai-filled'); filledCount++; }
+      if (el) { el.value = value; formatNumericFieldById(id); el.classList.add('ai-filled'); filledCount++; }
     }
     function fillSelect(id, value) {
       if (!value || !value.trim()) return;
