@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- BUILD: PLACEHOLDER_UPDATE_2026_05_24 -->
 <html lang="pl">
 <!-- BUILD: MPZP_ACT_UPLOAD_UI_2026_05_24_V2_REAL_DIFF -->
 
@@ -1239,7 +1240,7 @@ select:focus {
   <div class="card-body">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Imię i nazwisko brokera</div><div class="field-label-en">Broker Name</div></div><div class="field-value"><input id="broker_name" placeholder="Jan Kowalski"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Email</div><div class="field-label-en">Email Address</div></div><div class="field-value"><input id="broker_email" placeholder="jan@querco.pl"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Telefon</div><div class="field-label-en">Phone Number</div></div><div class="field-value"><input id="broker_phone" placeholder="+48 500 123 456"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Telefon</div><div class="field-label-en">Phone Number</div></div><div class="field-value"><input id="broker_phone" placeholder="+48 111 111 111"></div></div>
   </div>
 </div>
 
@@ -1253,23 +1254,23 @@ select:focus {
   </div>
   <div class="card-body">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. MARYNARKI POLSKIEJ 1"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="25 000"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Numer działki</div><div class="field-label-en">Plot Number</div></div><div class="field-value"><input id="plot_number" placeholder="12/5, 12/6"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. UPHAGENA 27"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="50 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Numer działki</div><div class="field-label-en">Plot Number</div></div><div class="field-value"><input id="plot_number" placeholder="100/1, 101/2-5"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Obręb</div><div class="field-label-en">Precinct</div></div><div class="field-value"><input id="precinct" placeholder="0042"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Gmina / Miasto</div><div class="field-label-en">Commune / City</div></div><div class="field-value"><input id="commune" placeholder="GDAŃSK"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Powiat</div><div class="field-label-en">County</div></div><div class="field-value"><input id="county" placeholder="M. GDAŃSK"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Rodzaj własności</div><div class="field-label-en">Type of Ownership</div></div><div class="field-value"><select id="ownership" class="select-ownership"><option value="">— wybierz —</option><option value="WŁASNOŚĆ">WŁASNOŚĆ</option><option value="UŻYTKOWANIE WIECZYSTE">UŻYTKOWANIE WIECZYSTE</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="asking_price" placeholder="32 000 000"><select id="asking_price_currency" onchange="updateCurrencyLabel('asking_price','Cena ofertowa')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="asking_price" placeholder="10 000 000"><select id="asking_price_currency" onchange="updateCurrencyLabel('asking_price','Cena ofertowa')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
     <div class="dist-grid">
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Lotnisko [km]</div><div class="field-label-en">Airport</div></div><div class="field-value"><input id="dist_airport" placeholder="15"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Autostrada [km]</div><div class="field-label-en">Expressway</div></div><div class="field-value"><input id="dist_expressway" placeholder="3"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Port [km]</div><div class="field-label-en">Port</div></div><div class="field-value"><input id="dist_port" placeholder="8"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Droga krajowa [km]</div><div class="field-label-en">Highway</div></div><div class="field-value"><input id="dist_highway" placeholder="2"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Kolej [km]</div><div class="field-label-en">Railway</div></div><div class="field-value"><input id="dist_railway" placeholder="5"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Komunikacja [m]</div><div class="field-label-en">Mass Transit</div></div><div class="field-value"><input id="dist_transit" placeholder="200"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Lotnisko [km]</div><div class="field-label-en">Airport</div></div><div class="field-value"><input id="dist_airport" placeholder="10"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Autostrada [km]</div><div class="field-label-en">Expressway</div></div><div class="field-value"><input id="dist_expressway" placeholder="10"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Port [km]</div><div class="field-label-en">Port</div></div><div class="field-value"><input id="dist_port" placeholder="10"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Droga krajowa [km]</div><div class="field-label-en">Highway</div></div><div class="field-value"><input id="dist_highway" placeholder="10"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Kolej [km]</div><div class="field-label-en">Railway</div></div><div class="field-value"><input id="dist_railway" placeholder="10"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Komunikacja [m]</div><div class="field-label-en">Mass Transit</div></div><div class="field-value"><input id="dist_transit" placeholder="0,5"></div></div>
     </div>
-    <div class="field-row field-row-wide"><div class="field-label"><div class="field-label-pl">Opis nieruchomości</div><div class="field-label-en">Property Description</div></div><div class="field-value"><textarea id="description" placeholder="Akapit 1: działki, powierzchnia w ha&#10;Akapit 2: lokalizacja&#10;Akapit 3: zabudowa"></textarea></div></div>
+    <div class="field-row field-row-wide"><div class="field-label"><div class="field-label-pl">Opis nieruchomości</div><div class="field-label-en">Property Description</div></div><div class="field-value"><textarea id="description" placeholder=""></textarea></div></div>
   </div>
 </div>
 
@@ -1282,13 +1283,13 @@ select:focus {
     </div>
   </div>
   <div class="card-body">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia zabudowy [m²]</div><div class="field-label-en">Building Footprint</div></div><div class="field-value"><input id="building_footprint" placeholder="12 000"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia użytkowa [m²]</div><div class="field-label-en">Total Area</div></div><div class="field-value"><input id="total_area" placeholder="15 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia zabudowy [m²]</div><div class="field-label-en">Building Footprint</div></div><div class="field-value"><input id="building_footprint" placeholder="15 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia użytkowa [m²]</div><div class="field-label-en">Total Area</div></div><div class="field-value"><input id="total_area" placeholder="20 000"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba miejsc parkingowych</div><div class="field-label-en">Parking Spots</div></div><div class="field-value"><input id="parking_spots" placeholder="50"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia magazynowa [m²]</div><div class="field-label-en">Warehouse Area</div></div><div class="field-value"><input id="warehouse_area" placeholder="13 500"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia biurowa [m²]</div><div class="field-label-en">Office Area</div></div><div class="field-value"><input id="office_area" placeholder="1 500"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia magazynowa [m²]</div><div class="field-label-en">Warehouse Area</div></div><div class="field-value"><input id="warehouse_area" placeholder="18 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia biurowa [m²]</div><div class="field-label-en">Office Area</div></div><div class="field-value"><input id="office_area" placeholder="2 000"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Rok modernizacji</div><div class="field-label-en">Year of Modernization</div></div><div class="field-value"><input id="year_modernization" placeholder="2020"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price-building">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price (Slide 3)</div></div><div class="field-value"><input id="asking_price_building" placeholder="32 000 000"><select id="asking_price_building_currency" onchange="updateCurrencyLabel('asking_price_building','Cena ofertowa','(slajd 3)')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price-building">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price (Slide 3)</div></div><div class="field-value"><input id="asking_price_building" placeholder="10 000 000"><select id="asking_price_building_currency" onchange="updateCurrencyLabel('asking_price_building','Cena ofertowa','(slajd 3)')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
   </div>
 </div>
 
@@ -1305,14 +1306,14 @@ select:focus {
     </div>
   </div>
   <div class="card-body" id="sec4-fields">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba najemców</div><div class="field-label-en">Number of Tenants</div></div><div class="field-value"><input id="num_tenants" placeholder="5"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba najemców</div><div class="field-label-en">Number of Tenants</div></div><div class="field-value"><input id="num_tenants" placeholder="10"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Poziom wynajęcia</div><div class="field-label-en">Occupancy Rate</div></div><div class="field-value"><input id="occupancy" placeholder="95%"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-noi">NOI [EUR]</div><div class="field-label-en">Net Operating Income</div></div><div class="field-value"><input id="noi" placeholder="1 200 000"><select id="noi_currency" onchange="updateCurrencyLabel('noi','NOI')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-noi">NOI [EUR]</div><div class="field-label-en">Net Operating Income</div></div><div class="field-value"><input id="noi" placeholder="1 000 000"><select id="noi_currency" onchange="updateCurrencyLabel('noi','NOI')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Stopa kapitalizacji [%]</div><div class="field-label-en">Yield [%]</div></div><div class="field-value"><input id="yield_pct" placeholder="7,5%"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-price-sale">Cena ofertowa [EUR]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="price_sale" placeholder="7 500 000"><select id="price_sale_currency" onchange="updateCurrencyLabel('price_sale','Cena ofertowa')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-rent-income">Przychód z najmu [PLN/m²]</div><div class="field-label-en">Annual Rental Income</div></div><div class="field-value"><input id="rent_income" placeholder="180"><select id="rent_income_currency" onchange="updateCurrencyLabel('rent_income','Przychód z najmu','/m²')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-service-charge">Opłaty serwisowe [EUR/m²]</div><div class="field-label-en">Annual Service Charge</div></div><div class="field-value"><input id="service_charge" placeholder="12"><select id="service_charge_currency" onchange="updateCurrencyLabel('service_charge','Opłaty serwisowe','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-gross-income">Łączny przychód op. [EUR/m²]</div><div class="field-label-en">Gross Operating Income</div></div><div class="field-value"><input id="gross_income" placeholder="85"><select id="gross_income_currency" onchange="updateCurrencyLabel('gross_income','Łączny przychód op.','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-price-sale">Cena ofertowa [EUR]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="price_sale" placeholder="10 000 000"><select id="price_sale_currency" onchange="updateCurrencyLabel('price_sale','Cena ofertowa')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-rent-income">Przychód z najmu [PLN/m²]</div><div class="field-label-en">Annual Rental Income</div></div><div class="field-value"><input id="rent_income" placeholder="900 000"><select id="rent_income_currency" onchange="updateCurrencyLabel('rent_income','Przychód z najmu','/m²')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-service-charge">Opłaty serwisowe [EUR/m²]</div><div class="field-label-en">Annual Service Charge</div></div><div class="field-value"><input id="service_charge" placeholder="500 000"><select id="service_charge_currency" onchange="updateCurrencyLabel('service_charge','Opłaty serwisowe','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-gross-income">Łączny przychód op. [EUR/m²]</div><div class="field-label-en">Gross Operating Income</div></div><div class="field-value"><input id="gross_income" placeholder="1 400 000"><select id="gross_income_currency" onchange="updateCurrencyLabel('gross_income','Łączny przychód op.','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Kurs EUR/PLN</div><div class="field-label-en">EUR/PLN Exchange Rate</div></div><div class="field-value"><input id="eur_pln_rate" placeholder="4,24"></div></div>
   </div>
 </div>
@@ -1334,7 +1335,7 @@ select:focus {
       <div class="mpzp-act-panel">
         <div class="mpzp-act-label"><div class="field-label-pl">Karta terenu</div><div class="field-label-en">Terrain Card / Planning Zone</div></div>
         <div class="mpzp-terrain-input-wrap" id="terrain-card-wrap">
-          <input id="terrain_card" placeholder="np. 1-P/U, 2PU, 003-P,U">
+          <input id="terrain_card" placeholder="1PU">
           <div class="mpzp-error-message" id="terrain-card-error">Najpierw wprowadź konkretną kartę terenu, np. 1-P/U. Bez tego AI nie wie, który fragment uchwały analizować.</div>
         </div>
       </div>
@@ -1348,9 +1349,9 @@ select:focus {
         <div class="mpzp-file-note" id="mpzp-file-note">Wgraj pełną uchwałę / MPZP. AI wyszuka parametry dla wpisanej karty terenu, tolerując warianty typu 2-PU / 2PU / 2 P/U.</div>
       </div>
     </div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Nr uchwały MPZP</div><div class="field-label-en">Resolution Number</div></div><div class="field-value mpzp-resolution-composer"><span class="mpzp-static-text">Uchwała nr</span><input id="mpzp_resolution" class="mpzp-resolution-number" placeholder="XXIII/456/2020"><span class="mpzp-static-text">z dnia</span><input id="mpzp_resolution_date" class="mpzp-resolution-date" placeholder="12 maja 2020 roku"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcja terenu</div><div class="field-label-en">Terrain Function</div></div><div class="field-value"><input id="terrain_function" placeholder="PRODUKCJA, SKŁADY, MAGAZYNY"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcje wyłączone</div><div class="field-label-en">Excluded Functions</div></div><div class="field-value"><input id="excluded_functions" placeholder="MIESZKANIOWA, HANDLOWA"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Nr uchwały MPZP</div><div class="field-label-en">Resolution Number</div></div><div class="field-value mpzp-resolution-composer"><span class="mpzp-static-text">Uchwała nr</span><input id="mpzp_resolution" class="mpzp-resolution-number" placeholder="XXIII/111/2026"><span class="mpzp-static-text">z dnia</span><input id="mpzp_resolution_date" class="mpzp-resolution-date" placeholder="1 STYCZNIA 2026 ROKU"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcja terenu</div><div class="field-label-en">Terrain Function</div></div><div class="field-value"><input id="terrain_function" placeholder="Teren produkcyjno-magazynowo-usługowy"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcje wyłączone</div><div class="field-label-en">Excluded Functions</div></div><div class="field-value"><input id="excluded_functions" placeholder="zabudowa wielorodzinna"></div></div>
     <div class="param-grid">
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. zabudowy MIN</div><div class="field-label-en">Building Area Min</div></div><div class="field-value"><input id="building_area_min" placeholder="-"></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. zabudowy MAX</div><div class="field-label-en">Building Area Max</div></div><div class="field-value"><input id="building_area_max" placeholder="60%"></div></div>
