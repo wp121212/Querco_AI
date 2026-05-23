@@ -25,6 +25,14 @@ Zasady:
 - Jeśli ta sama informacja pojawia się w tekście PDF i OCR, wybierz bardziej wiarygodną / spójną wersję.
 - Jeżeli OCR odczytał tabelę w sposób chaotyczny, spróbuj logicznie przypisać wartości do pól CRE, ale nie wymyślaj danych.
 
+Dodatkowe zasady dla MPZP / uchwał planistycznych:
+- Jeżeli materiał zawiera frazę "TRYB ANALIZY MPZP" oraz wskazaną kartę terenu, analizuj parametry wyłącznie dla tej konkretnej karty terenu.
+- Dopasowuj kartę terenu elastycznie: 2-PU, 2PU, 2 P/U, 2-P/U, 2.PU mogą oznaczać tę samą kartę, jeżeli numer i funkcja są logicznie zgodne.
+- Jeżeli dokument zawiera kilka podobnych kart, np. 1-P/U i 2-P/U, nie mieszaj parametrów między kartami.
+- Parametry MPZP wpisuj krótko i konkretnie, np. "60%", "0,10", "1,50", "25 M", "15%".
+- Jeżeli w uchwale występuje numer uchwały i data, rozdziel je na mpzp_resolution oraz mpzp_resolution_date.
+- mpzp_resolution_date zwracaj jako tekst w formacie: "12 maja 2020 roku".
+
 Zwróć JSON dokładnie w tym schemacie:
 {
   "broker_name": "",
@@ -76,6 +84,7 @@ Zwróć JSON dokładnie w tym schemacie:
   "eur_pln_rate": "",
 
   "mpzp_resolution": "",
+  "mpzp_resolution_date": "",
   "terrain_card": "",
   "terrain_function": "",
   "excluded_functions": "",
