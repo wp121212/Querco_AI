@@ -4,1117 +4,193 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Querco — Generator Ofert</title>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --q-navy: #102A3D;
-  --q-navy-2: #16354d;
-  --q-steel: #6E7579;
-  --q-ice: #F2F2F2;
-  --q-line: #d7dde2;
-  --q-line-soft: #e9edf0;
-  --q-bg: #eef1f3;
-  --q-card: #ffffff;
-  --q-text: #111827;
-  --q-muted: #6b7280;
-  --q-soft: #8c98a5;
-  --q-success: #1f7a3e;
-  --q-success-bg: #edf7f1;
-  --q-warning: #b97916;
-  --q-danger: #b42318;
-  --radius: 2px;
-  --shadow-card: 0 1px 2px rgba(16, 42, 61, 0.05), 0 16px 42px rgba(16, 42, 61, 0.045);
-  --transition: 160ms ease;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { background: var(--q-bg); }
-
-body {
-  font-family: 'Lato', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background:
-    radial-gradient(circle at 0 0, rgba(16,42,61,0.065), transparent 340px),
-    linear-gradient(180deg, #f7f8f9 0%, var(--q-bg) 100%);
-  color: var(--q-text);
-  -webkit-font-smoothing: antialiased;
-  letter-spacing: 0.01em;
-}
-
-/* === HEADER === */
-.header {
-  background: var(--q-navy);
-  min-height: 66px;
-  padding: 0 34px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 4px solid rgba(110,117,121,0.45);
-  box-shadow: 0 10px 28px rgba(16,42,61,0.22);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.header-left { display: flex; align-items: center; gap: 18px; }
-
-.logo {
-  color: #fff;
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  line-height: 1;
-}
-
-.logo::before {
-  content: '';
-  display: inline-block;
-  width: 12px;
-  height: 28px;
-  margin-right: 13px;
-  vertical-align: -8px;
-  background: #fff;
-  opacity: .88;
-}
-
-.logo span {
-  font-weight: 300;
-  color: rgba(255,255,255,0.66);
-  text-transform: lowercase;
-  letter-spacing: -0.03em;
-}
-
-.badge {
-  color: rgba(255,255,255,0.76);
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 2px;
-  padding: 7px 11px;
-  font-size: 10px;
-  line-height: 1;
-  font-weight: 700;
-  letter-spacing: 1.45px;
-  text-transform: uppercase;
-}
-
-/* === LAYOUT === */
-.main {
-  max-width: 1060px;
-  margin: 0 auto;
-  padding: 28px 22px 60px;
-}
-
-/* === CARDS / PANELS === */
-.card,
-.tmpl-card,
-.ai-card {
-  background: rgba(255,255,255,0.96);
-  border: 1px solid var(--q-line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-}
-
-.tmpl-card,
-.ai-card {
-  padding: 24px 26px;
-  margin-bottom: 16px;
-  position: relative;
-}
-
-.tmpl-card::before,
-.ai-card::before,
-.card::before {
-  content: '';
-  display: block;
-  height: 3px;
-  background: linear-gradient(90deg, var(--q-navy) 0%, var(--q-steel) 55%, rgba(242,242,242,0) 100%);
-}
-
-.tmpl-card::before,
-.ai-card::before {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-}
-
-.card { margin-bottom: 16px; }
-
-.card-header {
-  padding: 18px 26px 17px;
-  border-bottom: 1px solid var(--q-line-soft);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(180deg, #fff 0%, #fbfcfd 100%);
-}
-
-.card-header-left { display: flex; align-items: center; gap: 14px; }
-
-.card-num {
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--q-navy);
-  width: 30px;
-  height: 30px;
-  border-radius: 2px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.12);
-}
-
-.card-title {
-  font-size: 15px;
-  font-weight: 900;
-  color: var(--q-navy);
-  text-transform: uppercase;
-  letter-spacing: .02em;
-  line-height: 1.12;
-}
-
-.card-title-en {
-  margin-top: 3px;
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--q-soft);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.card-body { padding: 0; }
-
-.opt-label {
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 10px;
-  color: var(--q-soft);
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  margin-right: 8px;
-}
-
-/* === FORM ROWS === */
-.field-row,
-.dist-cell {
-  display: flex;
-  align-items: center;
-  min-height: 58px;
-  padding: 12px 26px;
-  border-bottom: 1px solid var(--q-line-soft);
-  background: #fff;
-  transition: background var(--transition), border-color var(--transition);
-}
-
-.field-row:last-child { border-bottom: none; }
-
-.field-row:hover,
-.dist-cell:hover {
-  background: #fbfcfd;
-}
-
-.field-label {
-  flex: 0 0 31%;
-  min-width: 0;
-  padding-right: 14px;
-}
-
-.field-label-pl {
-  font-size: 12px;
-  font-weight: 900;
-  color: var(--q-text);
-  text-transform: uppercase;
-  letter-spacing: .045em;
-  line-height: 1.25;
-}
-
-.field-label-en {
-  margin-top: 3px;
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--q-soft);
-  text-transform: uppercase;
-  letter-spacing: .075em;
-  line-height: 1.25;
-}
-
-.field-label-pl.editing,
-.field-label-en.editing {
-  cursor: text;
-  background: #fff;
-  outline: 1px solid var(--q-navy);
-  border-radius: 2px;
-  padding: 2px 4px;
-  margin: -2px -4px;
-}
-
-.field-value {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* edit icon between label and value */
-.edit-btn {
-  flex: 0 0 38px;
-  width: 38px;
-  height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 2px;
-  color: rgba(16,42,61,0.42);
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  margin-right: 18px;
-  transition: all var(--transition);
-  opacity: .42;
-}
-
-.field-row:hover .edit-btn,
-.dist-cell:hover .edit-btn {
-  opacity: .82;
-}
-
-.edit-btn:hover {
-  opacity: 1 !important;
-  color: var(--q-navy);
-  border-color: var(--q-line);
-  background: #f7f9fa;
-  transform: translateY(-1px);
-}
-
-.edit-btn.active {
-  opacity: 1 !important;
-  color: #fff;
-  background: var(--q-navy);
-  border-color: var(--q-navy);
-}
-
-/* wide text row */
-.field-row-wide {
-  display: block;
-  padding: 17px 26px 22px;
-}
-
-.field-row-wide .field-label {
-  width: 100%;
-  padding-right: 0;
-  margin-bottom: 9px;
-}
-
-.field-row-wide .edit-btn { display: none; }
-
-.field-row-wide .field-value { width: 100%; display: block; }
-
-/* distance grid */
-.dist-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--q-line-soft);
-}
-
-.dist-cell {
-  padding: 12px 20px;
-  border-right: 1px solid var(--q-line-soft);
-}
-
-.dist-cell:nth-child(3n) { border-right: none; }
-
-.dist-cell .field-label { flex: 0 0 52%; padding-right: 10px; }
-
-.dist-cell .edit-btn {
-  flex-basis: 28px;
-  width: 28px;
-  height: 28px;
-  font-size: 13px;
-  margin-right: 8px;
-}
-
-/* MPZP params */
-.param-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.param-grid .field-row {
-  border-right: 1px solid var(--q-line-soft);
-}
-
-.param-grid .field-row:nth-child(2n) { border-right: none; }
-
-/* === INPUTS === */
-input,
-textarea,
-select {
-  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
-}
-
-input,
-textarea {
-  width: 100%;
-  color: var(--q-text);
-  font-size: 14px;
-  font-weight: 700;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--q-line-soft);
-  padding: 8px 2px 7px;
-  outline: none;
-  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
-}
-
-input {
-  text-transform: uppercase;
-  letter-spacing: .025em;
-}
-
-input:focus {
-  border-bottom-color: var(--q-navy);
-  box-shadow: inset 0 -1px 0 var(--q-navy);
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #9aa5b1;
-  font-weight: 500;
-}
-
-textarea {
-  min-height: 96px;
-  resize: vertical;
-  border: 1px solid var(--q-line);
-  border-radius: 2px;
-  padding: 13px 14px;
-  background: #fbfcfd;
-  font-weight: 500;
-  line-height: 1.45;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-textarea:focus {
-  border-color: var(--q-navy);
-  box-shadow: 0 0 0 3px rgba(16,42,61,0.08);
-  background: #fff;
-}
-
-select {
-  height: 34px;
-  min-width: 64px;
-  padding: 0 10px;
-  border: 1px solid var(--q-line);
-  border-radius: 2px;
-  background: #f7f9fa;
-  color: var(--q-navy);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  outline: none;
-  cursor: pointer;
-  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
-}
-
-select:hover { border-color: #c6cdd4; background: #fff; }
-
-select:focus {
-  border-color: var(--q-navy);
-  box-shadow: 0 0 0 3px rgba(16,42,61,0.08);
-}
-
-.select-ownership {
-  min-width: 250px;
-  max-width: 320px;
-  height: 36px;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--q-line-soft);
-  border-radius: 0;
-  color: var(--q-text);
-  font-size: 13px;
-  text-align: left;
-  appearance: auto;
-  -webkit-appearance: auto;
-}
-
-.ai-filled {
-  background: var(--q-success-bg) !important;
-  border-bottom-color: var(--q-success) !important;
-}
-
-
-/* === BROKER PROFILE SELECTOR === */
-.card-header-right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 340px;
-}
-.broker-profile-select {
-  width: 100%;
-  max-width: 430px;
-  height: 46px;
-  padding: 0 46px 0 18px;
-  background: #fff;
-  border: 1px solid #cfd6dd;
-  border-radius: 2px;
-  color: var(--q-navy);
-  font-family: 'Lato', 'Inter', system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .09em;
-  text-transform: uppercase;
-  cursor: pointer;
-  appearance: auto;
-  -webkit-appearance: auto;
-  box-shadow: 0 1px 2px rgba(16,42,61,0.05);
-  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
-}
-.broker-profile-select:hover {
-  border-color: var(--q-navy);
-  background: #fff;
-  box-shadow: 0 3px 10px rgba(16,42,61,0.07);
-}
-.broker-profile-select:focus {
-  border-color: var(--q-navy);
-  box-shadow: 0 0 0 3px rgba(16,42,61,0.08);
-}
-.broker-profile-note { display: none; }
-
-/* === TEMPLATE SELECTOR === */
-.tmpl-label {
-  font-size: 11px;
-  font-weight: 900;
-  color: var(--q-steel);
-  text-transform: uppercase;
-  letter-spacing: .11em;
-  margin-bottom: 9px;
-}
-
-.tmpl-select {
-  width: 100%;
-  height: 44px;
-  background: #fff;
-  border: 1px solid var(--q-line);
-  border-radius: 2px;
-  padding: 0 13px;
-  color: var(--q-text);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: .02em;
-  appearance: auto;
-}
-
-.tmpl-loaded {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-top: 11px;
-  padding: 10px 12px;
-  background: var(--q-success-bg);
-  border: 1px solid rgba(31,122,62,0.18);
-  color: var(--q-success);
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: .045em;
-}
-
-/* === AI SECTION === */
-.ai-title {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 13px;
-  color: var(--q-navy);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: .095em;
-  text-transform: uppercase;
-}
-
-.ai-title span {
-  color: var(--q-steel);
-}
-
-.ai-textarea {
-  width: 100%;
-  min-height: 112px;
-  padding: 14px 15px;
-  border: 1px solid var(--q-line);
-  border-radius: 2px;
-  background: #fbfcfd;
-  color: var(--q-text);
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.45;
-  resize: vertical;
-  text-transform: none;
-}
-
-.ai-textarea:focus {
-  background: #fff;
-  border-color: var(--q-navy);
-  box-shadow: 0 0 0 3px rgba(16,42,61,0.08);
-}
-
-.file-drop {
-  margin-top: 12px;
-  padding: 22px 18px;
-  border: 1px dashed #b9c2ca;
-  border-radius: 2px;
-  background:
-    linear-gradient(135deg, rgba(16,42,61,0.025), rgba(110,117,121,0.035));
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--transition);
-}
-
-.file-drop:hover,
-.file-drop.drag-over {
-  border-color: var(--q-navy);
-  background: #f7f9fa;
-}
-
-.file-drop-icon {
-  font-size: 22px;
-  color: var(--q-navy);
-  margin-bottom: 5px;
-}
-
-.file-drop-text {
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--q-navy);
-  letter-spacing: .035em;
-  text-transform: uppercase;
-}
-
-.file-drop-sub {
-  margin-top: 5px;
-  color: var(--q-soft);
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 11px;
-  letter-spacing: .04em;
-}
-
-.file-list { margin-top: 10px; }
-
-.file-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
-  background: #fff;
-  border: 1px solid var(--q-line-soft);
-  border-radius: 2px;
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.file-item-name {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.file-item-size {
-  color: var(--q-soft);
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 10px;
-  flex-shrink: 0;
-}
-
-.file-item-remove {
-  background: transparent;
-  border: none;
-  color: var(--q-danger);
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.file-limit {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-  color: var(--q-soft);
-  font-size: 10px;
-  letter-spacing: .04em;
-}
-
-.file-limit-warn { color: var(--q-danger); }
-
-.ai-btn-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.ai-btn,
-.gen-btn {
-  border: none;
-  border-radius: 2px;
-  background: var(--q-navy);
-  color: #fff;
-  cursor: pointer;
-  font-family: 'Lato', system-ui, sans-serif;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: .085em;
-  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-}
-
-.ai-btn {
-  padding: 11px 18px;
-  font-size: 11px;
-}
-
-.ai-btn:hover,
-.gen-btn:hover {
-  background: var(--q-navy-2);
-  transform: translateY(-1px);
-  box-shadow: 0 12px 20px rgba(16,42,61,0.14);
-}
-
-.ai-btn:disabled,
-.gen-btn:disabled {
-  background: #9aa5b1;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.ai-status {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  color: var(--q-soft);
-  font-size: 12px;
-}
-
-.spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--q-line);
-  border-top-color: var(--q-navy);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.ai-hint {
-  margin-top: 10px;
-  color: var(--q-soft);
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 11px;
-  letter-spacing: .025em;
-}
-
-/* reset labels */
-.reset-labels-btn {
-  background: #fff;
-  border: 1px solid var(--q-line);
-  border-radius: 2px;
-  padding: 9px 13px;
-  color: var(--q-steel);
-  cursor: pointer;
-  font-family: 'Lato', system-ui, sans-serif;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .065em;
-  text-transform: uppercase;
-  transition: all var(--transition);
-  box-shadow: 0 1px 2px rgba(16,42,61,0.035);
-}
-
-.reset-labels-btn:hover {
-  color: var(--q-navy);
-  border-color: var(--q-navy);
-  background: #fbfcfd;
-}
-
-/* === TOGGLES === */
-.toggle {
-  width: 42px;
-  height: 22px;
-  border: none;
-  border-radius: 11px;
-  cursor: pointer;
-  position: relative;
-  transition: background var(--transition);
-}
-
-.toggle-dot {
-  position: absolute;
-  top: 3px;
-  width: 16px;
-  height: 16px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0,0,0,.18);
-  transition: left var(--transition);
-}
-
-
-/* === FIELD VISIBILITY TOGGLES === */
-.field-row.has-visibility-toggle {
-  position: relative;
-}
-
-.field-row.has-visibility-toggle .field-value {
-  padding-right: 4px;
-}
-
-.field-visible-switch {
-  flex: 0 0 68px;
-  width: 68px;
-  height: 28px;
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(16,42,61,0.20);
-  border-radius: 999px;
-  background: var(--q-navy);
-  cursor: pointer;
-  position: relative;
-  margin-left: 14px;
-  padding: 0;
-  color: #fff;
-  font-family: 'Roboto', system-ui, sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  line-height: 1;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(16,42,61,.10);
-  transition: background var(--transition), border-color var(--transition), opacity var(--transition), box-shadow var(--transition);
-  z-index: 5;
-}
-
-.field-visible-switch::before {
-  content: 'ON';
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #fff;
-  pointer-events: none;
-}
-
-.field-visible-switch::after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  left: 43px;
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0,0,0,.22);
-  transition: left var(--transition);
-  pointer-events: none;
-}
-
-.field-visible-switch.off {
-  background: #cfd6dd;
-  border-color: #c3cbd3;
-  color: var(--q-steel);
-  box-shadow: none;
-}
-
-.field-visible-switch.off::before {
-  content: 'OFF';
-  left: 31px;
-  color: #5f6b76;
-}
-
-.field-visible-switch.off::after {
-  left: 5px;
-}
-
-.field-visible-switch:hover {
-  opacity: .92;
-  box-shadow: 0 3px 8px rgba(16,42,61,.12);
-}
-
-.field-row.field-disabled {
-  background: #f4f6f7;
-  opacity: .62;
-}
-
-.field-row.field-disabled .field-label-pl,
-.field-row.field-disabled .field-label-en,
-.field-row.field-disabled input,
-.field-row.field-disabled select {
-  color: #9aa5b1 !important;
-}
-
-/* === GENERATE BUTTON === */
-.gen-btn {
-  display: block;
-  width: 100%;
-  margin-top: 18px;
-  padding: 16px;
-  font-size: 12px;
-}
-
-.status {
-  min-height: 28px;
-  text-align: center;
-  color: var(--q-steel);
-  font-size: 12px;
-  padding: 9px;
-}
-
-.sec-fields-off {
-  opacity: 0.34;
-  pointer-events: none;
-}
-
-.upload-loaded { display: none; }
-
-/* === RESPONSIVE === */
-@media (max-width: 760px) {
-  .header { padding: 0 18px; min-height: 58px; }
-  .main { padding: 18px 12px 44px; }
-
-  .field-row,
-  .dist-cell {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    padding: 14px 18px;
-  }
-
-  .field-label {
-    flex: 0 0 calc(100% - 44px);
-    width: calc(100% - 44px);
-    margin-bottom: 8px;
-  }
-
-  .edit-btn {
-    margin-left: auto;
-    margin-right: 0;
-    flex: 0 0 34px;
-    width: 34px;
-    height: 34px;
-    order: 1;
-  }
-
-  .field-value {
-    flex: 0 0 100%;
-    width: 100%;
-    order: 2;
-  }
-
-  .dist-grid,
-  .param-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dist-cell,
-  .param-grid .field-row {
-    border-right: none;
-  }
-
-  .card-header,
-  .tmpl-card,
-  .ai-card {
-    padding: 18px;
-  }
-
-  .logo::before { display: none; }
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f6f8;color:#1a1a2e}
+.header{background:#102A3D;padding:14px 20px;display:flex;align-items:center;gap:12px}
+.logo{color:#fff;font-size:17px;font-weight:500;letter-spacing:-0.3px}
+.logo span{font-weight:400;color:#8ba3b8}
+.badge{background:#1a3f5c;color:#7fb5d5;font-size:11px;padding:3px 9px;border-radius:4px;font-weight:500}
+.main{max-width:900px;margin:0 auto;padding:16px}
+.upload-zone{border:1.5px dashed #bfc8d2;border-radius:10px;padding:32px;text-align:center;cursor:pointer;margin-bottom:16px;transition:all 0.2s;background:#fff}
+.upload-zone:hover{border-color:#102A3D;background:#fafbfc}
+.upload-loaded{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#edf7ed;border-radius:8px;margin-bottom:16px;font-size:13px;color:#2e6b2e}
+.section{background:#fff;border:1px solid #e5e8ec;border-radius:10px;padding:16px 20px;margin-bottom:10px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:14px;font-weight:600;color:#102A3D;display:flex;align-items:center;gap:8px}
+.sec-num{background:#102A3D;color:#fff;width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.opt-label{font-size:11px;color:#999}
+.toggle{width:38px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle-dot{position:absolute;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.field-full{grid-column:1/-1}
+label{display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:4px;letter-spacing:0.1px}
+input,textarea,select{width:100%;font-size:13px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;border-radius:6px;padding:8px 10px;font-family:inherit;transition:border-color 0.15s;outline:none}
+input:focus,textarea:focus{border-color:#102A3D}
+textarea{min-height:80px;resize:vertical}
+.gen-btn{display:block;width:100%;margin-top:8px;padding:13px;background:#102A3D;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s;font-family:inherit}
+.gen-btn:hover{background:#1a3f5c}
+.gen-btn:disabled{background:#8ba3b8;cursor:not-allowed}
+.status{text-align:center;font-size:12px;color:#666;padding:8px;margin-top:4px}
+
+/* AI Section */
+.ai-section{background:#fff;border:1px solid #e5e8ec;border-radius:10px;padding:20px;margin-bottom:16px}
+.ai-section-title{font-size:14px;font-weight:600;color:#102A3D;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.ai-section-title .icon{font-size:18px}
+.ai-textarea{width:100%;min-height:100px;font-size:13px;color:#1a1a2e;background:#fafbfc;border:1px solid #dde1e6;border-radius:6px;padding:10px 12px;font-family:inherit;resize:vertical;outline:none;transition:border-color 0.15s}
+.ai-textarea:focus{border-color:#102A3D}
+.ai-btn-row{display:flex;gap:8px;margin-top:10px;align-items:center}
+.ai-btn{padding:9px 18px;background:#102A3D;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s;display:inline-flex;align-items:center;gap:6px}
+.ai-btn:hover{background:#1a3f5c}
+.ai-btn:disabled{background:#8ba3b8;cursor:not-allowed}
+.ai-status{font-size:12px;color:#666;display:none;align-items:center;gap:8px}
+.spinner{width:14px;height:14px;border:2px solid #dde1e6;border-top-color:#102A3D;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-hint{font-size:11px;color:#999;margin-top:6px}
+.ai-filled{border-color:#2e9e2e!important;background:#f8fdf8!important}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-left">
-    <div class="logo">QUERCO <span>property</span></div>
-  </div>
-  <span class="badge">Generator Ofert</span>
+  <div class="logo">QUERCO <span>property</span></div>
+  <span class="badge">AI GENERATOR OFERT</span>
 </div>
 
 <div class="main">
 
-<!-- TEMPLATE SELECTOR -->
-<div class="tmpl-card">
-  <div class="tmpl-label">Szablon oferty</div>
-  <select id="template-select" onchange="loadSelectedTemplate()" class="tmpl-select">
-    <option value="">— wybierz szablon —</option>
-    <option value="magazyn-sprzedaz">Magazyn — sprzedaż</option>
-  </select>
-  <div id="template-status" style="display:none;margin-top:8px;font-size:11px;color:var(--text-tertiary);align-items:center;gap:6px"></div>
-  <div id="template-loaded" style="display:none" class="tmpl-loaded">
-    <span>✓</span> <span id="template-loaded-name"></span>
+<!-- SZABLON PPTX UPLOAD -->
+<div id="upload-area">
+  <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" 
+       ondragover="event.preventDefault();this.style.borderColor='#102A3D'" 
+       ondragleave="this.style.borderColor=''" 
+       ondrop="handleDrop(event)">
+    <div style="font-size:28px;margin-bottom:8px">📁</div>
+    <div style="font-size:14px;color:#555">Przeciągnij szablon PPTX lub kliknij</div>
+    <div style="font-size:11px;color:#999;margin-top:4px">Magazyn_wzorzec_ai.pptx</div>
   </div>
+  <input type="file" id="file-input" accept=".pptx" style="display:none" onchange="loadTemplate(this.files[0])">
+</div>
+
+<div id="loaded-bar" style="display:none" class="upload-loaded">
+  <span>✓</span>
+  <span id="loaded-name"></span>
+  <button onclick="resetTemplate()" style="margin-left:auto;background:none;border:1px solid #2e6b2e;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:11px;color:#2e6b2e;font-family:inherit">Zmień</button>
 </div>
 
 <div id="form-area" style="display:none">
 
-<!-- AI EXTRACTION -->
-<div class="ai-card">
-  <div class="ai-title"><span>✦</span> AI Extraction</div>
-  <textarea class="ai-textarea" id="ai-source" placeholder="Wklej treść maila, notatki, opis z oferty developera..."></textarea>
-  <div class="file-drop" id="file-drop-zone" onclick="document.getElementById('ai-file-input').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleFileDrop(event)">
-    <div class="file-drop-icon">📎</div>
-    <div class="file-drop-text">Przeciągnij pliki lub kliknij</div>
-    <div class="file-drop-sub">PDF, JPG, PNG, WEBP, TXT — max 10 plików, 25 MB</div>
+<!-- ===== AI EXTRACTION SECTION ===== -->
+<div class="ai-section">
+  <div class="ai-section-title">
+    <span class="icon">✨</span> AI uzupełnianie pól
   </div>
-  <input type="file" id="ai-file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.txt" style="display:none" onchange="handleFileSelect(this.files)">
-  <div class="file-list" id="file-list"></div>
-  <div class="file-limit" id="file-limit" style="display:none"><span id="file-count">0 / 10</span><span id="file-size">0 / 25 MB</span></div>
+  <textarea class="ai-textarea" id="ai-source" placeholder="Wklej treść maila, notatki, opis z oferty developera, dane z systemu...
+
+Np: SPRZEDAŻ: Wynajęty Park Magazynowo-Produkcyjny NOHO, 8331 m2 PUU, ul. Bartników, Kraków. Cena: 28 000 000 PLN. Grunt: 1,8 ha, działka 45/3, obręb 0012. 5 najemców, occupancy 92%, NOI 1 450 000 EUR..."></textarea>
   <div class="ai-btn-row">
-    <button class="ai-btn" id="ai-btn" onclick="aiExtract()">✦ AI uzupełnij pola</button>
-    <div class="ai-status" id="ai-status"><div class="spinner"></div><span id="ai-status-text">Analizuję...</span></div>
+    <button class="ai-btn" id="ai-btn" onclick="aiExtract()">
+      ✨ AI uzupełnij pola
+    </button>
+    <div class="ai-status" id="ai-status">
+      <div class="spinner"></div>
+      <span id="ai-status-text">Analizuję...</span>
+    </div>
   </div>
-  <div class="ai-hint">AI przeanalizuje tekst i załączone pliki, następnie wypełni formularz.</div>
+  <div class="ai-hint">AI wyciągnie dane z tekstu i wypełni formularz. Sprawdź i popraw przed generowaniem.</div>
 </div>
 
-<div style="margin-bottom:12px"><button class="reset-labels-btn" onclick="resetAllLabels()">↺ Przywróć domyślne nazwy pól</button></div>
-
-<!-- SECTION 1: OKŁADKA -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-left">
-      <span class="card-num">01</span>
-      <div class="card-title-block"><div class="card-title">Okładka</div><div class="card-title-en">Cover Page</div></div>
-    </div>
-    <div class="card-header-right">
-      <select id="broker_profile" class="broker-profile-select" onchange="selectBrokerProfile(this.value)">
-        <option value="">WYBIERZ BROKERA Z LISTY</option>
-        <option value="piotr_wrobel">PIOTR WRÓBEL</option>
-        <option value="karolina_bomba">KAROLINA BOMBA</option>
-        <option value="lidia_szczepanska">LIDIA SZCZEPAŃSKA</option>
-      </select>
-    </div>
-  </div>
-  <div class="card-body">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Imię i nazwisko brokera</div><div class="field-label-en">Broker Name</div></div><div class="field-value"><input id="broker_name" placeholder="Jan Kowalski"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Email</div><div class="field-label-en">Email Address</div></div><div class="field-value"><input id="broker_email" placeholder="jan@querco.pl"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Telefon</div><div class="field-label-en">Phone Number</div></div><div class="field-value"><input id="broker_phone" placeholder="+48 500 123 456"></div></div>
+<!-- SLIDE 1: OKŁADKA -->
+<div class="section">
+  <div class="sec-head"><div class="sec-title"><span class="sec-num">1</span> Okładka</div></div>
+  <div class="field-grid">
+    <div class="field-full"><label>Imię i nazwisko brokera</label><input id="broker_name" placeholder="Jan Kowalski"></div>
+    <div><label>Email</label><input id="broker_email" placeholder="jan@querco.pl"></div>
+    <div><label>Telefon</label><input id="broker_phone" placeholder="+48 500 123 456"></div>
   </div>
 </div>
 
-<!-- SECTION 2: GRUNT / LOKALIZACJA -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-left">
-      <span class="card-num">02</span>
-      <div class="card-title-block"><div class="card-title">Grunt / Lokalizacja</div><div class="card-title-en">Land / Location</div></div>
-    </div>
-  </div>
-  <div class="card-body">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. MARYNARKI POLSKIEJ 1"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="25 000"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Numer działki</div><div class="field-label-en">Plot Number</div></div><div class="field-value"><input id="plot_number" placeholder="12/5, 12/6"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Obręb</div><div class="field-label-en">Precinct</div></div><div class="field-value"><input id="precinct" placeholder="0042"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Gmina / Miasto</div><div class="field-label-en">Commune / City</div></div><div class="field-value"><input id="commune" placeholder="GDAŃSK"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powiat</div><div class="field-label-en">County</div></div><div class="field-value"><input id="county" placeholder="M. GDAŃSK"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Rodzaj własności</div><div class="field-label-en">Type of Ownership</div></div><div class="field-value"><select id="ownership" class="select-ownership"><option value="">— wybierz —</option><option value="WŁASNOŚĆ">WŁASNOŚĆ</option><option value="UŻYTKOWANIE WIECZYSTE">UŻYTKOWANIE WIECZYSTE</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="asking_price" placeholder="32 000 000"><select id="asking_price_currency" onchange="updateCurrencyLabel('asking_price','Cena ofertowa')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
-    <div class="dist-grid">
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Lotnisko [km]</div><div class="field-label-en">Airport</div></div><div class="field-value"><input id="dist_airport" placeholder="15"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Autostrada [km]</div><div class="field-label-en">Expressway</div></div><div class="field-value"><input id="dist_expressway" placeholder="3"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Port [km]</div><div class="field-label-en">Port</div></div><div class="field-value"><input id="dist_port" placeholder="8"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Droga krajowa [km]</div><div class="field-label-en">Highway</div></div><div class="field-value"><input id="dist_highway" placeholder="2"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Kolej [km]</div><div class="field-label-en">Railway</div></div><div class="field-value"><input id="dist_railway" placeholder="5"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Komunikacja [m]</div><div class="field-label-en">Mass Transit</div></div><div class="field-value"><input id="dist_transit" placeholder="200"></div></div>
-    </div>
-    <div class="field-row field-row-wide"><div class="field-label"><div class="field-label-pl">Opis nieruchomości</div><div class="field-label-en">Property Description</div></div><div class="field-value"><textarea id="description" placeholder="Akapit 1: działki, powierzchnia w ha&#10;Akapit 2: lokalizacja&#10;Akapit 3: zabudowa"></textarea></div></div>
+<!-- SLIDE 2: GRUNT / LOKALIZACJA -->
+<div class="section">
+  <div class="sec-head"><div class="sec-title"><span class="sec-num">2</span> Grunt / Lokalizacja</div></div>
+  <div class="field-grid">
+    <div><label>Miasto</label><input id="city" placeholder="Gdańsk"></div>
+    <div><label>Ulica</label><input id="street" placeholder="ul. Marynarki Polskiej 1"></div>
+    <div><label>Powierzchnia gruntu [m²]</label><input id="land_area" placeholder="25 000"></div>
+    <div><label>Numer działki</label><input id="plot_number" placeholder="12/5, 12/6"></div>
+    <div><label>Obręb</label><input id="precinct" placeholder="0042"></div>
+    <div><label>Gmina / Miasto</label><input id="commune" placeholder="Gdańsk"></div>
+    <div><label>Powiat</label><input id="county" placeholder="m. Gdańsk"></div>
+    <div><label>Rodzaj własności</label><input id="ownership" placeholder="Własność"></div>
+    <div class="field-full"><label>Cena ofertowa [PLN]</label><input id="price_pln" placeholder="32 000 000 PLN"></div>
+    <div><label>Lotnisko [km]</label><input id="dist_airport" placeholder="15"></div>
+    <div><label>Ekspresowa [km]</label><input id="dist_expressway" placeholder="3"></div>
+    <div><label>Port [km]</label><input id="dist_port" placeholder="8"></div>
+    <div><label>Droga krajowa [km]</label><input id="dist_highway" placeholder="2"></div>
+    <div><label>Kolej [km]</label><input id="dist_railway" placeholder="5"></div>
+    <div><label>Komunikacja miejska [m]</label><input id="dist_transit" placeholder="200"></div>
+    <div class="field-full"><label>Opis nieruchomości (3 akapity, każdy w nowej linii)</label><textarea id="description" placeholder="Działka 1,2 ha przy ul. Marynarki...&#10;Obiekt położony w doskonałej lokalizacji...&#10;Zabudowa: hala magazynowa z częścią biurową..."></textarea></div>
   </div>
 </div>
 
-<!-- SECTION 3: ZABUDOWA -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-header-left">
-      <span class="card-num">03</span>
-      <div class="card-title-block"><div class="card-title">Zabudowa</div><div class="card-title-en">Building</div></div>
-    </div>
-  </div>
-  <div class="card-body">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia zabudowy [m²]</div><div class="field-label-en">Building Footprint</div></div><div class="field-value"><input id="building_footprint" placeholder="12 000"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia użytkowa [m²]</div><div class="field-label-en">Total Area</div></div><div class="field-value"><input id="total_area" placeholder="15 000"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba miejsc parkingowych</div><div class="field-label-en">Parking Spots</div></div><div class="field-value"><input id="parking_spots" placeholder="50"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia magazynowa [m²]</div><div class="field-label-en">Warehouse Area</div></div><div class="field-value"><input id="warehouse_area" placeholder="13 500"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia biurowa [m²]</div><div class="field-label-en">Office Area</div></div><div class="field-value"><input id="office_area" placeholder="1 500"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Rok modernizacji</div><div class="field-label-en">Year of Modernization</div></div><div class="field-value"><input id="year_modernization" placeholder="2020"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price-building">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price (Slide 3)</div></div><div class="field-value"><input id="asking_price_building" placeholder="32 000 000"><select id="asking_price_building_currency" onchange="updateCurrencyLabel('asking_price_building','Cena ofertowa','(slajd 3)')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
+<!-- SLIDE 3: ZABUDOWA -->
+<div class="section">
+  <div class="sec-head"><div class="sec-title"><span class="sec-num">3</span> Zabudowa</div></div>
+  <div class="field-grid">
+    <div><label>Powierzchnia zabudowy [m²]</label><input id="building_footprint" placeholder="12 000"></div>
+    <div><label>Powierzchnia użytkowa [m²]</label><input id="total_area" placeholder="15 000"></div>
+    <div><label>Liczba miejsc parkingowych</label><input id="parking_spots" placeholder="50"></div>
+    <div><label>Pow. magazynowa [m²]</label><input id="warehouse_area" placeholder="13 500"></div>
+    <div><label>Pow. biurowa [m²]</label><input id="office_area" placeholder="1 500"></div>
+    <div><label>Rok modernizacji</label><input id="year_modernization" placeholder="2020"></div>
+    <div class="field-full"><label>Cena ofertowa [PLN] (slajd 3)</label><input id="price_pln_building" placeholder="32 000 000 PLN"></div>
   </div>
 </div>
 
-<!-- SECTION 4: DOCHODY -->
-<div class="card" id="sec-slide4">
-  <div class="card-header">
-    <div class="card-header-left">
-      <span class="card-num">04</span>
-      <div class="card-title-block"><div class="card-title">Dochody / Najemcy</div><div class="card-title-en">Income / Tenants</div></div>
+<!-- SLIDE 4: DOCHODY (OPCJONALNY) -->
+<div class="section" id="sec-slide4">
+  <div class="sec-head">
+    <div class="sec-title">
+      <span class="sec-num">4</span> Dochody / Najemcy
+      <span class="opt-label">(opcjonalny)</span>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span class="opt-label">opcjonalny</span>
-      <button class="toggle" id="toggle4" onclick="toggleSection('slide4')" style="background:#102A3D"><div class="toggle-dot" style="left:18px"></div></button>
-    </div>
+    <button class="toggle" id="toggle4" onclick="toggleSlide('slide4','toggle4','sec4-fields')" style="background:#102A3D">
+      <div class="toggle-dot" style="left:20px"></div>
+    </button>
   </div>
-  <div class="card-body" id="sec4-fields">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba najemców</div><div class="field-label-en">Number of Tenants</div></div><div class="field-value"><input id="num_tenants" placeholder="5"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Poziom wynajęcia</div><div class="field-label-en">Occupancy Rate</div></div><div class="field-value"><input id="occupancy" placeholder="95%"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-noi">NOI [EUR]</div><div class="field-label-en">Net Operating Income</div></div><div class="field-value"><input id="noi" placeholder="1 200 000"><select id="noi_currency" onchange="updateCurrencyLabel('noi','NOI')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Stopa kapitalizacji [%]</div><div class="field-label-en">Yield [%]</div></div><div class="field-value"><input id="yield_pct" placeholder="7,5%"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-price-sale">Cena ofertowa [EUR]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="price_sale" placeholder="7 500 000"><select id="price_sale_currency" onchange="updateCurrencyLabel('price_sale','Cena ofertowa')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-rent-income">Przychód z najmu [PLN/m²]</div><div class="field-label-en">Annual Rental Income</div></div><div class="field-value"><input id="rent_income" placeholder="180"><select id="rent_income_currency" onchange="updateCurrencyLabel('rent_income','Przychód z najmu','/m²')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-service-charge">Opłaty serwisowe [EUR/m²]</div><div class="field-label-en">Annual Service Charge</div></div><div class="field-value"><input id="service_charge" placeholder="12"><select id="service_charge_currency" onchange="updateCurrencyLabel('service_charge','Opłaty serwisowe','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-gross-income">Łączny przychód op. [EUR/m²]</div><div class="field-label-en">Gross Operating Income</div></div><div class="field-value"><input id="gross_income" placeholder="85"><select id="gross_income_currency" onchange="updateCurrencyLabel('gross_income','Łączny przychód op.','/m²')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Kurs EUR/PLN</div><div class="field-label-en">EUR/PLN Exchange Rate</div></div><div class="field-value"><input id="eur_pln_rate" placeholder="4,24"></div></div>
-  </div>
-</div>
-
-<!-- SECTION 5: MPZP -->
-<div class="card" id="sec-slide5">
-  <div class="card-header">
-    <div class="card-header-left">
-      <span class="card-num">05</span>
-      <div class="card-title-block"><div class="card-title">MPZP</div><div class="card-title-en">Local Spatial Development Plan</div></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span class="opt-label">opcjonalny</span>
-      <button class="toggle" id="toggle5" onclick="toggleSection('slide5')" style="background:#ccc"><div class="toggle-dot" style="left:2px"></div></button>
-    </div>
-  </div>
-  <div class="card-body sec-fields-off" id="sec5-fields">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Nr uchwały MPZP</div><div class="field-label-en">Resolution Number</div></div><div class="field-value"><input id="mpzp_resolution" placeholder="UCHWAŁA NR XXIII/456/2020"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Karta terenu</div><div class="field-label-en">Terrain Card</div></div><div class="field-value"><input id="terrain_card" placeholder="P/U"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcja terenu</div><div class="field-label-en">Terrain Function</div></div><div class="field-value"><input id="terrain_function" placeholder="PRODUKCJA, SKŁADY, MAGAZYNY"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcje wyłączone</div><div class="field-label-en">Excluded Functions</div></div><div class="field-value"><input id="excluded_functions" placeholder="MIESZKANIOWA, HANDLOWA"></div></div>
-    <div class="param-grid">
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. zabudowy MIN</div><div class="field-label-en">Building Area Min</div></div><div class="field-value"><input id="building_area_min" placeholder="-"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. zabudowy MAX</div><div class="field-label-en">Building Area Max</div></div><div class="field-value"><input id="building_area_max" placeholder="60%"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Intensywność MIN</div><div class="field-label-en">Intensity Min</div></div><div class="field-value"><input id="intensity_min" placeholder="0,1"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Intensywność MAX</div><div class="field-label-en">Intensity Max</div></div><div class="field-value"><input id="intensity_max" placeholder="1,5"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Wysokość zabudowy MAX</div><div class="field-label-en">Max Height</div></div><div class="field-value"><input id="height_max" placeholder="25 m"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. biol. czynna MIN</div><div class="field-label-en">Biologically Active Min</div></div><div class="field-value"><input id="bio_surface_min" placeholder="15%"></div></div>
-    </div>
+  <div id="sec4-fields" class="field-grid">
+    <div><label>Liczba najemców</label><input id="num_tenants" placeholder="5"></div>
+    <div><label>Poziom wynajęcia</label><input id="occupancy" placeholder="95%"></div>
+    <div><label>NOI [EUR]</label><input id="noi_eur" placeholder="1 200 000"></div>
+    <div><label>Stopa kapitalizacji [%]</label><input id="yield_pct" placeholder="7.5%"></div>
+    <div><label>Cena ofertowa [EUR]</label><input id="price_eur" placeholder="7 500 000"></div>
+    <div><label>Przychód z najmu [PLN/m²]</label><input id="rent_income_pln" placeholder="180"></div>
+    <div><label>Opłaty serwisowe [EUR/m²]</label><input id="service_charge_eur" placeholder="12"></div>
+    <div><label>Łączny przychód op. [EUR/m²]</label><input id="gross_income_eur" placeholder="85"></div>
+    <div class="field-full"><label>Kurs EUR/PLN</label><input id="eur_pln_rate" placeholder="4,24"></div>
   </div>
 </div>
 
-<button class="gen-btn" id="gen-btn" onclick="generatePptx()">⬇ GENERUJ PPTX</button>
+<!-- SLIDE 5: MPZP -->
+<div class="section">
+  <div class="sec-head"><div class="sec-title"><span class="sec-num">5</span> MPZP</div></div>
+  <div class="field-grid">
+    <div class="field-full"><label>Nr uchwały MPZP</label><input id="mpzp_resolution" placeholder="UCHWAŁA NR XXIII/456/2020 z dnia 15 września 2020 r."></div>
+    <div class="field-full"><label>Karta terenu</label><input id="terrain_card" placeholder="010-P31"></div>
+    <div class="field-full"><label>Funkcja terenu</label><input id="terrain_function" placeholder="Produkcja, składy, magazyny"></div>
+    <div class="field-full"><label>Funkcje wyłączone</label><input id="excluded_functions" placeholder="Mieszkaniowa, handlowa wielkopowierzchniowa"></div>
+    <div><label>Pow. zabudowy MIN</label><input id="building_area_min" placeholder="-"></div>
+    <div><label>Pow. zabudowy MAX</label><input id="building_area_max" placeholder="60%"></div>
+    <div><label>Intensywność MIN</label><input id="intensity_min" placeholder="0.1"></div>
+    <div><label>Intensywność MAX</label><input id="intensity_max" placeholder="1.5"></div>
+    <div><label>Wysokość zabudowy MAX</label><input id="height_max" placeholder="25 m"></div>
+    <div><label>Pow. biologicznie czynna MIN</label><input id="bio_surface_min" placeholder="15%"></div>
+  </div>
+</div>
+
+<button class="gen-btn" id="gen-btn" onclick="generatePptx()">
+  ⬇ Generuj PPTX
+</button>
 <div class="status" id="status"></div>
 
 </div><!-- /form-area -->
@@ -1124,1091 +200,247 @@ select:focus {
 <script>
 var templateBuffer = null;
 var slide4Active = true;
-var slide5Active = false;
-
-/* ===== SECTION 03 FIELD VISIBILITY ===== */
-var BUILDING_FIELD_CONFIG = [
-  { key: 'building_footprint', plFallback: 'POWIERZCHNIA ZABUDOWY [m²]', enFallback: 'BUILDING FOOTPRINT' },
-  { key: 'total_area', plFallback: 'POWIERZCHNIA UŻYTKOWA [m²]', enFallback: 'TOTAL AREA' },
-  { key: 'parking_spots', plFallback: 'LICZBA MIEJSC PARKINGOWYCH', enFallback: 'PARKING SPOTS' },
-  { key: 'warehouse_area', plFallback: 'POWIERZCHNIA MAGAZYNOWA [m²]', enFallback: 'WAREHOUSE AREA' },
-  { key: 'office_area', plFallback: 'POWIERZCHNIA BIUROWA [m²]', enFallback: 'OFFICE AREA' },
-  { key: 'year_modernization', plFallback: 'ROK MODERNIZACJI', enFallback: 'YEAR OF MODERNIZATION' }
-];
-
-var BUILDING_PRICE_FIELD = 'asking_price_building';
-var buildingFieldState = {};
-
-function initBuildingFieldToggles() {
-  BUILDING_FIELD_CONFIG.concat([{ key: BUILDING_PRICE_FIELD }]).forEach(function(cfg) {
-    var input = document.getElementById(cfg.key);
-    if (!input) return;
-
-    var row = input.closest('.field-row');
-    if (!row || row.getAttribute('data-visibility-toggle-ready') === '1') return;
-
-    row.setAttribute('data-visibility-toggle-ready', '1');
-    row.setAttribute('data-building-field', cfg.key);
-    row.classList.add('has-visibility-toggle');
-    buildingFieldState[cfg.key] = true;
-
-    var toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'field-visible-switch';
-    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
-    toggle.title = 'Pokaż / ukryj pole w prezentacji';
-    toggle.setAttribute('data-building-toggle', cfg.key);
-    toggle.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleBuildingField(cfg.key);
-    });
-
-    row.appendChild(toggle);
-  });
-}
-
-function toggleBuildingField(key) {
-  buildingFieldState[key] = !buildingFieldState[key];
-
-  var row = document.querySelector('[data-building-field="' + key + '"]');
-  var toggle = document.querySelector('[data-building-toggle="' + key + '"]');
-
-  if (row) row.classList.toggle('field-disabled', !buildingFieldState[key]);
-  if (toggle) toggle.classList.toggle('off', !buildingFieldState[key]);
-}
-
-function isBuildingFieldEnabled(key) {
-  return buildingFieldState[key] !== false;
-}
-
-function getBuildingFieldLabel(key, lang, fallback) {
-  var custom = getLabel(key, lang);
-  return (custom || fallback || '').toUpperCase();
-}
-
-function getActiveBuildingFields() {
-  var active = [];
-  BUILDING_FIELD_CONFIG.forEach(function(cfg) {
-    if (!isBuildingFieldEnabled(cfg.key)) return;
-
-    active.push({
-      key: cfg.key,
-      label_pl: getBuildingFieldLabel(cfg.key, 'pl', cfg.plFallback),
-      label_en: getBuildingFieldLabel(cfg.key, 'en', cfg.enFallback),
-      value: val(cfg.key)
-    });
-  });
-  return active;
-}
-
-function escapeXmlText(value) {
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-var BUILDING_TABLE_ROW_HEIGHT = '338400'; // 0,94 cm in PowerPoint EMU units
-
-function setTableRowHeight(rowXml, height) {
-  if (/<a:tr[^>]*h="[^"]*"/.test(rowXml)) {
-    return rowXml.replace(/<a:tr([^>]*)h="[^"]*"([^>]*)>/, '<a:tr$1h="' + height + '"$2>');
-  }
-  return rowXml.replace(/<a:tr([^>]*)>/, '<a:tr$1 h="' + height + '">');
-}
-
-function setTableRowHeights(tableXml, height) {
-  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
-    return setTableRowHeight(rowXml, height);
-  });
-}
-
-function setCellBorder(rowXml, borderTag, visible) {
-  var re = new RegExp('<a:' + borderTag + '([^>]*)>[\s\S]*?<\/a:' + borderTag + '>', 'g');
-  return rowXml.replace(re, function(match, attrs) {
-    if (visible) {
-      return '<a:' + borderTag + attrs + '><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:prstDash val="solid"/><a:round/><a:headEnd type="none" w="med" len="med"/><a:tailEnd type="none" w="med" len="med"/></a:' + borderTag + '>';
-    }
-    return '<a:' + borderTag + attrs + '><a:noFill/></a:' + borderTag + '>';
-  });
-}
-
-function setBuildingMasterRowBorders(rowXml, rowIndex, activeCount) {
-  // Requirement: no top or bottom border for the whole dynamic block.
-  // Show horizontal lines only BETWEEN active text rows.
-  var hasNextActiveRow = rowIndex < activeCount - 1;
-  rowXml = setCellBorder(rowXml, 'lnT', false);
-  rowXml = setCellBorder(rowXml, 'lnB', hasNextActiveRow);
-  return rowXml;
-}
-
-function replaceBuildingMasterRows(tableXml, rowsValues, activeCount) {
-  // Compact mode: keep ONLY active rows. Empty/disabled rows are removed from the
-  // PowerPoint table instead of being moved to the bottom as blank rows.
-  // This prevents the empty rows from expanding and leaving horizontal border lines.
-  var rowIndex = 0;
-  var rowsToRender = rowsValues.length ? rowsValues : [['', '']];
-  var renderCount = rowsToRender.length;
-
-  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
-    if (rowIndex >= renderCount) {
-      rowIndex++;
-      return '';
-    }
-
-    var values = rowsToRender[rowIndex] || [];
-    var visibleRows = activeCount || 0;
-    rowXml = setTableRowHeight(rowXml, BUILDING_TABLE_ROW_HEIGHT);
-    rowXml = setBuildingMasterRowBorders(rowXml, rowIndex, visibleRows);
-
-    var textIndex = 0;
-    rowXml = rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(textXml) {
-      var replacement = textIndex < values.length ? values[textIndex] : '';
-      textIndex++;
-      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
-    });
-    rowIndex++;
-    return rowXml;
-  });
-}
-
-function replaceTableByIndex(xml, targetIndex, callback) {
-  var tableIndex = -1;
-  return xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(tableXml) {
-    tableIndex++;
-    if (tableIndex === targetIndex) {
-      return callback(tableXml);
-    }
-    return tableXml;
-  });
-}
-
-function replaceTableRowsText(tableXml, rowsValues) {
-  var rowIndex = 0;
-  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
-    var values = rowsValues[rowIndex] || [];
-    rowIndex++;
-
-    var textIndex = 0;
-    return rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(textXml) {
-      var replacement = textIndex < values.length ? values[textIndex] : '';
-      textIndex++;
-      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
-    });
-  });
-}
-
-function replaceTableRowsTextCompact(tableXml, rowsValues) {
-  // Same as replaceTableRowsText, but removes disabled rows completely.
-  // Used for slide 3 values table so hidden rows do not leave empty borders.
-  var rowIndex = 0;
-  var rowsToRender = rowsValues.length ? rowsValues : [['']];
-  var renderCount = rowsToRender.length;
-
-  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
-    if (rowIndex >= renderCount) {
-      rowIndex++;
-      return '';
-    }
-
-    var values = rowsToRender[rowIndex] || [];
-    rowXml = setTableRowHeight(rowXml, BUILDING_TABLE_ROW_HEIGHT);
-
-    var textIndex = 0;
-    rowXml = rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(textXml) {
-      var replacement = textIndex < values.length ? values[textIndex] : '';
-      textIndex++;
-      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
-    });
-    rowIndex++;
-    return rowXml;
-  });
-}
-
-function processBuildingMasterLabels(xml) {
-  var active = getActiveBuildingFields();
-  var rows = [];
-
-  active.forEach(function(field) {
-    rows.push([field.label_pl, field.label_en]);
-  });
-
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, rows, active.length);
-  });
-
-  if (!isBuildingFieldEnabled(BUILDING_PRICE_FIELD)) {
-    xml = replaceTableByIndex(xml, 1, function(tableXml) {
-      return replaceTableRowsText(tableXml, [[''], ['']]);
-    });
-  }
-
-  return xml;
-}
-
-
-/* ===== SECTION 02 FIELD VISIBILITY ===== */
-var LAND_FIELD_CONFIG = [
-  { key: 'land_area', plFallback: 'POWIERZCHNIA GRUNTU [m²]', enFallback: 'LAND AREA [m²]' },
-  { key: 'plot_number', plFallback: 'NUMER DZIAŁKI', enFallback: 'PLOT NUMBER' },
-  { key: 'precinct', plFallback: 'OBRĘB', enFallback: 'PRECINCT' },
-  { key: 'commune', plFallback: 'GMINA | MIASTO', enFallback: 'COMMUNE | CITY' },
-  { key: 'county', plFallback: 'POWIAT', enFallback: 'COUNTY' },
-  { key: 'ownership', plFallback: 'RODZAJ WŁASNOŚCI', enFallback: 'TYPE OF OWNERSHIP' }
-];
-var LAND_PRICE_FIELD = 'asking_price';
-var landFieldState = {};
-
-function initLandFieldToggles() {
-  LAND_FIELD_CONFIG.concat([{ key: LAND_PRICE_FIELD }]).forEach(function(cfg) {
-    var input = document.getElementById(cfg.key);
-    if (!input) return;
-    var row = input.closest('.field-row');
-    if (!row || row.getAttribute('data-land-visibility-toggle-ready') === '1') return;
-
-    row.setAttribute('data-land-visibility-toggle-ready', '1');
-    row.setAttribute('data-land-field', cfg.key);
-    row.classList.add('has-visibility-toggle');
-    landFieldState[cfg.key] = true;
-
-    var toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'field-visible-switch';
-    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
-    toggle.title = 'Pokaż / ukryj pole w prezentacji';
-    toggle.setAttribute('data-land-toggle', cfg.key);
-    toggle.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleLandField(cfg.key);
-    });
-    row.appendChild(toggle);
-  });
-}
-
-function toggleLandField(key) {
-  landFieldState[key] = !landFieldState[key];
-  var row = document.querySelector('[data-land-field="' + key + '"]');
-  var toggle = document.querySelector('[data-land-toggle="' + key + '"]');
-  if (row) row.classList.toggle('field-disabled', !landFieldState[key]);
-  if (toggle) toggle.classList.toggle('off', !landFieldState[key]);
-}
-
-function isLandFieldEnabled(key) {
-  return landFieldState[key] !== false;
-}
-
-function getLandFieldLabel(key, lang, fallback) {
-  var custom = getLabel(key, lang);
-  return (custom || fallback || '').toUpperCase();
-}
-
-function getActiveLandFields() {
-  var active = [];
-  LAND_FIELD_CONFIG.forEach(function(cfg) {
-    if (!isLandFieldEnabled(cfg.key)) return;
-    active.push({
-      key: cfg.key,
-      label_pl: getLandFieldLabel(cfg.key, 'pl', cfg.plFallback),
-      label_en: getLandFieldLabel(cfg.key, 'en', cfg.enFallback),
-      value: valUpper(cfg.key)
-    });
-  });
-  return active;
-}
-
-function processLandMasterLabels(xml) {
-  var active = getActiveLandFields();
-  var rows = [];
-  active.forEach(function(field) {
-    rows.push([field.label_pl, field.label_en]);
-  });
-
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, rows, active.length);
-  });
-
-  if (!isLandFieldEnabled(LAND_PRICE_FIELD)) {
-    xml = replaceTableByIndex(xml, 1, function(tableXml) {
-      return replaceTableRowsText(tableXml, [[''], ['']]);
-    });
-  }
-
-  return xml;
-}
-
-/* ===== SECTION 04 FIELD VISIBILITY ===== */
-var INCOME_TENANT_FIELD_CONFIG = [
-  { key: 'num_tenants', plFallback: 'LICZBA NAJEMCÓW', enFallback: 'NUMBER OF TENANTS' },
-  { key: 'occupancy', plFallback: 'POZIOM WYNAJĘCIA', enFallback: 'OCCUPANCY RATE' }
-];
-var INCOME_FINANCIAL_FIELD_CONFIG = [
-  { key: 'noi', plFallback: 'DOCHÓD OPERACYJNY NETTO [CUR]', enFallback: 'NOI [CUR]' },
-  { key: 'yield_pct', plFallback: 'STOPA KAPITALIZACJI [%]', enFallback: 'YIELD [%]' },
-  { key: 'price_sale', plFallback: 'CENA OFERTOWA [CUR]', enFallback: 'ASKING PRICE [CUR]' }
-];
-var incomeFieldState = {};
-
-function initIncomeFieldToggles() {
-  INCOME_TENANT_FIELD_CONFIG.concat(INCOME_FINANCIAL_FIELD_CONFIG).forEach(function(cfg) {
-    var input = document.getElementById(cfg.key);
-    if (!input) return;
-    var row = input.closest('.field-row');
-    if (!row || row.getAttribute('data-income-visibility-toggle-ready') === '1') return;
-
-    row.setAttribute('data-income-visibility-toggle-ready', '1');
-    row.setAttribute('data-income-field', cfg.key);
-    row.classList.add('has-visibility-toggle');
-    incomeFieldState[cfg.key] = true;
-
-    var toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'field-visible-switch';
-    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
-    toggle.title = 'Pokaż / ukryj pole w prezentacji';
-    toggle.setAttribute('data-income-toggle', cfg.key);
-    toggle.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleIncomeField(cfg.key);
-    });
-    row.appendChild(toggle);
-  });
-}
-
-function toggleIncomeField(key) {
-  incomeFieldState[key] = !incomeFieldState[key];
-  var row = document.querySelector('[data-income-field="' + key + '"]');
-  var toggle = document.querySelector('[data-income-toggle="' + key + '"]');
-  if (row) row.classList.toggle('field-disabled', !incomeFieldState[key]);
-  if (toggle) toggle.classList.toggle('off', !incomeFieldState[key]);
-}
-
-function isIncomeFieldEnabled(key) {
-  return incomeFieldState[key] !== false;
-}
-
-function getIncomeFieldLabel(key, lang, fallback) {
-  var custom = getLabel(key, lang);
-  return (custom || fallback || '').toUpperCase();
-}
-
-function getActiveIncomeTenantFields() {
-  var active = [];
-  INCOME_TENANT_FIELD_CONFIG.forEach(function(cfg) {
-    if (!isIncomeFieldEnabled(cfg.key)) return;
-    active.push({
-      key: cfg.key,
-      label_pl: getIncomeFieldLabel(cfg.key, 'pl', cfg.plFallback),
-      label_en: getIncomeFieldLabel(cfg.key, 'en', cfg.enFallback),
-      value: val(cfg.key)
-    });
-  });
-  return active;
-}
-
-function getActiveIncomeFinancialFields() {
-  var active = [];
-  INCOME_FINANCIAL_FIELD_CONFIG.forEach(function(cfg) {
-    if (!isIncomeFieldEnabled(cfg.key)) return;
-    active.push({
-      key: cfg.key,
-      label_pl: getIncomeFieldLabel(cfg.key, 'pl', cfg.plFallback),
-      label_en: getIncomeFieldLabel(cfg.key, 'en', cfg.enFallback),
-      value: val(cfg.key)
-    });
-  });
-  return active;
-}
-
-function processIncomeMasterLabels(xml) {
-  var tenantRows = [];
-  getActiveIncomeTenantFields().forEach(function(field) {
-    tenantRows.push([field.label_pl, field.label_en]);
-  });
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, tenantRows, tenantRows.length);
-  });
-
-  var financialRows = [];
-  getActiveIncomeFinancialFields().forEach(function(field) {
-    financialRows.push([field.label_pl, field.label_en]);
-  });
-  xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, financialRows, financialRows.length);
-  });
-
-  return xml;
-}
-
-
-/* ===== BROKER PROFILE SELECTOR ===== */
-var BROKER_PROFILES = {
-  piotr_wrobel: {
-    name: 'Piotr Wróbel',
-    email: 'piotr.wrobel@quercoproperty.pl',
-    phone: '538 395 952'
-  },
-  karolina_bomba: {
-    name: 'Karolina Bomba',
-    email: 'karolina.bomba@quercoproperty.pl',
-    phone: '509 778 879'
-  },
-  lidia_szczepanska: {
-    name: 'Lidia Szczepańska',
-    email: 'lidia.szczepanska@quercoproperty.pl',
-    phone: '882 732 212'
-  }
-};
-
-function selectBrokerProfile(key) {
-  if (!key || !BROKER_PROFILES[key]) return;
-  var broker = BROKER_PROFILES[key];
-  var nameEl = document.getElementById('broker_name');
-  var emailEl = document.getElementById('broker_email');
-  var phoneEl = document.getElementById('broker_phone');
-  if (nameEl) { nameEl.value = broker.name; nameEl.classList.add('ai-filled'); }
-  if (emailEl) { emailEl.value = broker.email; emailEl.classList.add('ai-filled'); }
-  if (phoneEl) { phoneEl.value = broker.phone; phoneEl.classList.add('ai-filled'); }
-  setStatus('Uzupełniono dane brokera: ' + broker.name);
-  setTimeout(function() { setStatus(''); }, 2500);
-}
-
-/* ===== EDITABLE LABELS SYSTEM ===== */
-var defaultLabels = {}; // { element_id: { pl: 'OBRĘB', en: 'PRECINCT' } }
-
-// Map of PPTX slideMaster label text → which form field it belongs to
-// Used during PPTX generation to replace labels in slideMasters
-var PPTX_LABEL_MAP = {
-  // slideMaster4 (slide 2: grunt)
-  'POWIERZCHNIA GRUNTU [m²]': { field: 'land_area', lang: 'pl' },
-  'LAND AREA [m²]': { field: 'land_area', lang: 'en' },
-  'NUMER DZIAŁKI': { field: 'plot_number', lang: 'pl' },
-  'PLOT NUMBER': { field: 'plot_number', lang: 'en' },
-  'OBRĘB': { field: 'precinct', lang: 'pl' },
-  'PRECINCT': { field: 'precinct', lang: 'en' },
-  'GMINA | MIASTO': { field: 'commune', lang: 'pl' },
-  'COMMUNE | CITY': { field: 'commune', lang: 'en' },
-  'POWIAT': { field: 'county', lang: 'pl' },
-  'COUNTY': { field: 'county', lang: 'en' },
-  'RODZAJ WŁASNOŚCI': { field: 'ownership', lang: 'pl' },
-  'TYPE OF OWNERSHIP': { field: 'ownership', lang: 'en' },
-  // slideMaster6 (slide 3: zabudowa)
-  'POWIERZCHNIA ZABUDOWY [m²]': { field: 'building_footprint', lang: 'pl' },
-  'BUILDING FOOTPRINT': { field: 'building_footprint', lang: 'en' },
-  'POWIERZCHNIA UŻYTKOWA [m²]': { field: 'total_area', lang: 'pl' },
-  'TOTAL AREA': { field: 'total_area', lang: 'en' },
-  'LICZBA MIEJSC PARKINGOWY': { field: 'parking_spots', lang: 'pl' },
-  'NUMBER OF PARKING SPOTS': { field: 'parking_spots', lang: 'en' },
-  'POWIERZCHNIA MAGAZYNOWA [m²]': { field: 'warehouse_area', lang: 'pl' },
-  'WAREHOUSE AREA': { field: 'warehouse_area', lang: 'en' },
-  'POWIERZCHNIA BIUROWA [m²]': { field: 'office_area', lang: 'pl' },
-  'OFFICE AREA': { field: 'office_area', lang: 'en' },
-  'ROK MODERNIZACJI': { field: 'year_modernization', lang: 'pl' },
-  'YEAR OF MODERNIZATION': { field: 'year_modernization', lang: 'en' },
-  // slideMaster7 (slide 4: dochody)
-  'LICZBA NAJEMCÓW': { field: 'num_tenants', lang: 'pl' },
-  'NUMBER OF TENANTS': { field: 'num_tenants', lang: 'en' },
-  'POZIOM WYNAJĘCIA': { field: 'occupancy', lang: 'pl' },
-  'OCCUPANCY RATE': { field: 'occupancy', lang: 'en' },
-  'STOPA KAPITALIZACJI [%]': { field: 'yield_pct', lang: 'pl' },
-  'YIELD [%]': { field: 'yield_pct', lang: 'en' },
-};
-
-function initEditableLabels() {
-  document.querySelectorAll('.field-label').forEach(function(container) {
-    var plEl = container.querySelector('.field-label-pl');
-    var enEl = container.querySelector('.field-label-en');
-    if (!plEl || !enEl) return;
-
-    var row = container.closest('.field-row, .dist-cell');
-    if (!row) return;
-    if (row.classList.contains('no-label-edit')) return;
-    var input = row.querySelector('input, select, textarea');
-    if (!input || !input.id) return;
-    var fieldKey = input.id;
-
-    // Store defaults (uppercase)
-    defaultLabels[fieldKey] = { pl: plEl.textContent.trim().toUpperCase(), en: enEl.textContent.trim().toUpperCase() };
-
-    // Set data attributes (but NOT contenteditable yet)
-    plEl.setAttribute('data-field', fieldKey);
-    plEl.setAttribute('data-lang', 'pl');
-    plEl.setAttribute('spellcheck', 'false');
-    enEl.setAttribute('data-field', fieldKey);
-    enEl.setAttribute('data-lang', 'en');
-    enEl.setAttribute('spellcheck', 'false');
-
-    // Add edit button — inserted into the ROW between label and value
-    var editBtn = document.createElement('button');
-    editBtn.className = 'edit-btn';
-    editBtn.innerHTML = '✎';
-    editBtn.title = 'Edytuj nazwę pola';
-    editBtn.setAttribute('data-field', fieldKey);
-    editBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      var isActive = this.classList.contains('active');
-      if (isActive) {
-        finishEditing(fieldKey, plEl, enEl, this);
-      } else {
-        startEditing(fieldKey, plEl, enEl, this);
-      }
-    });
-    // Insert button AFTER field-label, BEFORE field-value
-    var valueEl = row.querySelector('.field-value');
-    if (valueEl) {
-      row.insertBefore(editBtn, valueEl);
-    } else {
-      container.after(editBtn);
-    }
-
-    // Blur handlers — when user clicks away, finish editing
-    function onBlurCheck() {
-      setTimeout(function() {
-        var btn = row.querySelector('.edit-btn');
-        if (!btn || !btn.classList.contains('active')) return;
-        var active = document.activeElement;
-        if (active !== plEl && active !== enEl) {
-          finishEditing(fieldKey, plEl, enEl, btn);
-        }
-      }, 150);
-    }
-    plEl.addEventListener('blur', onBlurCheck);
-    enEl.addEventListener('blur', onBlurCheck);
-
-    // Prevent Enter key
-    function onKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } }
-    plEl.addEventListener('keydown', onKeydown);
-    enEl.addEventListener('keydown', onKeydown);
-  });
-}
-
-function startEditing(fieldKey, plEl, enEl, btn) {
-  plEl.setAttribute('contenteditable', 'true');
-  enEl.setAttribute('contenteditable', 'true');
-  plEl.classList.add('editing');
-  enEl.classList.add('editing');
-  btn.classList.add('active');
-  btn.innerHTML = '✓';
-  btn.title = 'Zapisz';
-  plEl.focus();
-}
-
-function finishEditing(fieldKey, plEl, enEl, btn) {
-  // Uppercase (except description)
-  if (fieldKey !== 'description') {
-    plEl.textContent = plEl.textContent.replace(/\n/g, ' ').trim().toUpperCase();
-    enEl.textContent = enEl.textContent.replace(/\n/g, ' ').trim().toUpperCase();
-  }
-  plEl.setAttribute('contenteditable', 'false');
-  enEl.setAttribute('contenteditable', 'false');
-  plEl.classList.remove('editing');
-  enEl.classList.remove('editing');
-  btn.classList.remove('active');
-  btn.innerHTML = '✎';
-  btn.title = 'Edytuj nazwę pola';
-}
-
-function getLabel(fieldKey, lang) {
-  var selector = '.field-label-' + lang + '[data-field="' + fieldKey + '"]';
-  var el = document.querySelector(selector);
-  var text = '';
-  if (el) {
-    text = el.textContent.trim();
-  } else if (defaultLabels[fieldKey]) {
-    text = defaultLabels[fieldKey][lang];
-  }
-  // Always return uppercase for PPTX
-  return text.toUpperCase();
-}
-
-function resetAllLabels() {
-  Object.keys(defaultLabels).forEach(function(fieldKey) {
-    var plEl = document.querySelector('.field-label-pl[data-field="' + fieldKey + '"]');
-    var enEl = document.querySelector('.field-label-en[data-field="' + fieldKey + '"]');
-    if (plEl) plEl.textContent = defaultLabels[fieldKey].pl;
-    if (enEl) enEl.textContent = defaultLabels[fieldKey].en;
-    // Make sure editing is off
-    if (plEl) { plEl.setAttribute('contenteditable', 'false'); plEl.classList.remove('editing'); }
-    if (enEl) { enEl.setAttribute('contenteditable', 'false'); enEl.classList.remove('editing'); }
-    var row = plEl ? plEl.closest('.field-row, .dist-cell') : null;
-    var btn = row ? row.querySelector('.edit-btn') : null;
-    if (btn) { btn.classList.remove('active'); btn.innerHTML = '✎'; }
-  });
-  setStatus('Przywrócono domyślne nazwy pól.');
-  setTimeout(function() { setStatus(''); }, 3000);
-}
-
-// Replace labels in PPTX slideMaster XML — always uppercase
-function replacePptxLabels(xml) {
-  Object.keys(PPTX_LABEL_MAP).forEach(function(originalLabel) {
-    var mapping = PPTX_LABEL_MAP[originalLabel];
-    var newLabel = getLabel(mapping.field, mapping.lang); // getLabel returns uppercase
-    if (newLabel && newLabel !== originalLabel) {
-      xml = xml.split(originalLabel).join(newLabel);
-      console.log('[PPTX Labels] ' + originalLabel + ' → ' + newLabel);
-    }
-  });
-  return xml;
-}
-
-// Init on DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-  try { initEditableLabels(); } catch (e) { console.error('initEditableLabels failed', e); }
-  try { initLandFieldToggles(); } catch (e) { console.error('initLandFieldToggles failed', e); }
-  try { initBuildingFieldToggles(); } catch (e) { console.error('initBuildingFieldToggles failed', e); }
-  try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
-});
-
-/* ===== CURRENCY LABEL UPDATER ===== */
-function updateCurrencyLabel(fieldId, baseName, suffix) {
-  var cur = document.getElementById(fieldId + '_currency').value;
-  var labelId = 'label-' + fieldId.replace(/_/g, '-');
-  var el = document.getElementById(labelId);
-  if (el) {
-    el.textContent = baseName + ' [' + cur + (suffix || '') + ']' + (fieldId === 'asking_price_building' ? ' (slajd 3)' : '');
-  }
-}
-
-/* ===== SECTION TOGGLES ===== */
-function toggleSection(section) {
-  if (section === 'slide4') {
-    slide4Active = !slide4Active;
-    var t = document.getElementById('toggle4');
-    var f = document.getElementById('sec4-fields');
-    t.style.background = slide4Active ? '#102A3D' : '#ccc';
-    t.querySelector('.toggle-dot').style.left = slide4Active ? '20px' : '2px';
-    if (slide4Active) { f.classList.remove('sec-fields-off'); } else { f.classList.add('sec-fields-off'); }
-  } else if (section === 'slide5') {
-    slide5Active = !slide5Active;
-    var t5 = document.getElementById('toggle5');
-    var f5 = document.getElementById('sec5-fields');
-    t5.style.background = slide5Active ? '#102A3D' : '#ccc';
-    t5.querySelector('.toggle-dot').style.left = slide5Active ? '20px' : '2px';
-    if (slide5Active) { f5.classList.remove('sec-fields-off'); } else { f5.classList.add('sec-fields-off'); }
-  }
-}
-
-/* ===== FILE UPLOAD HANDLING ===== */
-var uploadedFiles = []; // { file: File, id: string }
-var MAX_FILES = 10;
-var MAX_SIZE = 25 * 1024 * 1024;
-var ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'text/plain'];
-var ALLOWED_EXT = ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'txt'];
-
-function getFileExt(name) { return (name || '').toLowerCase().split('.').pop(); }
-function getFileIcon(name) {
-  var ext = getFileExt(name);
-  if (ext === 'pdf') return '📄';
-  if (['jpg','jpeg','png','webp'].indexOf(ext) !== -1) return '🖼️';
-  if (ext === 'txt') return '📝';
-  return '📎';
-}
-function formatSize(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-}
-function totalFileSize() {
-  return uploadedFiles.reduce(function(sum, f) { return sum + f.file.size; }, 0);
-}
-
-function handleFileDrop(e) {
-  e.preventDefault();
-  document.getElementById('file-drop-zone').classList.remove('drag-over');
-  handleFileSelect(e.dataTransfer.files);
-}
-
-function handleFileSelect(files) {
-  if (!files || !files.length) return;
-  for (var i = 0; i < files.length; i++) {
-    var file = files[i];
-    var ext = getFileExt(file.name);
-    if (ALLOWED_EXT.indexOf(ext) === -1) {
-      setStatus('Nieobsługiwany format: ' + file.name);
-      continue;
-    }
-    if (uploadedFiles.length >= MAX_FILES) {
-      setStatus('Maksymalnie ' + MAX_FILES + ' plików');
-      break;
-    }
-    if (totalFileSize() + file.size > MAX_SIZE) {
-      setStatus('Przekroczono limit 25 MB');
-      break;
-    }
-    uploadedFiles.push({ file: file, id: 'f' + Date.now() + '_' + i });
-  }
-  document.getElementById('ai-file-input').value = '';
-  renderFileList();
-}
-
-function removeFile(id) {
-  uploadedFiles = uploadedFiles.filter(function(f) { return f.id !== id; });
-  renderFileList();
-}
-
-function renderFileList() {
-  var container = document.getElementById('file-list');
-  var limitEl = document.getElementById('file-limit');
-  if (uploadedFiles.length === 0) {
-    container.innerHTML = '';
-    limitEl.style.display = 'none';
-    return;
-  }
-  var html = '';
-  uploadedFiles.forEach(function(f) {
-    html += '<div class="file-item">' +
-      '<span class="file-item-icon">' + getFileIcon(f.file.name) + '</span>' +
-      '<span class="file-item-name">' + f.file.name + '</span>' +
-      '<span class="file-item-size">' + formatSize(f.file.size) + '</span>' +
-      '<button class="file-item-remove" onclick="removeFile(\'' + f.id + '\')" title="Usuń">✕</button>' +
-    '</div>';
-  });
-  container.innerHTML = html;
-  limitEl.style.display = 'flex';
-  var ts = totalFileSize();
-  document.getElementById('file-count').textContent = uploadedFiles.length + ' / ' + MAX_FILES + ' plików';
-  var sizeEl = document.getElementById('file-size');
-  sizeEl.textContent = formatSize(ts) + ' / 25 MB';
-  sizeEl.className = ts > MAX_SIZE * 0.9 ? 'file-limit-warn' : '';
-}
 
 /* ===== AI EXTRACTION ===== */
 async function aiExtract() {
   var text = document.getElementById('ai-source').value.trim();
-  var hasFiles = uploadedFiles.length > 0;
-  if (!text && !hasFiles) { setStatus('Wklej tekst lub wrzuć pliki do analizy'); return; }
+  if (!text) { setStatus('Wklej tekst do analizy'); return; }
 
   var btn = document.getElementById('ai-btn');
   var statusEl = document.getElementById('ai-status');
   btn.disabled = true;
   statusEl.style.display = 'flex';
-  var statusText = document.getElementById('ai-status-text');
-  statusText.textContent = hasFiles ? 'Przesyłam pliki...' : 'Analizuję tekst...';
+  document.getElementById('ai-status-text').textContent = 'Analizuję tekst...';
   setStatus('');
 
   try {
-    var formData = new FormData();
-    formData.append('text', text);
-    uploadedFiles.forEach(function(f) {
-      formData.append('files', f.file);
-    });
-
-    statusText.textContent = 'AI analizuje' + (hasFiles ? ' (' + uploadedFiles.length + ' plików)' : '') + '...';
-
     var resp = await fetch('/api/extract', {
       method: 'POST',
-      body: formData
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text })
     });
+
     if (!resp.ok) {
       var errData = await resp.json().catch(function() { return {}; });
       throw new Error(errData.error || 'Błąd serwera (' + resp.status + ')');
     }
+
     var data = await resp.json();
 
-    // Simple fields
-    var simpleFields = [
+    // Fill all fields from AI response
+    var allFields = [
       'broker_name','broker_email','broker_phone',
-      'city','street','land_area','plot_number','precinct','commune','county',
+      'city','street','land_area','plot_number','precinct','commune','county','ownership','price_pln',
       'dist_airport','dist_expressway','dist_port','dist_highway','dist_railway','dist_transit','description',
-      'building_footprint','total_area','parking_spots','warehouse_area','office_area','year_modernization',
-      'num_tenants','occupancy','yield_pct','eur_pln_rate',
+      'building_footprint','total_area','parking_spots','warehouse_area','office_area','year_modernization','price_pln_building',
+      'num_tenants','occupancy','noi_eur','yield_pct','price_eur','rent_income_pln','service_charge_eur','gross_income_eur','eur_pln_rate',
       'mpzp_resolution','terrain_card','terrain_function','excluded_functions',
       'building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'
     ];
 
     var filledCount = 0;
-    function fillField(id, value) {
-      if (!value || value === 'null' || value === 'brak danych' || !value.trim()) return;
-      var el = document.getElementById(id);
-      if (el) { el.value = value; el.classList.add('ai-filled'); filledCount++; }
-    }
-    function fillSelect(id, value) {
-      if (!value || !value.trim()) return;
-      var el = document.getElementById(id);
-      if (el) { el.value = value; filledCount++; }
-    }
-
-    simpleFields.forEach(function(id) { fillField(id, data[id]); });
-
-    // Ownership select
-    if (data.ownership) {
-      var ow = data.ownership.toUpperCase();
-      if (ow.indexOf('WIECZYSTE') !== -1) fillSelect('ownership', 'UŻYTKOWANIE WIECZYSTE');
-      else if (ow.indexOf('WŁASNOŚĆ') !== -1 || ow.indexOf('WLASNOSC') !== -1) fillSelect('ownership', 'WŁASNOŚĆ');
-    }
-
-    // Currency fields
-    var currencyFields = [
-      { val: 'asking_price', cur: 'asking_price_currency', label: 'asking_price', baseName: 'Cena ofertowa' },
-      { val: 'asking_price_building', cur: 'asking_price_building_currency', label: 'asking_price_building', baseName: 'Cena ofertowa', suffix: '', extra: ' (slajd 3)' },
-      { val: 'noi', cur: 'noi_currency', label: 'noi', baseName: 'NOI' },
-      { val: 'price_sale', cur: 'price_sale_currency', label: 'price_sale', baseName: 'Cena ofertowa' },
-      { val: 'rent_income', cur: 'rent_income_currency', label: 'rent_income', baseName: 'Przychód z najmu', suffix: '/m²' },
-      { val: 'service_charge', cur: 'service_charge_currency', label: 'service_charge', baseName: 'Opłaty serwisowe', suffix: '/m²' },
-      { val: 'gross_income', cur: 'gross_income_currency', label: 'gross_income', baseName: 'Łączny przychód op.', suffix: '/m²' },
-    ];
-    currencyFields.forEach(function(cf) {
-      fillField(cf.val, data[cf.val]);
-      if (data[cf.cur]) {
-        fillSelect(cf.cur, data[cf.cur]);
-        updateCurrencyLabel(cf.label, cf.baseName, cf.suffix || '');
+    allFields.forEach(function(id) {
+      var value = data[id];
+      if (value && value !== 'null' && value !== 'brak danych' && value.trim() !== '') {
+        var el = document.getElementById(id);
+        if (el) {
+          el.value = value;
+          el.classList.add('ai-filled');
+          filledCount++;
+        }
       }
     });
 
-    // Auto-activate MPZP section if AI found MPZP data
-    var mpzpFields = ['mpzp_resolution','terrain_card','terrain_function','excluded_functions','building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'];
-    var hasMpzp = mpzpFields.some(function(f) { return data[f] && data[f].trim(); });
-    if (hasMpzp && !slide5Active) { toggleSection('slide5'); }
-
-    // Auto-activate Dochody section if AI found income data
-    var incomeFields = ['num_tenants','occupancy','noi','yield_pct','price_sale','rent_income','service_charge','gross_income'];
-    var hasIncome = incomeFields.some(function(f) { return data[f] && data[f].trim(); });
-    if (hasIncome && !slide4Active) { toggleSection('slide4'); }
-
     setStatus('AI wypełniło ' + filledCount + ' pól. Sprawdź i popraw.');
     setTimeout(function() { setStatus(''); }, 6000);
+
   } catch (err) {
     console.error(err);
     setStatus('Błąd: ' + err.message);
   }
+
   btn.disabled = false;
   statusEl.style.display = 'none';
 }
 
-/* ===== TEMPLATE MAP ===== */
-var TEMPLATE_MAP = {
-  'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' }
-  // Dodaj kolejne szablony tutaj:
-  // 'biuro-wynajem': { path: '/templates/biuro-wynajem.pptx', label: 'Biuro — wynajem' },
-  // 'grunt-sprzedaz': { path: '/templates/grunt-sprzedaz.pptx', label: 'Grunt — sprzedaż' },
-};
-
-/* ===== TEMPLATE HANDLING ===== */
-async function loadSelectedTemplate() {
-  var select = document.getElementById('template-select');
-  var key = select.value;
-  if (!key) {
-    templateBuffer = null;
-    document.getElementById('form-area').style.display = 'none';
-    document.getElementById('template-loaded').style.display = 'none';
-    return;
-  }
-
-  var tmpl = TEMPLATE_MAP[key];
-  if (!tmpl) return;
-
-  var statusEl = document.getElementById('template-status');
-  statusEl.style.display = 'flex';
-  statusEl.innerHTML = '<div class="spinner"></div> Ładowanie szablonu...';
-  document.getElementById('template-loaded').style.display = 'none';
-
-  try {
-    var resp = await fetch(tmpl.path);
-    if (!resp.ok) throw new Error('Nie znaleziono szablonu (' + resp.status + ')');
-    templateBuffer = await resp.arrayBuffer();
-
-    statusEl.style.display = 'none';
-    document.getElementById('template-loaded').style.display = 'flex';
-    document.getElementById('template-loaded-name').textContent = tmpl.label;
-    document.getElementById('form-area').style.display = 'block';
-  } catch (err) {
-    statusEl.innerHTML = '<span style="color:#cc3333">Błąd: ' + err.message + '</span>';
-    templateBuffer = null;
-    document.getElementById('form-area').style.display = 'none';
-  }
+/* ===== TEMPLATE HANDLING (unchanged) ===== */
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('drop-zone').style.borderColor='';
+  var f=e.dataTransfer.files[0];
+  if(f) loadTemplate(f);
 }
 
-function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
-function valUpper(id) { var v = val(id); return v ? v.toUpperCase() : ''; }
-function cur(id) { return val(id + '_currency'); }
+function loadTemplate(file){
+  if(!file||!file.name.endsWith('.pptx')){setStatus('Wrzuć plik .pptx');return;}
+  var r=new FileReader();
+  r.onload=function(e){
+    templateBuffer=e.target.result;
+    document.getElementById('upload-area').style.display='none';
+    document.getElementById('loaded-bar').style.display='flex';
+    document.getElementById('loaded-name').textContent=file.name;
+    document.getElementById('form-area').style.display='block';
+  };
+  r.readAsArrayBuffer(file);
+}
 
-function replaceAll(str, find, rep) {
-  if (!find || find === rep) return str;
-  while (str.indexOf(find) !== -1) str = str.replace(find, rep);
+function resetTemplate(){
+  templateBuffer=null;
+  document.getElementById('upload-area').style.display='block';
+  document.getElementById('loaded-bar').style.display='none';
+  document.getElementById('form-area').style.display='none';
+  document.getElementById('file-input').value='';
+}
+
+function toggleSlide(slideKey,toggleId,fieldsId){
+  slide4Active=!slide4Active;
+  var t=document.getElementById(toggleId);
+  var f=document.getElementById(fieldsId);
+  t.style.background=slide4Active?'#102A3D':'#ccc';
+  t.querySelector('.toggle-dot').style.left=slide4Active?'20px':'2px';
+  f.style.opacity=slide4Active?'1':'0.4';
+  f.style.pointerEvents=slide4Active?'auto':'none';
+}
+
+function val(id){return document.getElementById(id).value.trim();}
+
+function replaceAll(str,find,rep){
+  if(!find||find===rep)return str;
+  while(str.indexOf(find)!==-1) str=str.replace(find,rep);
   return str;
 }
 
-/* ===== PPTX SLIDE PROCESSORS ===== */
-function processSlide1(xml) {
-  var name = val('broker_name');
-  var parts = name.split(' ');
-  var first = parts[0] || '';
-  var last = parts.slice(1).join(' ') || '';
-  xml = xml.replace(/>Imię i </, '>' + first + ' <');
-  xml = xml.replace(/>Naziwsko</, '>' + last + '<');
-  xml = xml.replace(/> brokera</, '><');
-  xml = replaceAll(xml, '>Email<', '>' + val('broker_email') + '<');
-  xml = replaceAll(xml, '>Numer telefonu<', '>' + val('broker_phone') + '<');
+/* ===== PPTX SLIDE PROCESSORS (unchanged) ===== */
+function processSlide1(xml){
+  var name=val('broker_name');
+  var parts=name.split(' ');
+  var first=parts[0]||'';
+  var last=parts.slice(1).join(' ')||'';
+  xml=xml.replace(/>Imię i </,'>'+first+' <');
+  xml=xml.replace(/>Naziwsko</,'>'+last+'<');
+  xml=xml.replace(/> brokera</,'><');
+  xml=replaceAll(xml,'>Email<','>'+val('broker_email')+'<');
+  xml=replaceAll(xml,'>Numer telefonu<','>'+val('broker_phone')+'<');
   return xml;
 }
 
-function processSlide2(xml) {
-  var city = valUpper('city');
-  var street = valUpper('street');
-  xml = xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g, city);
-  xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
-  xml = xml.replace(/UL\. „ulica[^<]*/g, street);
+function processSlide2(xml){
+  var city=val('city'); var street=val('street');
+  xml=xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g,city);
+  xml=xml.replace(/UL\. &#x201E;ulica[^<]*/g,street);
+  xml=xml.replace(/UL\. „ulica[^<]*/g,street);
 
-  var activeFields = getActiveLandFields();
-
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    var rows = [];
-    activeFields.forEach(function(field) {
-      rows.push([field.value || '']);
-    });
-    return replaceTableRowsTextCompact(tableXml, rows);
-  });
-
-  xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    if (!isLandFieldEnabled(LAND_PRICE_FIELD)) {
-      return replaceTableRowsText(tableXml, [['']]);
-    }
-
-    var priceCur = cur('asking_price');
-    var priceVal = val('asking_price');
-    tableXml = replaceAll(tableXml, '[CUR]', '[' + priceCur + ']');
-    return replaceTableRowsText(tableXml, [[priceVal]]);
-  });
-
-  var di = 0;
-  var dists = [val('dist_airport'), val('dist_expressway'), val('dist_port'), val('dist_highway'), val('dist_railway')];
-  xml = xml.replace(/>X KM</g, function() {
-    var v = dists[di++];
-    return '>' + (v ? v + ' KM' : '-') + '<';
-  });
-  xml = xml.replace(/>X M</, '>' + (val('dist_transit') ? val('dist_transit') + ' M' : '-') + '<');
-
-  var desc = val('description').split('\n').filter(Boolean);
-  xml = xml.replace(/>Krótko opis nieruchomości[^<]*/, '>' + (desc[0] || ''));
-  xml = xml.replace(/>W pierwszym akapicie[^<]*/, '>' + (desc[0] || ''));
-  xml = xml.replace(/>W drugim akapicie opis lokalizacji</, '>' + (desc[1] || '') + '<');
-  xml = xml.replace(/>W trzecim akapicie opis zabudowy</, '>' + (desc[2] || '') + '<');
-  return xml;
-}
-
-function processSlide3(xml) {
-  var city = valUpper('city');
-  var street = valUpper('street');
-  xml = xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g, city);
-  xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
-  xml = xml.replace(/UL\. „ulica[^<]*/g, street);
-
-  var activeFields = getActiveBuildingFields();
-
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    var rows = [];
-    activeFields.forEach(function(field) {
-      rows.push([field.value || '']);
-    });
-    return replaceTableRowsTextCompact(tableXml, rows);
-  });
-
-  xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    if (!isBuildingFieldEnabled(BUILDING_PRICE_FIELD)) {
-      return replaceTableRowsText(tableXml, [['']]);
-    }
-
-    var priceCur = cur('asking_price_building') || cur('asking_price');
-    var priceVal = val('asking_price_building') || val('asking_price');
-    tableXml = replaceAll(tableXml, '[CUR]', '[' + priceCur + ']');
-    return replaceTableRowsText(tableXml, [[priceVal]]);
-  });
-
-  return xml;
-}
-
-function processSlide4(xml) {
-  var city = valUpper('city');
-  var street = valUpper('street');
-  xml = xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g, city);
-  xml = xml.replace(/UL\. &#x201E;ulica[^<]*/g, street);
-  xml = xml.replace(/UL\. „ulica[^<]*/g, street);
-
-  var noiCur = cur('noi') || 'PLN';
-  var priceSaleCur = cur('price_sale') || 'PLN';
-  var rentCur = cur('rent_income') || 'PLN';
-  var scCur = cur('service_charge') || 'PLN';
-  var giCur = cur('gross_income') || 'PLN';
-
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    var fields = [val('rent_income'), val('service_charge'), val('gross_income')];
-    var currencies = [rentCur, scCur, giCur];
-    var ri = 0;
-    return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-      var v = fields[ri];
-      var c = currencies[ri];
-      ri++;
-      row = replaceAll(row, '[CUR]', '[' + c + ']');
-      return row.replace(/>5t<|>tak<|>TEKST</, '>' + (v || '') + '<');
-    });
-  });
-
-  xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    var rows = [];
-    getActiveIncomeTenantFields().forEach(function(field) {
-      rows.push([field.value || '']);
-    });
-    return replaceTableRowsTextCompact(tableXml, rows);
-  });
-
-  xml = replaceTableByIndex(xml, 2, function(tableXml) {
-    var rows = [];
-    getActiveIncomeFinancialFields().forEach(function(field) {
-      rows.push([field.value || '']);
-    });
-    return replaceTableRowsTextCompact(tableXml, rows);
-  });
-
-  var rate = val('eur_pln_rate');
-  if (rate) xml = xml.replace(/4,24/, rate);
-  return xml;
-}
-
-function processSlide5(xml) {
-  var res = valUpper('mpzp_resolution');
-  var card = valUpper('terrain_card');
-  if (res) {
-    xml = xml.replace(/UCHWAŁA NR y z dnia xx[^<]*/, res);
-    xml = xml.replace(/>UCHWAŁA NR y[^<]*/, '>' + res);
-  }
-  if (card) {
-    xml = xml.replace(/&#x201D;Karta terenu&#x201D;\s*/g, card);
-    xml = xml.replace(/"Karta terenu"\s*/g, card);
-    xml = xml.replace(/>&#x201C;Karta terenu[^<]*/, '>' + card);
-  }
-  var fnCount = 0;
-  xml = xml.replace(/>tekst</g, function() {
-    fnCount++;
-    if (fnCount === 1) return '>' + (valUpper('terrain_function') || '') + '<';
-    if (fnCount === 2) return '>' + (valUpper('excluded_functions') || '') + '<';
-    return '><';
-  });
-  var tblIdx = 0;
-  xml = xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g, function(m) {
+  var tbl1=[val('land_area'),val('plot_number'),val('precinct'),val('commune'),val('county'),val('ownership')];
+  var tbl2=[val('price_pln')];
+  var tblIdx=0;
+  xml=xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g,function(m){
     tblIdx++;
-    if (tblIdx === 1) {
-      var vals = [val('building_area_min'), val('building_area_max'), val('intensity_min'), val('intensity_max')];
-      var ri = 0;
-      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = vals[ri++];
-        if (v !== undefined) return row.replace(/> ?x</, '>' + (v || '-') + '<');
+    if(tblIdx===1){
+      var ri=0;
+      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g,function(row){
+        var v=tbl1[ri++];
+        if(v) return row.replace(/>TEKST</,'>'+v+'<');
         return row;
       });
     }
-    if (tblIdx === 2) {
-      var vals2 = [val('height_max'), val('bio_surface_min')];
-      var ri2 = 0;
-      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(row) {
-        var v = vals2[ri2++];
-        if (v !== undefined) return row.replace(/> ?x</, '>' + (v || '-') + '<');
-        return row;
+    if(tblIdx===2){
+      return m.replace(/>TEKST</,'>'+tbl2[0]+'<');
+    }
+    return m;
+  });
+
+  var di=0;
+  var dists=[val('dist_airport'),val('dist_expressway'),val('dist_port'),val('dist_highway'),val('dist_railway')];
+  xml=xml.replace(/>X KM</g,function(){
+    var v=dists[di++];
+    return '>'+(v?v+' KM':'-')+'<';
+  });
+  xml=xml.replace(/>X M</,'>'+( val('dist_transit')?val('dist_transit')+' M':'-')+'<');
+
+  var desc=val('description').split('\n').filter(Boolean);
+  xml=xml.replace(/>Krótko opis nieruchomości[^<]*/,'>'+( desc[0]||''));
+  xml=xml.replace(/>W pierwszym akapicie[^<]*/,'>'+(desc[0]||''));
+  xml=xml.replace(/>W drugim akapicie opis lokalizacji</,'>'+(desc[1]||'')+'<');
+  xml=xml.replace(/>W trzecim akapicie opis zabudowy</,'>'+(desc[2]||'')+'<');
+  return xml;
+}
+
+function processSlide3(xml){
+  var city=val('city'); var street=val('street');
+  xml=xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g,city);
+  xml=xml.replace(/UL\. &#x201E;ulica[^<]*/g,street);
+  xml=xml.replace(/UL\. „ulica[^<]*/g,street);
+  var tbl1=[val('building_footprint'),val('total_area'),val('parking_spots'),val('warehouse_area'),val('office_area'),val('year_modernization')];
+  var tblIdx=0;
+  xml=xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g,function(m){
+    tblIdx++;
+    if(tblIdx===1){var ri=0;return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g,function(row){var v=tbl1[ri++];if(v)return row.replace(/>TEKST</,'>'+v+'<');return row;});}
+    if(tblIdx===2){return m.replace(/>TEKST</,'>'+(val('price_pln_building')||val('price_pln'))+'<');}
+    return m;
+  });
+  return xml;
+}
+
+function processSlide4(xml){
+  var city=val('city'); var street=val('street');
+  xml=xml.replace(/&#x201E;Miasto&#x201D;|„Miasto"/g,city);
+  xml=xml.replace(/UL\. &#x201E;ulica[^<]*/g,street);
+  xml=xml.replace(/UL\. „ulica[^<]*/g,street);
+  var tblIdx=0;
+  xml=xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g,function(m){
+    tblIdx++;
+    if(tblIdx===1){
+      var fields=[val('rent_income_pln'),val('service_charge_eur'),val('gross_income_eur')];
+      var ri=0;
+      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g,function(row){
+        var v=fields[ri++];
+        return row.replace(/>5t<|>tak<|>TEKST</,'>'+( v||'')+'<');
       });
     }
-    if (tblIdx === 3) {
-      if (res) m = m.replace(/UCHWAŁA NR y z dnia xx[^\<]*/, res);
-      if (card) m = m.replace(/"Karta terenu"\s*/, card);
+    if(tblIdx===2){var f=[val('num_tenants'),val('occupancy')];var ri2=0;return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g,function(row){var v=f[ri2++];if(v)return row.replace(/>TEKST</,'>'+v+'<');return row;});}
+    if(tblIdx===3){var f2=[val('noi_eur'),val('yield_pct'),val('price_eur')];var ri3=0;return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g,function(row){var v=f2[ri3++];if(v)return row.replace(/>TEKST</,'>'+v+'<');return row;});}
+    return m;
+  });
+  var rate=val('eur_pln_rate');
+  if(rate) xml=xml.replace(/4,24/,rate);
+  return xml;
+}
+
+function processSlide5(xml){
+  var res=val('mpzp_resolution');
+  var card=val('terrain_card');
+  if(res){
+    xml=xml.replace(/UCHWAŁA NR y z dnia xx[^<]*/,res);
+    xml=xml.replace(/>UCHWAŁA NR y[^<]*/,'>'+res);
+  }
+  if(card){
+    xml=xml.replace(/&#x201D;Karta terenu&#x201D;\s*/g,card);
+    xml=xml.replace(/"Karta terenu"\s*/g,card);
+    xml=xml.replace(/>&#x201C;Karta terenu[^<]*/,'>'+card);
+  }
+  var fnCount=0;
+  xml=xml.replace(/>tekst</g,function(){
+    fnCount++;
+    if(fnCount===1) return '>'+(val('terrain_function')||'')+'<';
+    if(fnCount===2) return '>'+(val('excluded_functions')||'')+'<';
+    return '>'+'<';
+  });
+  var tblIdx=0;
+  xml=xml.replace(/<a:tbl[\s\S]*?<\/a:tbl>/g,function(m){
+    tblIdx++;
+    if(tblIdx===1){
+      var vals=[val('building_area_min'),val('building_area_max'),val('intensity_min'),val('intensity_max')];
+      var ri=0;
+      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g,function(row){var v=vals[ri++];if(v!==undefined)return row.replace(/> ?x</,'>'+( v||'-')+'<');return row;});
+    }
+    if(tblIdx===2){
+      var vals2=[val('height_max'),val('bio_surface_min')];
+      var ri2=0;
+      return m.replace(/<a:tr[\s\S]*?<\/a:tr>/g,function(row){var v=vals2[ri2++];if(v!==undefined)return row.replace(/> ?x</,'>'+( v||'-')+'<');return row;});
+    }
+    if(tblIdx===3){
+      if(res) m=m.replace(/UCHWAŁA NR y z dnia xx[^\<]*/,res);
+      if(card) m=m.replace(/"Karta terenu"\s*/,card);
       return m;
     }
     return m;
@@ -2216,187 +448,62 @@ function processSlide5(xml) {
   return xml;
 }
 
-function removeSlideFromPresentation(xml, slideIndex) {
-  var matches = [...xml.matchAll(/<p:sldId[^/]*\/>/g)];
-  if (slideIndex < matches.length) {
-    xml = xml.replace(matches[slideIndex][0], '');
+function removeSlide4FromPresentation(xml){
+  var matches=[...xml.matchAll(/<p:sldId[^/]*\/>/g)];
+  if(matches.length>=4){
+    xml=xml.replace(matches[3][0],'');
   }
   return xml;
 }
 
-function setStatus(msg) { document.getElementById('status').textContent = msg; }
+function setStatus(msg){document.getElementById('status').textContent=msg;}
 
-async function generatePptx() {
-  if (!templateBuffer) { setStatus('Wybierz szablon'); return; }
-  var btn = document.getElementById('gen-btn');
-  btn.disabled = true;
-  btn.textContent = 'Generowanie...';
+async function generatePptx(){
+  if(!templateBuffer){setStatus('Najpierw wrzuć szablon PPTX');return;}
+  var btn=document.getElementById('gen-btn');
+  btn.disabled=true;btn.textContent='Generowanie...';
   setStatus('');
-  try {
-    var zip = await JSZip.loadAsync(templateBuffer);
-    var processors = {
-      'ppt/slides/slide1.xml': processSlide1,
-      'ppt/slides/slide2.xml': processSlide2,
-      'ppt/slides/slide3.xml': processSlide3,
+  try{
+    var zip=await JSZip.loadAsync(templateBuffer);
+    var processors={
+      'ppt/slides/slide1.xml':processSlide1,
+      'ppt/slides/slide2.xml':processSlide2,
+      'ppt/slides/slide3.xml':processSlide3,
+      'ppt/slides/slide5.xml':processSlide5,
     };
-    if (slide4Active) processors['ppt/slides/slide4.xml'] = processSlide4;
-    if (slide5Active) processors['ppt/slides/slide5.xml'] = processSlide5;
-
-    for (var path in processors) {
-      var file = zip.file(path);
-      if (file) {
-        var xml = await file.async('string');
-        xml = processors[path](xml);
-        zip.file(path, xml);
+    if(slide4Active) processors['ppt/slides/slide4.xml']=processSlide4;
+    for(var path in processors){
+      var file=zip.file(path);
+      if(file){
+        var xml=await file.async('string');
+        xml=processors[path](xml);
+        zip.file(path,xml);
       }
     }
-
-    // ===== CURRENCY REPLACEMENT — BRUTE FORCE =====
-    // Replace [CUR] in ALL XML files in the PPTX
-    var askingCur = cur('asking_price') || 'PLN';
-    var askingBuildingCur = cur('asking_price_building') || askingCur;
-    var noiCur = cur('noi') || 'EUR';
-    var priceSaleCur = cur('price_sale') || 'EUR';
-    var rentCur = cur('rent_income') || 'PLN';
-    var scCur = cur('service_charge') || 'EUR';
-    var giCur = cur('gross_income') || 'EUR';
-
-    console.log('[PPTX] Currencies:', { askingCur, askingBuildingCur, noiCur, priceSaleCur, rentCur, scCur, giCur });
-
-    // Get ALL xml files from the zip
-    var xmlFiles = [];
-    zip.forEach(function(relativePath, file) {
-      if (relativePath.endsWith('.xml') && !file.dir) {
-        xmlFiles.push(relativePath);
+    if(!slide4Active){
+      var presFile=zip.file('ppt/presentation.xml');
+      if(presFile){
+        var presXml=await presFile.async('string');
+        presXml=removeSlide4FromPresentation(presXml);
+        zip.file('ppt/presentation.xml',presXml);
       }
-    });
-    console.log('[PPTX] Scanning ' + xmlFiles.length + ' XML files for [CUR]');
-
-    for (var xi = 0; xi < xmlFiles.length; xi++) {
-      var xmlPath = xmlFiles[xi];
-      var xmlFile = zip.file(xmlPath);
-      if (!xmlFile) continue;
-
-      var xmlStr = await xmlFile.async('string');
-      var modified = false;
-      
-      // Replace custom labels in slideMasters (always, regardless of CUR)
-      if (xmlPath.indexOf('slideMaster') !== -1) {
-        var before = xmlStr;
-        if (xmlPath.indexOf('slideMaster4') !== -1) {
-          xmlStr = processLandMasterLabels(xmlStr);
-        }
-        if (xmlPath.indexOf('slideMaster6') !== -1) {
-          xmlStr = processBuildingMasterLabels(xmlStr);
-        }
-        if (xmlPath.indexOf('slideMaster7') !== -1) {
-          xmlStr = processIncomeMasterLabels(xmlStr);
-        }
-        xmlStr = replacePptxLabels(xmlStr);
-        if (xmlStr !== before) modified = true;
-      }
-      
-      if (xmlStr.indexOf('CUR') === -1) {
-        // No CUR but might have label changes
-        if (modified) zip.file(xmlPath, xmlStr);
-        continue;
-      }
-
-      var origCount = (xmlStr.match(/CUR/g) || []).length;
-      console.log('[PPTX] Found CUR in: ' + xmlPath + ' (' + origCount + ' occurrences)');
-
-      // Context-aware replacement based on surrounding text
-      // Replace specific full label patterns FIRST, then catch remaining [CUR]
-
-      // DOCHÓD OPERACYJNY NETTO [CUR] / NOI [CUR]
-      xmlStr = xmlStr.replace(/DOCHÓD OPERACYJNY NETTO \[CUR\]/g, 'DOCHÓD OPERACYJNY NETTO [' + noiCur + ']');
-      xmlStr = xmlStr.replace(/NOI \[CUR\]/g, 'NOI [' + noiCur + ']');
-
-      // ANNUAL RENTAL INCOME [CUR / m²]
-      xmlStr = xmlStr.replace(/ANNUAL RENTAL INCOME \[CUR/g, 'ANNUAL RENTAL INCOME [' + rentCur);
-      // ROCZNY PRZYCHÓD Z NAJMU ... [CUR
-      xmlStr = xmlStr.replace(/PRZYCHÓD Z NAJMU(.*?)\[CUR/g, 'PRZYCHÓD Z NAJMU$1[' + rentCur);
-
-      // ANNUAL SERVICE CHARGE INCOME [CUR / m²]
-      xmlStr = xmlStr.replace(/ANNUAL SERVICE CHARGE INCOME \[CUR/g, 'ANNUAL SERVICE CHARGE INCOME [' + scCur);
-      // ROCZNY PRZYCHÓD Z OPŁAT SERWISOWYCH [CUR
-      xmlStr = xmlStr.replace(/OPŁAT SERWISOWYCH(.*?)\[CUR/g, 'OPŁAT SERWISOWYCH$1[' + scCur);
-
-      // GROSS OPERATING INCOME ... [CUR
-      xmlStr = xmlStr.replace(/GROSS OPERATING INCOME(.*?)\[CUR/g, 'GROSS OPERATING INCOME$1[' + giCur);
-      // ŁĄCZNY ROCZNY PRZYCHÓD OPERACYJNY ... [CUR
-      xmlStr = xmlStr.replace(/PRZYCHÓD OPERACYJNY(.*?)\[CUR/g, 'PRZYCHÓD OPERACYJNY$1[' + giCur);
-
-      // CENA OFERTOWA [CUR] / ASKING PRICE [CUR]
-      // For slideMaster7 (slide4) this is price_sale, for others it's asking price
-      if (xmlPath.indexOf('slideMaster7') !== -1) {
-        xmlStr = xmlStr.replace(/CENA OFERTOWA \[CUR\]/g, 'CENA OFERTOWA [' + priceSaleCur + ']');
-        xmlStr = xmlStr.replace(/ASKING PRICE \[CUR\]/g, 'ASKING PRICE [' + priceSaleCur + ']');
-      } else if (xmlPath.indexOf('slideMaster6') !== -1) {
-        xmlStr = xmlStr.replace(/CENA OFERTOWA \[CUR\]/g, 'CENA OFERTOWA [' + askingBuildingCur + ']');
-        xmlStr = xmlStr.replace(/ASKING PRICE \[CUR\]/g, 'ASKING PRICE [' + askingBuildingCur + ']');
-      } else {
-        xmlStr = xmlStr.replace(/CENA OFERTOWA \[CUR\]/g, 'CENA OFERTOWA [' + askingCur + ']');
-        xmlStr = xmlStr.replace(/ASKING PRICE \[CUR\]/g, 'ASKING PRICE [' + askingCur + ']');
-      }
-
-      // Catch ANY remaining [CUR] (standalone or in unknown context)
-      while (xmlStr.indexOf('[CUR]') !== -1) {
-        xmlStr = xmlStr.replace('[CUR]', '[' + askingCur + ']');
-      }
-      // Also catch [CUR / and CUR/ patterns (split across runs)
-      while (xmlStr.indexOf('[CUR /') !== -1) {
-        xmlStr = xmlStr.replace('[CUR /', '[' + askingCur + ' /');
-      }
-      while (xmlStr.indexOf('[CUR/') !== -1) {
-        xmlStr = xmlStr.replace('[CUR/', '[' + askingCur + '/');
-      }
-
-      var remaining = (xmlStr.match(/CUR/g) || []).length;
-      // Filter out "KURS" which contains CUR legitimately
-      var kursCount = (xmlStr.match(/KURS/g) || []).length;
-      var realRemaining = remaining - kursCount;
-      console.log('[PPTX] ' + xmlPath + ': done. Remaining CUR (excl KURS): ' + realRemaining);
-
-      zip.file(xmlPath, xmlStr);
     }
-
-    // Remove inactive slides from presentation.xml
-    var presFile = zip.file('ppt/presentation.xml');
-    if (presFile) {
-      var presXml = await presFile.async('string');
-      if (!slide5Active && !slide4Active) {
-        presXml = removeSlideFromPresentation(presXml, 4);
-        presXml = removeSlideFromPresentation(presXml, 3);
-      } else if (!slide5Active) {
-        presXml = removeSlideFromPresentation(presXml, 4);
-      } else if (!slide4Active) {
-        presXml = removeSlideFromPresentation(presXml, 3);
-      }
-      zip.file('ppt/presentation.xml', presXml);
-    }
-
-    var blob = await zip.generateAsync({ type: 'blob' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    var city = val('city').replace(/\s/g, '_') || 'Obiekt';
-    a.href = url;
-    a.download = 'Oferta_' + city + '.pptx';
-    document.body.appendChild(a);
-    a.click();
+    var blob=await zip.generateAsync({type:'blob'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    var city=val('city').replace(/\s/g,'_')||'Obiekt';
+    a.href=url;a.download='Oferta_'+city+'.pptx';
+    document.body.appendChild(a);a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     setStatus('Pobrano!');
-    setTimeout(function() { setStatus(''); }, 3000);
-  } catch (err) {
+    setTimeout(function(){setStatus('');},3000);
+  }catch(err){
     console.error(err);
-    setStatus('Błąd: ' + err.message);
+    setStatus('Błąd: '+err.message);
   }
-  btn.disabled = false;
-  btn.innerHTML = '⬇ Generuj PPTX';
+  btn.disabled=false;btn.innerHTML='⬇ Generuj PPTX';
 }
 </script>
-</body>
-</html>
 </body>
 </html>
