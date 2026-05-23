@@ -1127,6 +1127,7 @@ select:focus {
 }
 
 .slide-photo-upload:hover,
+.slide-photo-upload.drag-over,
 .slide-photo-upload.has-file {
   border-color: var(--q-navy);
   background: #fff;
@@ -1321,11 +1322,11 @@ select:focus {
       <div class="card-title-block"><div class="card-title">Grunt / Lokalizacja</div><div class="card-title-en">Land / Location</div></div>
     </div>
     <div class="card-header-right">
-      <div class="slide-photo-upload" id="slide02-photo-upload" onclick="document.getElementById('slide02-photo-input').click()">
+      <div class="slide-photo-upload" id="slide02-photo-upload" onclick="document.getElementById('slide02-photo-input').click()" ondragover="handleSlide02MainPhotoDragOver(event)" ondragleave="handleSlide02MainPhotoDragLeave(event)" ondrop="handleSlide02MainPhotoDrop(event)">
         <span class="slide-photo-upload-icon">🖼️</span>
         <span class="slide-photo-upload-text">
           <span class="slide-photo-upload-title">Miejsce na zdjęcie</span>
-          <span class="slide-photo-upload-name" id="slide02-photo-name">JPG, PNG lub WEBP</span>
+          <span class="slide-photo-upload-name" id="slide02-photo-name">Przeciągnij albo kliknij — JPG, PNG, WEBP</span>
         </span>
         <button type="button" class="slide-photo-remove" id="slide02-photo-remove" onclick="event.stopPropagation();removeSlide02MainPhoto()" style="display:none">×</button>
       </div>
@@ -3049,6 +3050,29 @@ async function aiExtract() {
 
 
 /* ===== SLIDE 02 MAIN PHOTO ===== */
+function handleSlide02MainPhotoDragOver(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide02-photo-upload');
+  if (upload) upload.classList.add('drag-over');
+}
+
+function handleSlide02MainPhotoDragLeave(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide02-photo-upload');
+  if (upload) upload.classList.remove('drag-over');
+}
+
+function handleSlide02MainPhotoDrop(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide02-photo-upload');
+  if (upload) upload.classList.remove('drag-over');
+  var files = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
+  handleSlide02MainPhotoSelect(files);
+}
+
 function handleSlide02MainPhotoSelect(files) {
   if (!files || !files.length) return;
   var file = files[0];
@@ -3083,7 +3107,7 @@ function removeSlide02MainPhoto() {
   var nameEl = document.getElementById('slide02-photo-name');
   var removeBtn = document.getElementById('slide02-photo-remove');
   if (upload) upload.classList.remove('has-file');
-  if (nameEl) nameEl.textContent = 'JPG, PNG lub WEBP';
+  if (nameEl) nameEl.textContent = 'Przeciągnij albo kliknij — JPG, PNG, WEBP';
   if (removeBtn) removeBtn.style.display = 'none';
 }
 
@@ -3137,11 +3161,12 @@ function buildCoverSrcRect(imgW, imgH, boxCx, boxCy) {
 }
 
 function buildPictureXmlForSlide02(relId) {
-  // Główne zdjęcie slajdu 02: duży lewy górny obszar w szarym bloku template'u.
-  var x = 0;
-  var y = 1371600;
-  var cx = 5225000;
-  var cy = 2860000;
+  // Główne zdjęcie slajdu 02: dokładne położenie placeholdera z layoutu PowerPoint.
+  // Placeholder: "TUTAJ ZDJĘCIE NIERUCHOMOŚCI" na slideLayout2.
+  var x = 381000;
+  var y = 404812;
+  var cx = 5114925;
+  var cy = 3415158;
   var srcRect = buildCoverSrcRect(slide02MainPhotoMeta && slide02MainPhotoMeta.width, slide02MainPhotoMeta && slide02MainPhotoMeta.height, cx, cy);
   return '' +
     '<p:pic>' +
