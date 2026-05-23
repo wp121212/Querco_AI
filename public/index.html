@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD: PLACEHOLDER_UPDATE_2026_05_24 -->
+<!-- BUILD: SLIDE02_MAIN_PHOTO_UPLOAD_2026_05_24 -->
 <html lang="pl">
 <!-- BUILD: MPZP_ACT_UPLOAD_UI_2026_05_24_V2_REAL_DIFF -->
 
@@ -1109,6 +1109,75 @@ select:focus {
 
 .upload-loaded { display: none; }
 
+
+/* === SLIDE 02 MAIN PHOTO UPLOAD === */
+.slide-photo-upload {
+  width: 260px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border: 1px dashed #b9c2ca;
+  border-radius: 2px;
+  background: #fbfcfd;
+  color: var(--q-navy);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.slide-photo-upload:hover,
+.slide-photo-upload.has-file {
+  border-color: var(--q-navy);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(16,42,61,0.06);
+}
+
+.slide-photo-upload-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  border: 1px solid var(--q-line-soft);
+  background: #fff;
+  font-size: 17px;
+}
+
+.slide-photo-upload-text { min-width: 0; flex: 1; }
+.slide-photo-upload-title {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.slide-photo-upload-name {
+  margin-top: 4px;
+  color: var(--q-soft);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slide-photo-remove {
+  border: none;
+  background: transparent;
+  color: var(--q-danger);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 3px;
+}
+
+@media (max-width: 760px) {
+  .slide-photo-upload { width: 100%; }
+  .card-header-right { min-width: 0; width: 100%; margin-top: 12px; }
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 760px) {
   .header { padding: 0 18px; min-height: 58px; }
@@ -1251,6 +1320,17 @@ select:focus {
       <span class="card-num">02</span>
       <div class="card-title-block"><div class="card-title">Grunt / Lokalizacja</div><div class="card-title-en">Land / Location</div></div>
     </div>
+    <div class="card-header-right">
+      <div class="slide-photo-upload" id="slide02-photo-upload" onclick="document.getElementById('slide02-photo-input').click()">
+        <span class="slide-photo-upload-icon">🖼️</span>
+        <span class="slide-photo-upload-text">
+          <span class="slide-photo-upload-title">Miejsce na zdjęcie</span>
+          <span class="slide-photo-upload-name" id="slide02-photo-name">JPG, PNG lub WEBP</span>
+        </span>
+        <button type="button" class="slide-photo-remove" id="slide02-photo-remove" onclick="event.stopPropagation();removeSlide02MainPhoto()" style="display:none">×</button>
+      </div>
+      <input type="file" id="slide02-photo-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleSlide02MainPhotoSelect(this.files)">
+    </div>
   </div>
   <div class="card-body">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
@@ -1376,6 +1456,8 @@ if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
 var templateBuffer = null;
 var slide4Active = true;
 var slide5Active = false;
+var slide02MainPhotoFile = null;
+var slide02MainPhotoMeta = null;
 
 /* ===== SECTION 03 FIELD VISIBILITY ===== */
 var BUILDING_FIELD_CONFIG = [
@@ -2965,6 +3047,146 @@ async function aiExtract() {
   statusEl.style.display = 'none';
 }
 
+
+/* ===== SLIDE 02 MAIN PHOTO ===== */
+function handleSlide02MainPhotoSelect(files) {
+  if (!files || !files.length) return;
+  var file = files[0];
+  var ext = getFileExt(file.name);
+  if (['jpg','jpeg','png','webp'].indexOf(ext) === -1) {
+    setStatus('Nieobsługiwany format zdjęcia: ' + file.name);
+    return;
+  }
+  slide02MainPhotoFile = file;
+  slide02MainPhotoMeta = null;
+
+  var upload = document.getElementById('slide02-photo-upload');
+  var nameEl = document.getElementById('slide02-photo-name');
+  var removeBtn = document.getElementById('slide02-photo-remove');
+  if (upload) upload.classList.add('has-file');
+  if (nameEl) nameEl.textContent = file.name;
+  if (removeBtn) removeBtn.style.display = 'inline-flex';
+
+  loadImageFromBlob(file).then(function(img) {
+    slide02MainPhotoMeta = { width: img.width, height: img.height };
+  }).catch(function(err) {
+    console.warn('[Slide 02 photo preview meta error]', err);
+  });
+
+  document.getElementById('slide02-photo-input').value = '';
+}
+
+function removeSlide02MainPhoto() {
+  slide02MainPhotoFile = null;
+  slide02MainPhotoMeta = null;
+  var upload = document.getElementById('slide02-photo-upload');
+  var nameEl = document.getElementById('slide02-photo-name');
+  var removeBtn = document.getElementById('slide02-photo-remove');
+  if (upload) upload.classList.remove('has-file');
+  if (nameEl) nameEl.textContent = 'JPG, PNG lub WEBP';
+  if (removeBtn) removeBtn.style.display = 'none';
+}
+
+async function convertSlide02PhotoToPngArrayBuffer(file) {
+  var img = await loadImageFromBlob(file);
+  slide02MainPhotoMeta = { width: img.width, height: img.height };
+  var canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png', 0.95); });
+  if (!blob) throw new Error('Nie udało się przygotować zdjęcia do PPTX');
+  return await blob.arrayBuffer();
+}
+
+function getNextRelId(relsXml) {
+  var maxId = 0;
+  var matches = relsXml.match(/Id="rId(\d+)"/g) || [];
+  matches.forEach(function(m) {
+    var n = parseInt(m.replace(/\D/g, ''), 10);
+    if (!isNaN(n) && n > maxId) maxId = n;
+  });
+  return 'rId' + (maxId + 1);
+}
+
+function ensurePngContentType(zip) {
+  var ctFile = zip.file('[Content_Types].xml');
+  if (!ctFile) return Promise.resolve();
+  return ctFile.async('string').then(function(xml) {
+    if (xml.indexOf('Extension="png"') === -1) {
+      xml = xml.replace('</Types>', '<Default Extension="png" ContentType="image/png"/></Types>');
+      zip.file('[Content_Types].xml', xml);
+    }
+  });
+}
+
+function buildCoverSrcRect(imgW, imgH, boxCx, boxCy) {
+  if (!imgW || !imgH) return '';
+  var imgRatio = imgW / imgH;
+  var boxRatio = boxCx / boxCy;
+  if (imgRatio > boxRatio) {
+    var cropX = Math.round((1 - (boxRatio / imgRatio)) / 2 * 100000);
+    return '<a:srcRect l="' + cropX + '" r="' + cropX + '"/>';
+  }
+  if (imgRatio < boxRatio) {
+    var cropY = Math.round((1 - (imgRatio / boxRatio)) / 2 * 100000);
+    return '<a:srcRect t="' + cropY + '" b="' + cropY + '"/>';
+  }
+  return '';
+}
+
+function buildPictureXmlForSlide02(relId) {
+  // Główne zdjęcie slajdu 02: duży lewy górny obszar w szarym bloku template'u.
+  var x = 0;
+  var y = 1371600;
+  var cx = 5225000;
+  var cy = 2860000;
+  var srcRect = buildCoverSrcRect(slide02MainPhotoMeta && slide02MainPhotoMeta.width, slide02MainPhotoMeta && slide02MainPhotoMeta.height, cx, cy);
+  return '' +
+    '<p:pic>' +
+      '<p:nvPicPr>' +
+        '<p:cNvPr id="9002" name="slide02_main_photo.png"/>' +
+        '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>' +
+        '<p:nvPr/>' +
+      '</p:nvPicPr>' +
+      '<p:blipFill>' +
+        '<a:blip r:embed="' + relId + '"/>' +
+        srcRect +
+        '<a:stretch><a:fillRect/></a:stretch>' +
+      '</p:blipFill>' +
+      '<p:spPr>' +
+        '<a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm>' +
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>' +
+      '</p:spPr>' +
+    '</p:pic>';
+}
+
+async function insertSlide02MainPhoto(zip) {
+  if (!slide02MainPhotoFile) return;
+
+  await ensurePngContentType(zip);
+
+  var mediaPath = 'ppt/media/slide02_main_photo.png';
+  var arr = await convertSlide02PhotoToPngArrayBuffer(slide02MainPhotoFile);
+  zip.file(mediaPath, arr);
+
+  var relsPath = 'ppt/slides/_rels/slide2.xml.rels';
+  var relsFile = zip.file(relsPath);
+  var relsXml = relsFile ? await relsFile.async('string') : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+  var relId = getNextRelId(relsXml);
+  var relXml = '<Relationship Id="' + relId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/slide02_main_photo.png"/>';
+  relsXml = relsXml.replace('</Relationships>', relXml + '</Relationships>');
+  zip.file(relsPath, relsXml);
+
+  var slidePath = 'ppt/slides/slide2.xml';
+  var slideFile = zip.file(slidePath);
+  if (!slideFile) return;
+  var slideXml = await slideFile.async('string');
+  slideXml = slideXml.replace('</p:spTree>', buildPictureXmlForSlide02(relId) + '</p:spTree>');
+  zip.file(slidePath, slideXml);
+}
+
 /* ===== TEMPLATE MAP ===== */
 var TEMPLATE_MAP = {
   'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' }
@@ -3270,6 +3492,8 @@ async function generatePptx() {
         zip.file(path, xml);
       }
     }
+
+    await insertSlide02MainPhoto(zip);
 
     // ===== CURRENCY REPLACEMENT — BRUTE FORCE =====
     // Replace [CUR] in ALL XML files in the PPTX
