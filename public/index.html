@@ -432,6 +432,35 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(16,42,61,0.08);
 }
 
+/* === MPZP RESOLUTION COMPOSER === */
+.mpzp-resolution-composer {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) auto minmax(210px, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.mpzp-static-text {
+  color: var(--q-navy);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .035em;
+  white-space: nowrap;
+  text-transform: none;
+}
+
+.mpzp-resolution-number,
+.mpzp-resolution-date {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .mpzp-resolution-composer {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
 .select-ownership {
   min-width: 250px;
   max-width: 320px;
@@ -1170,7 +1199,7 @@ select:focus {
     </div>
   </div>
   <div class="card-body sec-fields-off" id="sec5-fields">
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Nr uchwały MPZP</div><div class="field-label-en">Resolution Number</div></div><div class="field-value"><input id="mpzp_resolution" placeholder="UCHWAŁA NR XXIII/456/2020"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Nr uchwały MPZP</div><div class="field-label-en">Resolution Number</div></div><div class="field-value mpzp-resolution-composer"><span class="mpzp-static-text">Uchwała nr</span><input id="mpzp_resolution" class="mpzp-resolution-number" placeholder="XXIII/456/2020"><span class="mpzp-static-text">z dnia</span><input id="mpzp_resolution_date" class="mpzp-resolution-date" placeholder="12 maja 2020 roku"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Karta terenu</div><div class="field-label-en">Terrain Card</div></div><div class="field-value"><input id="terrain_card" placeholder="P/U"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcja terenu</div><div class="field-label-en">Terrain Function</div></div><div class="field-value"><input id="terrain_function" placeholder="PRODUKCJA, SKŁADY, MAGAZYNY"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcje wyłączone</div><div class="field-label-en">Excluded Functions</div></div><div class="field-value"><input id="excluded_functions" placeholder="MIESZKANIOWA, HANDLOWA"></div></div>
@@ -1834,6 +1863,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
   try { initNumberFormatting(); } catch (e) { console.error('initNumberFormatting failed', e); }
   try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
+  try { initMpzpResolutionComposer(); } catch (e) { console.error('initMpzpResolutionComposer failed', e); }
 });
 
 /* ===== CURRENCY LABEL UPDATER ===== */
@@ -1998,6 +2028,100 @@ function syncAskingPriceGroupFromAvailableData() {
     return el && el.value && el.value.trim();
   });
   if (source) syncAskingPriceGroup(source.val);
+}
+
+/* ===== MPZP RESOLUTION COMPOSER ===== */
+function stripMpzpResolutionPrefix(value) {
+  return String(value || '')
+    .replace(/^\s*uchwa[łl]a\s+nr\s+/i, '')
+    .replace(/^\s*nr\s+/i, '')
+    .trim();
+}
+
+function normalizePolishResolutionDate(value) {
+  var raw = String(value || '').trim();
+  if (!raw) return '';
+
+  var months = {
+    '01': 'stycznia', '1': 'stycznia', 'styczen': 'stycznia', 'styczeń': 'stycznia', 'stycznia': 'stycznia',
+    '02': 'lutego', '2': 'lutego', 'luty': 'lutego', 'lutego': 'lutego',
+    '03': 'marca', '3': 'marca', 'marzec': 'marca', 'marca': 'marca',
+    '04': 'kwietnia', '4': 'kwietnia', 'kwiecien': 'kwietnia', 'kwiecień': 'kwietnia', 'kwietnia': 'kwietnia',
+    '05': 'maja', '5': 'maja', 'maj': 'maja', 'maja': 'maja',
+    '06': 'czerwca', '6': 'czerwca', 'czerwiec': 'czerwca', 'czerwca': 'czerwca',
+    '07': 'lipca', '7': 'lipca', 'lipiec': 'lipca', 'lipca': 'lipca',
+    '08': 'sierpnia', '8': 'sierpnia', 'sierpien': 'sierpnia', 'sierpień': 'sierpnia', 'sierpnia': 'sierpnia',
+    '09': 'września', '9': 'września', 'wrzesien': 'września', 'wrzesień': 'września', 'września': 'września', 'wrzesnia': 'września',
+    '10': 'października', 'pazdziernik': 'października', 'październik': 'października', 'października': 'października', 'pazdziernika': 'października',
+    '11': 'listopada', 'listopad': 'listopada', 'listopada': 'listopada',
+    '12': 'grudnia', 'grudzien': 'grudnia', 'grudzień': 'grudnia', 'grudnia': 'grudnia'
+  };
+
+  raw = raw
+    .replace(/^\s*z\s+dnia\s+/i, '')
+    .replace(/\s+roku\.?$/i, '')
+    .replace(/\s+r\.?$/i, '')
+    .trim();
+
+  var numeric = raw.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
+  if (numeric) {
+    var d = String(parseInt(numeric[1], 10)).padStart(2, '0');
+    var m = months[String(parseInt(numeric[2], 10))] || months[numeric[2]] || numeric[2];
+    return d + ' ' + m + ' ' + numeric[3] + ' roku';
+  }
+
+  var words = raw.match(/^(\d{1,2})\s+([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]+)\s+(\d{4})$/);
+  if (words) {
+    var day = String(parseInt(words[1], 10)).padStart(2, '0');
+    var key = words[2].toLowerCase();
+    var month = months[key] || key;
+    return day + ' ' + month + ' ' + words[3] + ' roku';
+  }
+
+  return raw;
+}
+
+function normalizeMpzpResolutionComposite() {
+  var numberEl = document.getElementById('mpzp_resolution');
+  var dateEl = document.getElementById('mpzp_resolution_date');
+  if (!numberEl) return;
+
+  var rawNumber = numberEl.value || '';
+  var fullMatch = rawNumber.match(/uchwa[łl]a\s+nr\s+([\s\S]*?)\s+z\s+dnia\s+([\s\S]*)$/i);
+  if (fullMatch) {
+    numberEl.value = stripMpzpResolutionPrefix(fullMatch[1]);
+    if (dateEl && !dateEl.value.trim()) {
+      dateEl.value = normalizePolishResolutionDate(fullMatch[2]);
+    }
+  } else {
+    numberEl.value = stripMpzpResolutionPrefix(rawNumber);
+  }
+
+  if (dateEl && dateEl.value.trim()) {
+    dateEl.value = normalizePolishResolutionDate(dateEl.value);
+  }
+}
+
+function getMpzpResolutionText() {
+  normalizeMpzpResolutionComposite();
+  var number = val('mpzp_resolution');
+  var date = normalizePolishResolutionDate(val('mpzp_resolution_date'));
+  if (!number && !date) return '';
+  if (number && date) return 'Uchwała nr ' + number + ' z dnia ' + date;
+  if (number) return 'Uchwała nr ' + number;
+  return 'z dnia ' + date;
+}
+
+function initMpzpResolutionComposer() {
+  var numberEl = document.getElementById('mpzp_resolution');
+  var dateEl = document.getElementById('mpzp_resolution_date');
+
+  [numberEl, dateEl].forEach(function(el) {
+    if (!el || el.getAttribute('data-mpzp-resolution-ready') === '1') return;
+    el.setAttribute('data-mpzp-resolution-ready', '1');
+    el.addEventListener('change', normalizeMpzpResolutionComposite);
+    el.addEventListener('blur', normalizeMpzpResolutionComposite);
+  });
 }
 
 /* ===== SECTION TOGGLES ===== */
@@ -2432,7 +2556,7 @@ async function aiExtract() {
       'dist_airport','dist_expressway','dist_port','dist_highway','dist_railway','dist_transit','description',
       'building_footprint','total_area','parking_spots','warehouse_area','office_area','year_modernization',
       'num_tenants','occupancy','yield_pct','eur_pln_rate',
-      'mpzp_resolution','terrain_card','terrain_function','excluded_functions',
+      'mpzp_resolution','mpzp_resolution_date','terrain_card','terrain_function','excluded_functions',
       'building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'
     ];
 
@@ -2449,6 +2573,7 @@ async function aiExtract() {
     }
 
     simpleFields.forEach(function(id) { fillField(id, data[id]); });
+    normalizeMpzpResolutionComposite();
 
     // Ownership select
     if (data.ownership) {
@@ -2479,7 +2604,7 @@ async function aiExtract() {
     syncAskingPriceGroupFromAvailableData();
 
     // Auto-activate MPZP section if AI found MPZP data
-    var mpzpFields = ['mpzp_resolution','terrain_card','terrain_function','excluded_functions','building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'];
+    var mpzpFields = ['mpzp_resolution','mpzp_resolution_date','terrain_card','terrain_function','excluded_functions','building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'];
     var hasMpzp = mpzpFields.some(function(f) { return data[f] && data[f].trim(); });
     if (hasMpzp && !slide5Active) { toggleSection('slide5'); }
 
@@ -2728,7 +2853,7 @@ function processSlide4(xml) {
 }
 
 function processSlide5(xml) {
-  var res = valUpper('mpzp_resolution');
+  var res = getMpzpResolutionText();
   var card = valUpper('terrain_card');
   if (res) {
     xml = xml.replace(/UCHWAŁA NR y z dnia xx[^<]*/, res);
