@@ -990,6 +990,33 @@ select:focus {
 }
 
 
+/* === SLIDE LEVEL TOGGLES === */
+.slide-toggle-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 4px;
+  padding-left: 12px;
+  border-left: 1px solid var(--q-line-soft);
+}
+
+.slide-toggle-inline .opt-label {
+  margin-right: 0;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+.slide-toggle-inline .toggle {
+  width: 40px;
+  height: 21px;
+}
+
+.slide-toggle-inline .toggle-dot {
+  width: 15px;
+  height: 15px;
+}
+
+
 /* === FIELD VISIBILITY TOGGLES === */
 .field-row.has-visibility-toggle {
   position: relative;
@@ -1110,7 +1137,7 @@ select:focus {
 .upload-loaded { display: none; }
 
 
-/* === SLIDE 02 MAIN PHOTO UPLOAD === */
+/* === SLIDE MAIN PHOTO UPLOAD === */
 .slide-photo-upload {
   width: 260px;
   min-height: 52px;
@@ -1176,6 +1203,8 @@ select:focus {
 
 @media (max-width: 760px) {
   .slide-photo-upload { width: 100%; }
+  .card-header-left { flex-wrap: wrap; }
+  .slide-toggle-inline { margin-left: 0; padding-left: 0; border-left: none; }
   .card-header-right { min-width: 0; width: 100%; margin-top: 12px; }
 }
 
@@ -1315,25 +1344,29 @@ select:focus {
 </div>
 
 <!-- SECTION 2: GRUNT / LOKALIZACJA -->
-<div class="card">
+<div class="card" id="sec-slide2">
   <div class="card-header">
     <div class="card-header-left">
       <span class="card-num">02</span>
       <div class="card-title-block"><div class="card-title">Grunt / Lokalizacja</div><div class="card-title-en">Land / Location</div></div>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggle2" onclick="toggleSection('slide2')" style="background:#102A3D" title="Pokaż / ukryj slajd w prezentacji"><div class="toggle-dot" style="left:18px"></div></button>
+      </div>
     </div>
     <div class="card-header-right">
-      <div class="slide-photo-upload" id="slide02-photo-upload" onclick="document.getElementById('slide02-photo-input').click()" ondragover="handleSlide02MainPhotoDragOver(event)" ondragleave="handleSlide02MainPhotoDragLeave(event)" ondrop="handleSlide02MainPhotoDrop(event)">
+      <div class="slide-photo-upload" id="slide02-photo-upload" onclick="document.getElementById('slide02-photo-input').click()" ondragover="handleSlideMainPhotoDragOver(event, '02')" ondragleave="handleSlideMainPhotoDragLeave(event, '02')" ondrop="handleSlideMainPhotoDrop(event, '02')">
         <span class="slide-photo-upload-icon">🖼️</span>
         <span class="slide-photo-upload-text">
           <span class="slide-photo-upload-title">Miejsce na zdjęcie</span>
           <span class="slide-photo-upload-name" id="slide02-photo-name">Przeciągnij albo kliknij — JPG, PNG, WEBP</span>
         </span>
-        <button type="button" class="slide-photo-remove" id="slide02-photo-remove" onclick="event.stopPropagation();removeSlide02MainPhoto()" style="display:none">×</button>
+        <button type="button" class="slide-photo-remove" id="slide02-photo-remove" onclick="event.stopPropagation();removeSlideMainPhoto('02')" style="display:none">×</button>
       </div>
-      <input type="file" id="slide02-photo-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleSlide02MainPhotoSelect(this.files)">
+      <input type="file" id="slide02-photo-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleSlideMainPhotoSelect(this.files, '02')">
     </div>
   </div>
-  <div class="card-body">
+  <div class="card-body" id="sec2-fields">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. UPHAGENA 27"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="50 000"></div></div>
@@ -1356,14 +1389,29 @@ select:focus {
 </div>
 
 <!-- SECTION 3: ZABUDOWA -->
-<div class="card">
+<div class="card" id="sec-slide3">
   <div class="card-header">
     <div class="card-header-left">
       <span class="card-num">03</span>
       <div class="card-title-block"><div class="card-title">Zabudowa</div><div class="card-title-en">Building</div></div>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggle3" onclick="toggleSection('slide3')" style="background:#102A3D" title="Pokaż / ukryj slajd w prezentacji"><div class="toggle-dot" style="left:18px"></div></button>
+      </div>
+    </div>
+    <div class="card-header-right">
+      <div class="slide-photo-upload" id="slide03-photo-upload" onclick="document.getElementById('slide03-photo-input').click()" ondragover="handleSlideMainPhotoDragOver(event, '03')" ondragleave="handleSlideMainPhotoDragLeave(event, '03')" ondrop="handleSlideMainPhotoDrop(event, '03')">
+        <span class="slide-photo-upload-icon">🖼️</span>
+        <span class="slide-photo-upload-text">
+          <span class="slide-photo-upload-title">Miejsce na zdjęcie</span>
+          <span class="slide-photo-upload-name" id="slide03-photo-name">Przeciągnij albo kliknij — JPG, PNG, WEBP</span>
+        </span>
+        <button type="button" class="slide-photo-remove" id="slide03-photo-remove" onclick="event.stopPropagation();removeSlideMainPhoto('03')" style="display:none">×</button>
+      </div>
+      <input type="file" id="slide03-photo-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleSlideMainPhotoSelect(this.files, '03')">
     </div>
   </div>
-  <div class="card-body">
+  <div class="card-body" id="sec3-fields">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia zabudowy [m²]</div><div class="field-label-en">Building Footprint</div></div><div class="field-value"><input id="building_footprint" placeholder="15 000"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia użytkowa [m²]</div><div class="field-label-en">Total Area</div></div><div class="field-value"><input id="total_area" placeholder="20 000"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba miejsc parkingowych</div><div class="field-label-en">Parking Spots</div></div><div class="field-value"><input id="parking_spots" placeholder="50"></div></div>
@@ -1380,10 +1428,21 @@ select:focus {
     <div class="card-header-left">
       <span class="card-num">04</span>
       <div class="card-title-block"><div class="card-title">Dochody / Najemcy</div><div class="card-title-en">Income / Tenants</div></div>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggle4" onclick="toggleSection('slide4')" style="background:#102A3D" title="Pokaż / ukryj slajd w prezentacji"><div class="toggle-dot" style="left:18px"></div></button>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span class="opt-label">opcjonalny</span>
-      <button class="toggle" id="toggle4" onclick="toggleSection('slide4')" style="background:#102A3D"><div class="toggle-dot" style="left:18px"></div></button>
+    <div class="card-header-right">
+      <div class="slide-photo-upload" id="slide04-photo-upload" onclick="document.getElementById('slide04-photo-input').click()" ondragover="handleSlideMainPhotoDragOver(event, '04')" ondragleave="handleSlideMainPhotoDragLeave(event, '04')" ondrop="handleSlideMainPhotoDrop(event, '04')">
+        <span class="slide-photo-upload-icon">🖼️</span>
+        <span class="slide-photo-upload-text">
+          <span class="slide-photo-upload-title">Miejsce na zdjęcie</span>
+          <span class="slide-photo-upload-name" id="slide04-photo-name">Przeciągnij albo kliknij — JPG, PNG, WEBP</span>
+        </span>
+        <button type="button" class="slide-photo-remove" id="slide04-photo-remove" onclick="event.stopPropagation();removeSlideMainPhoto('04')" style="display:none">×</button>
+      </div>
+      <input type="file" id="slide04-photo-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleSlideMainPhotoSelect(this.files, '04')">
     </div>
   </div>
   <div class="card-body" id="sec4-fields">
@@ -1405,10 +1464,10 @@ select:focus {
     <div class="card-header-left">
       <span class="card-num">05</span>
       <div class="card-title-block"><div class="card-title">MPZP</div><div class="card-title-en">Local Spatial Development Plan</div></div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span class="opt-label">opcjonalny</span>
-      <button class="toggle" id="toggle5" onclick="toggleSection('slide5')" style="background:#ccc"><div class="toggle-dot" style="left:2px"></div></button>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggle5" onclick="toggleSection('slide5')" style="background:#ccc" title="Pokaż / ukryj slajd w prezentacji"><div class="toggle-dot" style="left:2px"></div></button>
+      </div>
     </div>
   </div>
   <div class="card-body sec-fields-off" id="sec5-fields">
@@ -1455,10 +1514,15 @@ if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
   window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 var templateBuffer = null;
+var slide2Active = true;
+var slide3Active = true;
 var slide4Active = true;
 var slide5Active = false;
-var slide02MainPhotoFile = null;
-var slide02MainPhotoMeta = null;
+var slidePhotoState = {
+  '02': { file: null, meta: null },
+  '03': { file: null, meta: null },
+  '04': { file: null, meta: null }
+};
 
 /* ===== SECTION 03 FIELD VISIBILITY ===== */
 var BUILDING_FIELD_CONFIG = [
@@ -2541,22 +2605,35 @@ async function analyzeMpzpActFile() {
 }
 
 /* ===== SECTION TOGGLES ===== */
-function toggleSection(section) {
-  if (section === 'slide4') {
-    slide4Active = !slide4Active;
-    var t = document.getElementById('toggle4');
-    var f = document.getElementById('sec4-fields');
-    t.style.background = slide4Active ? '#102A3D' : '#ccc';
-    t.querySelector('.toggle-dot').style.left = slide4Active ? '20px' : '2px';
-    if (slide4Active) { f.classList.remove('sec-fields-off'); } else { f.classList.add('sec-fields-off'); }
-  } else if (section === 'slide5') {
-    slide5Active = !slide5Active;
-    var t5 = document.getElementById('toggle5');
-    var f5 = document.getElementById('sec5-fields');
-    t5.style.background = slide5Active ? '#102A3D' : '#ccc';
-    t5.querySelector('.toggle-dot').style.left = slide5Active ? '20px' : '2px';
-    if (slide5Active) { f5.classList.remove('sec-fields-off'); } else { f5.classList.add('sec-fields-off'); }
+function isSlideActive(section) {
+  if (section === 'slide2') return slide2Active;
+  if (section === 'slide3') return slide3Active;
+  if (section === 'slide4') return slide4Active;
+  if (section === 'slide5') return slide5Active;
+  return true;
+}
+
+function setSlideActive(section, active) {
+  if (section === 'slide2') slide2Active = active;
+  if (section === 'slide3') slide3Active = active;
+  if (section === 'slide4') slide4Active = active;
+  if (section === 'slide5') slide5Active = active;
+
+  var num = section.replace('slide', '');
+  var toggle = document.getElementById('toggle' + num);
+  var fields = document.getElementById('sec' + num + '-fields');
+  var dot = toggle ? toggle.querySelector('.toggle-dot') : null;
+
+  if (toggle) toggle.style.background = active ? '#102A3D' : '#ccc';
+  if (dot) dot.style.left = active ? '18px' : '2px';
+  if (fields) {
+    if (active) fields.classList.remove('sec-fields-off');
+    else fields.classList.add('sec-fields-off');
   }
+}
+
+function toggleSection(section) {
+  setSlideActive(section, !isSlideActive(section));
 }
 
 /* ===== FILE UPLOAD HANDLING ===== */
@@ -3049,31 +3126,36 @@ async function aiExtract() {
 }
 
 
-/* ===== SLIDE 02 MAIN PHOTO ===== */
-function handleSlide02MainPhotoDragOver(event) {
+/* ===== SLIDE MAIN PHOTOS ===== */
+function getSlidePhotoState(slideKey) {
+  if (!slidePhotoState[slideKey]) slidePhotoState[slideKey] = { file: null, meta: null };
+  return slidePhotoState[slideKey];
+}
+
+function handleSlideMainPhotoDragOver(event, slideKey) {
   event.preventDefault();
   event.stopPropagation();
-  var upload = document.getElementById('slide02-photo-upload');
+  var upload = document.getElementById('slide' + slideKey + '-photo-upload');
   if (upload) upload.classList.add('drag-over');
 }
 
-function handleSlide02MainPhotoDragLeave(event) {
+function handleSlideMainPhotoDragLeave(event, slideKey) {
   event.preventDefault();
   event.stopPropagation();
-  var upload = document.getElementById('slide02-photo-upload');
+  var upload = document.getElementById('slide' + slideKey + '-photo-upload');
   if (upload) upload.classList.remove('drag-over');
 }
 
-function handleSlide02MainPhotoDrop(event) {
+function handleSlideMainPhotoDrop(event, slideKey) {
   event.preventDefault();
   event.stopPropagation();
-  var upload = document.getElementById('slide02-photo-upload');
+  var upload = document.getElementById('slide' + slideKey + '-photo-upload');
   if (upload) upload.classList.remove('drag-over');
   var files = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
-  handleSlide02MainPhotoSelect(files);
+  handleSlideMainPhotoSelect(files, slideKey);
 }
 
-function handleSlide02MainPhotoSelect(files) {
+function handleSlideMainPhotoSelect(files, slideKey) {
   if (!files || !files.length) return;
   var file = files[0];
   var ext = getFileExt(file.name);
@@ -3081,39 +3163,44 @@ function handleSlide02MainPhotoSelect(files) {
     setStatus('Nieobsługiwany format zdjęcia: ' + file.name);
     return;
   }
-  slide02MainPhotoFile = file;
-  slide02MainPhotoMeta = null;
 
-  var upload = document.getElementById('slide02-photo-upload');
-  var nameEl = document.getElementById('slide02-photo-name');
-  var removeBtn = document.getElementById('slide02-photo-remove');
+  var state = getSlidePhotoState(slideKey);
+  state.file = file;
+  state.meta = null;
+
+  var upload = document.getElementById('slide' + slideKey + '-photo-upload');
+  var nameEl = document.getElementById('slide' + slideKey + '-photo-name');
+  var removeBtn = document.getElementById('slide' + slideKey + '-photo-remove');
   if (upload) upload.classList.add('has-file');
   if (nameEl) nameEl.textContent = file.name;
   if (removeBtn) removeBtn.style.display = 'inline-flex';
 
   loadImageFromBlob(file).then(function(img) {
-    slide02MainPhotoMeta = { width: img.width, height: img.height };
+    state.meta = { width: img.width, height: img.height };
   }).catch(function(err) {
-    console.warn('[Slide 02 photo preview meta error]', err);
+    console.warn('[Slide ' + slideKey + ' photo preview meta error]', err);
   });
 
-  document.getElementById('slide02-photo-input').value = '';
+  var input = document.getElementById('slide' + slideKey + '-photo-input');
+  if (input) input.value = '';
 }
 
-function removeSlide02MainPhoto() {
-  slide02MainPhotoFile = null;
-  slide02MainPhotoMeta = null;
-  var upload = document.getElementById('slide02-photo-upload');
-  var nameEl = document.getElementById('slide02-photo-name');
-  var removeBtn = document.getElementById('slide02-photo-remove');
+function removeSlideMainPhoto(slideKey) {
+  var state = getSlidePhotoState(slideKey);
+  state.file = null;
+  state.meta = null;
+  var upload = document.getElementById('slide' + slideKey + '-photo-upload');
+  var nameEl = document.getElementById('slide' + slideKey + '-photo-name');
+  var removeBtn = document.getElementById('slide' + slideKey + '-photo-remove');
   if (upload) upload.classList.remove('has-file');
   if (nameEl) nameEl.textContent = 'Przeciągnij albo kliknij — JPG, PNG, WEBP';
   if (removeBtn) removeBtn.style.display = 'none';
 }
 
-async function convertSlide02PhotoToPngArrayBuffer(file) {
-  var img = await loadImageFromBlob(file);
-  slide02MainPhotoMeta = { width: img.width, height: img.height };
+async function convertSlidePhotoToPngArrayBuffer(slideKey) {
+  var state = getSlidePhotoState(slideKey);
+  var img = await loadImageFromBlob(state.file);
+  state.meta = { width: img.width, height: img.height };
   var canvas = document.createElement('canvas');
   canvas.width = img.width;
   canvas.height = img.height;
@@ -3160,18 +3247,19 @@ function buildCoverSrcRect(imgW, imgH, boxCx, boxCy) {
   return '';
 }
 
-function buildPictureXmlForSlide02(relId) {
-  // Główne zdjęcie slajdu 02: dokładne położenie placeholdera z layoutu PowerPoint.
-  // Placeholder: "TUTAJ ZDJĘCIE NIERUCHOMOŚCI" na slideLayout2.
+function buildPictureXmlForSlide(slideKey, relId) {
+  // Główne zdjęcie slajdów 02 / 03 / 04: dokładne położenie placeholdera z layoutu PowerPoint.
+  // Placeholder: "TUTAJ ZDJĘCIE NIERUCHOMOŚCI".
   var x = 381000;
   var y = 404812;
   var cx = 5114925;
   var cy = 3415158;
-  var srcRect = buildCoverSrcRect(slide02MainPhotoMeta && slide02MainPhotoMeta.width, slide02MainPhotoMeta && slide02MainPhotoMeta.height, cx, cy);
+  var state = getSlidePhotoState(slideKey);
+  var srcRect = buildCoverSrcRect(state.meta && state.meta.width, state.meta && state.meta.height, cx, cy);
   return '' +
     '<p:pic>' +
       '<p:nvPicPr>' +
-        '<p:cNvPr id="9002" name="slide02_main_photo.png"/>' +
+        '<p:cNvPr id="90' + slideKey + '" name="slide' + slideKey + '_main_photo.png"/>' +
         '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>' +
         '<p:nvPr/>' +
       '</p:nvPicPr>' +
@@ -3187,31 +3275,38 @@ function buildPictureXmlForSlide02(relId) {
     '</p:pic>';
 }
 
-async function insertSlide02MainPhoto(zip) {
-  if (!slide02MainPhotoFile) return;
+async function insertSlideMainPhoto(zip, slideKey) {
+  var state = getSlidePhotoState(slideKey);
+  var slideNumber = parseInt(slideKey, 10);
+  if (!state.file || !isSlideActive('slide' + slideNumber)) return;
 
   await ensurePngContentType(zip);
 
-  var mediaPath = 'ppt/media/slide02_main_photo.png';
-  var arr = await convertSlide02PhotoToPngArrayBuffer(slide02MainPhotoFile);
+  var mediaPath = 'ppt/media/slide' + slideKey + '_main_photo.png';
+  var arr = await convertSlidePhotoToPngArrayBuffer(slideKey);
   zip.file(mediaPath, arr);
 
-  var relsPath = 'ppt/slides/_rels/slide2.xml.rels';
+  var relsPath = 'ppt/slides/_rels/slide' + slideNumber + '.xml.rels';
   var relsFile = zip.file(relsPath);
   var relsXml = relsFile ? await relsFile.async('string') : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
   var relId = getNextRelId(relsXml);
-  var relXml = '<Relationship Id="' + relId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/slide02_main_photo.png"/>';
+  var relXml = '<Relationship Id="' + relId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/slide' + slideKey + '_main_photo.png"/>';
   relsXml = relsXml.replace('</Relationships>', relXml + '</Relationships>');
   zip.file(relsPath, relsXml);
 
-  var slidePath = 'ppt/slides/slide2.xml';
+  var slidePath = 'ppt/slides/slide' + slideNumber + '.xml';
   var slideFile = zip.file(slidePath);
   if (!slideFile) return;
   var slideXml = await slideFile.async('string');
-  slideXml = slideXml.replace('</p:spTree>', buildPictureXmlForSlide02(relId) + '</p:spTree>');
+  slideXml = slideXml.replace('</p:spTree>', buildPictureXmlForSlide(slideKey, relId) + '</p:spTree>');
   zip.file(slidePath, slideXml);
 }
 
+async function insertAllSlideMainPhotos(zip) {
+  await insertSlideMainPhoto(zip, '02');
+  await insertSlideMainPhoto(zip, '03');
+  await insertSlideMainPhoto(zip, '04');
+}
 /* ===== TEMPLATE MAP ===== */
 var TEMPLATE_MAP = {
   'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' }
@@ -3503,9 +3598,9 @@ async function generatePptx() {
     var zip = await JSZip.loadAsync(templateBuffer);
     var processors = {
       'ppt/slides/slide1.xml': processSlide1,
-      'ppt/slides/slide2.xml': processSlide2,
-      'ppt/slides/slide3.xml': processSlide3,
     };
+    if (slide2Active) processors['ppt/slides/slide2.xml'] = processSlide2;
+    if (slide3Active) processors['ppt/slides/slide3.xml'] = processSlide3;
     if (slide4Active) processors['ppt/slides/slide4.xml'] = processSlide4;
     if (slide5Active) processors['ppt/slides/slide5.xml'] = processSlide5;
 
@@ -3518,7 +3613,7 @@ async function generatePptx() {
       }
     }
 
-    await insertSlide02MainPhoto(zip);
+    await insertAllSlideMainPhotos(zip);
 
     // ===== CURRENCY REPLACEMENT — BRUTE FORCE =====
     // Replace [CUR] in ALL XML files in the PPTX
@@ -3630,18 +3725,18 @@ async function generatePptx() {
       zip.file(xmlPath, xmlStr);
     }
 
-    // Remove inactive slides from presentation.xml
+    // Remove inactive slides from presentation.xml — cover stays always active.
     var presFile = zip.file('ppt/presentation.xml');
     if (presFile) {
       var presXml = await presFile.async('string');
-      if (!slide5Active && !slide4Active) {
-        presXml = removeSlideFromPresentation(presXml, 4);
-        presXml = removeSlideFromPresentation(presXml, 3);
-      } else if (!slide5Active) {
-        presXml = removeSlideFromPresentation(presXml, 4);
-      } else if (!slide4Active) {
-        presXml = removeSlideFromPresentation(presXml, 3);
-      }
+      var slidesToRemove = [];
+      if (!slide2Active) slidesToRemove.push(1);
+      if (!slide3Active) slidesToRemove.push(2);
+      if (!slide4Active) slidesToRemove.push(3);
+      if (!slide5Active) slidesToRemove.push(4);
+      slidesToRemove.sort(function(a, b) { return b - a; }).forEach(function(idx) {
+        presXml = removeSlideFromPresentation(presXml, idx);
+      });
       zip.file('ppt/presentation.xml', presXml);
     }
 
