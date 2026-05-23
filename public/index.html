@@ -1832,6 +1832,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initLandFieldToggles(); } catch (e) { console.error('initLandFieldToggles failed', e); }
   try { initBuildingFieldToggles(); } catch (e) { console.error('initBuildingFieldToggles failed', e); }
   try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
+  try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
 });
 
 /* ===== CURRENCY LABEL UPDATER ===== */
@@ -1842,6 +1843,76 @@ function updateCurrencyLabel(fieldId, baseName, suffix) {
   if (el) {
     el.textContent = baseName + ' [' + cur + (suffix || '') + ']' + (fieldId === 'asking_price_building' ? ' (slajd 3)' : '');
   }
+}
+
+/* ===== ASKING PRICE SYNC: SLIDE 02 / 03 / 04 ===== */
+// Wersja naprawcza: price-sync-2026-05-23
+var ASKING_PRICE_SYNC_FIELDS = [
+  { val: 'asking_price', cur: 'asking_price_currency', baseName: 'Cena ofertowa', suffix: '' },
+  { val: 'asking_price_building', cur: 'asking_price_building_currency', baseName: 'Cena ofertowa', suffix: '' },
+  { val: 'price_sale', cur: 'price_sale_currency', baseName: 'Cena ofertowa', suffix: '' }
+];
+var askingPriceSyncInProgress = false;
+
+function syncAskingPriceGroup(sourceValueId) {
+  if (askingPriceSyncInProgress) return;
+
+  var sourceCfg = ASKING_PRICE_SYNC_FIELDS.find(function(cfg) { return cfg.val === sourceValueId; });
+  if (!sourceCfg) return;
+
+  var sourceValueEl = document.getElementById(sourceCfg.val);
+  var sourceCurrencyEl = document.getElementById(sourceCfg.cur);
+  if (!sourceValueEl || !sourceCurrencyEl) return;
+
+  var sourceValue = sourceValueEl.value || '';
+  var sourceCurrency = sourceCurrencyEl.value || '';
+
+  // If user clears a price field, do not erase the other two automatically.
+  if (!sourceValue.trim()) return;
+
+  askingPriceSyncInProgress = true;
+  try {
+    ASKING_PRICE_SYNC_FIELDS.forEach(function(cfg) {
+      var valueEl = document.getElementById(cfg.val);
+      var currencyEl = document.getElementById(cfg.cur);
+
+      if (valueEl && valueEl !== sourceValueEl) {
+        valueEl.value = sourceValue;
+        if (sourceValueEl.classList.contains('ai-filled')) valueEl.classList.add('ai-filled');
+      }
+
+      if (currencyEl) currencyEl.value = sourceCurrency;
+      updateCurrencyLabel(cfg.val, cfg.baseName, cfg.suffix || '');
+    });
+  } finally {
+    askingPriceSyncInProgress = false;
+  }
+}
+
+function initAskingPriceSync() {
+  ASKING_PRICE_SYNC_FIELDS.forEach(function(cfg) {
+    var valueEl = document.getElementById(cfg.val);
+    var currencyEl = document.getElementById(cfg.cur);
+
+    if (valueEl && valueEl.getAttribute('data-price-sync-ready') !== '1') {
+      valueEl.setAttribute('data-price-sync-ready', '1');
+      valueEl.addEventListener('input', function() { syncAskingPriceGroup(cfg.val); });
+      valueEl.addEventListener('change', function() { syncAskingPriceGroup(cfg.val); });
+    }
+
+    if (currencyEl && currencyEl.getAttribute('data-price-sync-ready') !== '1') {
+      currencyEl.setAttribute('data-price-sync-ready', '1');
+      currencyEl.addEventListener('change', function() { syncAskingPriceGroup(cfg.val); });
+    }
+  });
+}
+
+function syncAskingPriceGroupFromAvailableData() {
+  var source = ASKING_PRICE_SYNC_FIELDS.find(function(cfg) {
+    var el = document.getElementById(cfg.val);
+    return el && el.value && el.value.trim();
+  });
+  if (source) syncAskingPriceGroup(source.val);
 }
 
 /* ===== SECTION TOGGLES ===== */
@@ -2318,6 +2389,9 @@ async function aiExtract() {
         updateCurrencyLabel(cf.label, cf.baseName, cf.suffix || '');
       }
     });
+
+    // Keep asking price consistent across slide 02, 03 and 04.
+    syncAskingPriceGroupFromAvailableData();
 
     // Auto-activate MPZP section if AI found MPZP data
     var mpzpFields = ['mpzp_resolution','terrain_card','terrain_function','excluded_functions','building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'];
