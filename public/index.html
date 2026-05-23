@@ -1016,7 +1016,7 @@ select:focus {
 <!-- TEMPLATE SELECTOR -->
 <div class="tmpl-card">
   <div class="tmpl-label">Szablon oferty</div>
-  <select id="template-select" onchange="loadSelectedTemplate()" class="tmpl-select">
+  <select id="template-select" class="tmpl-select">
     <option value="">— wybierz szablon —</option>
     <option value="magazyn-sprzedaz">Magazyn — sprzedaż</option>
   </select>
@@ -1191,9 +1191,6 @@ select:focus {
 </div><!-- /form-area -->
 </div><!-- /main -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
   window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -2158,9 +2155,7 @@ async function ocrPdfFirstPagesClientSide(file, statusText, requestedPageLimit) 
     warnings.push('PDF "' + file.name + '" ma ' + pdf.numPages + ' stron — OCR wykonano tylko dla pierwszych ' + pageLimit + ' stron zgodnie z limitem w formularzu.');
   }
 
-  return { text: chunks.join('
-
-'), warnings: warnings };
+  return { text: chunks.join('\n\n'), warnings: warnings };
 }
 
 async function extractTextFromUploadedFilesClientSide(statusText) {
@@ -2394,6 +2389,37 @@ async function loadSelectedTemplate() {
     templateBuffer = null;
     document.getElementById('form-area').style.display = 'none';
   }
+}
+
+
+// ===== SAFE TEMPLATE INIT / EVENT BINDING =====
+// Wersja naprawcza: 2026-05-23
+// Nie polegamy już na inline onchange="..." w HTML.
+// Funkcję przypinamy do window i podpinamy event z poziomu JS.
+window.loadSelectedTemplate = loadSelectedTemplate;
+
+function initTemplateSelectorSafe() {
+  var select = document.getElementById('template-select');
+  if (!select) return;
+
+  if (select.getAttribute('data-safe-template-bound') === '1') return;
+  select.setAttribute('data-safe-template-bound', '1');
+
+  select.addEventListener('change', function() {
+    window.loadSelectedTemplate();
+  });
+
+  // Jeśli przeglądarka zachowała wartość selecta po refreshu,
+  // ładujemy formularz automatycznie.
+  if (select.value) {
+    window.loadSelectedTemplate();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initTemplateSelectorSafe);
+} else {
+  initTemplateSelectorSafe();
 }
 
 function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
@@ -2772,5 +2798,8 @@ async function generatePptx() {
   btn.innerHTML = '⬇ Generuj PPTX';
 }
 </script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </body>
 </html>
