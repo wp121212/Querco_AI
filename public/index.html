@@ -1944,63 +1944,9 @@ async function extractPdfTextClientSide(file, statusText) {
   return { text: extracted.slice(0, PDF_TEXT_MAX_CHARS), warning: '' };
 }
 
-var PDF_VISION_MAX_TOTAL_PAGES = 8; // wysyłamy pierwsze strony PDF jako obrazy do vision/OCR
-var PDF_VISION_RENDER_SCALE = 1.55;
-var PDF_VISION_IMAGE_QUALITY = 0.78;
-
-function canvasToJpegFile(canvas, filename, quality) {
-  return new Promise(function(resolve, reject) {
-    canvas.toBlob(function(blob) {
-      if (!blob) return reject(new Error('Nie udało się utworzyć obrazu strony PDF'));
-      resolve(new File([blob], filename, { type: 'image/jpeg' }));
-    }, 'image/jpeg', quality || PDF_VISION_IMAGE_QUALITY);
-  });
-}
-
-async function renderPdfPagesForVision(file, statusText, maxPagesToRender) {
-  if (!window.pdfjsLib) {
-    return { files: [], warning: 'Nie załadowała się biblioteka PDF.js — nie mogę wysłać stron PDF jako obrazów do OCR.' };
-  }
-
-  configurePdfJsWorker();
-
-  var arrayBuffer = await file.arrayBuffer();
-  var pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  var pageLimit = Math.min(pdf.numPages, maxPagesToRender || PDF_VISION_MAX_TOTAL_PAGES);
-  var files = [];
-  var baseName = (file.name || 'pdf').replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ_-]+/g, '_');
-
-  for (var pageNo = 1; pageNo <= pageLimit; pageNo++) {
-    if (statusText) statusText.textContent = 'Renderuję PDF do OCR: ' + file.name + ' — strona ' + pageNo + ' / ' + pageLimit;
-
-    var page = await pdf.getPage(pageNo);
-    var viewport = page.getViewport({ scale: PDF_VISION_RENDER_SCALE });
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d', { alpha: false });
-    canvas.width = Math.ceil(viewport.width);
-    canvas.height = Math.ceil(viewport.height);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-
-    var imgFile = await canvasToJpegFile(canvas, baseName + '_page_' + String(pageNo).padStart(2, '0') + '.jpg', PDF_VISION_IMAGE_QUALITY);
-    files.push(imgFile);
-  }
-
-  var warning = '';
-  if (pdf.numPages > pageLimit) {
-    warning = 'PDF "' + file.name + '" ma ' + pdf.numPages + ' stron — do OCR wysłano pierwsze ' + pageLimit + ' stron.';
-  }
-  console.log('[PDF vision render]', file.name, 'pages rendered:', files.length);
-  return { files: files, warning: warning };
-}
-
 async function extractTextFromUploadedFilesClientSide(statusText) {
   var chunks = [];
   var warnings = [];
-  var pdfPageImages = [];
-  var remainingPdfImagePages = PDF_VISION_MAX_TOTAL_PAGES;
 
   for (var i = 0; i < uploadedFiles.length; i++) {
     var file = uploadedFiles[i].file;
@@ -2011,17 +1957,6 @@ async function extractTextFromUploadedFilesClientSide(statusText) {
         var pdfResult = await extractPdfTextClientSide(file, statusText);
         if (pdfResult.text) chunks.push(pdfResult.text);
         if (pdfResult.warning) warnings.push(pdfResult.warning);
-
-        // Kluczowa poprawka: PDF wysyłamy też jako obrazy stron do OpenAI Vision.
-        // Sam tekst z PDF bywa poszatkowany albo pusty, a oferta jest wizualnym deckiem.
-        if (remainingPdfImagePages > 0) {
-          var rendered = await renderPdfPagesForVision(file, statusText, remainingPdfImagePages);
-          if (rendered.files && rendered.files.length) {
-            pdfPageImages = pdfPageImages.concat(rendered.files);
-            remainingPdfImagePages -= rendered.files.length;
-          }
-          if (rendered.warning) warnings.push(rendered.warning);
-        }
       } else if (ext === 'txt') {
         if (statusText) statusText.textContent = 'Odczytuję TXT: ' + file.name;
         var txt = await readTextFile(file);
@@ -2033,7 +1968,7 @@ async function extractTextFromUploadedFilesClientSide(statusText) {
     }
   }
 
-  return { text: chunks.join('\n\n'), warnings: warnings, pdfPageImages: pdfPageImages };
+  return { text: chunks.join('\n\n'), warnings: warnings };
 }
 
 
@@ -2074,28 +2009,11 @@ async function aiExtract() {
     var formData = new FormData();
     formData.append('text', combinedText || text);
 
-    // PDF-ów nie wysyłamy już jako surowych plików do API. Zamiast tego:
-    // 1) tekst PDF trafia w polu text,
-    // 2) pierwsze strony PDF trafiają jako JPG do OpenAI Vision/OCR.
-    // Dzięki temu AI czyta także oferty-prezentacje i skany, a nie tylko selectable text.
-    var hasPdfOriginal = false;
+    // Pliki nadal wysyłamy do backendu jako fallback/przyszłą obsługę obrazów,
+    // ale PDF/TXT trafia już także jako zwykły tekst.
     uploadedFiles.forEach(function(f) {
-      var ext = getFileExt(f.file.name);
-      if (ext === 'pdf') { hasPdfOriginal = true; return; }
       formData.append('files', f.file);
     });
-
-    if (extractedFiles.pdfPageImages && extractedFiles.pdfPageImages.length) {
-      extractedFiles.pdfPageImages.forEach(function(imgFile) {
-        formData.append('files', imgFile);
-      });
-      console.log('[AI extract] PDF pages sent as images:', extractedFiles.pdfPageImages.length);
-    } else if (hasPdfOriginal) {
-      // Awaryjnie: jeśli render stron się nie udał, wyślij oryginalny PDF do backendowego pdf-parse.
-      uploadedFiles.forEach(function(f) {
-        if (getFileExt(f.file.name) === 'pdf') formData.append('files', f.file);
-      });
-    }
 
     if (extractedFiles.warnings && extractedFiles.warnings.length) {
       console.warn('[PDF/TXT extraction warnings]', extractedFiles.warnings);
