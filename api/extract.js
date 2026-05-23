@@ -136,11 +136,15 @@ export default async function handler(req, res) {
     console.log("FINAL TEXT LENGTH:", combinedText.length);
 
     const response = await client.responses.create({
-      model: "gpt-4.1-mini",
+  model: "gpt-4.1-mini",
 
-      response_format: {
-        type: "json_object",
-      },
+  text: {
+    format: {
+      type: "json_object"
+    }
+  },
+
+  input: [
 
       input: [
         {
