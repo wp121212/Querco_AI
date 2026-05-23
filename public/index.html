@@ -724,6 +724,65 @@ select:focus {
   letter-spacing: .025em;
 }
 
+.ocr-options {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fbfcfd;
+  border: 1px solid var(--q-line-soft);
+  border-radius: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.ocr-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--q-navy);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ocr-check input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--q-navy);
+  cursor: pointer;
+}
+
+.ocr-pages-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--q-soft);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.ocr-pages-wrap select {
+  height: 30px;
+  min-width: 82px;
+  font-size: 10px;
+  background: #fff;
+}
+
+.ocr-mini-note {
+  flex: 1 1 100%;
+  color: var(--q-soft);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
 /* reset labels */
 .reset-labels-btn {
   background: #fff;
@@ -981,6 +1040,17 @@ select:focus {
   <input type="file" id="ai-file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.txt" style="display:none" onchange="handleFileSelect(this.files)">
   <div class="file-list" id="file-list"></div>
   <div class="file-limit" id="file-limit" style="display:none"><span id="file-count">0 / 10</span><span id="file-size">0 / 25 MB</span></div>
+  <div class="ocr-options">
+    <label class="ocr-check"><input type="checkbox" id="pdf-ocr-enabled" checked> Czytaj też obrazy w PDF</label>
+    <span class="ocr-pages-wrap">Strony PDF do OCR
+      <select id="pdf-ocr-pages">
+        <option value="3" selected>1–3</option>
+        <option value="5">1–5</option>
+        <option value="10">1–10</option>
+      </select>
+    </span>
+    <div class="ocr-mini-note">Dla PDF-ów tekstowych AI dostaje tekst z PDF + OCR pierwszych stron. To łapie screeny, skany i tabele zapisane jako obraz, ale może działać wolniej.</div>
+  </div>
   <div class="ai-btn-row">
     <button class="ai-btn" id="ai-btn" onclick="aiExtract()">✦ AI uzupełnij pola</button>
     <div class="ai-status" id="ai-status"><div class="spinner"></div><span id="ai-status-text">Analizuję...</span></div>
@@ -1881,17 +1951,31 @@ function renderFileList() {
 }
 
 
-/* ===== CLIENT-SIDE PDF/TXT TEXT EXTRACTION ===== */
+/* ===== CLIENT-SIDE PDF/TXT/IMAGE/OCR TEXT EXTRACTION ===== */
 /*
-  Backend /api/extract dalej dostaje pliki, ale PDF/TXT próbujemy najpierw
+  Backend /api/extract nie musi dostawać surowych plików. PDF/TXT/obrazy próbujemy
   odczytać w przeglądarce i dopisać do pola "text". Dzięki temu AI analizuje
-  PDF tak samo jak tekst wklejony ręcznie, nawet jeśli backendowy parser PDF
-  nie działa idealnie.
+  PDF, screeny i obrazy tak samo jak tekst wklejony ręcznie. Dzięki temu backend
+  dostaje jeden combinedText, bez ciężkich plików.
 */
 var PDF_TEXT_MAX_CHARS = 90000;
-var PDF_OCR_MAX_PAGES = 3;
-var IMAGE_OCR_MAX_FILES = 5;
+var PDF_OCR_DEFAULT_MAX_PAGES = 3;
+var PDF_OCR_HARD_MAX_PAGES = 10;
+var IMAGE_OCR_MAX_FILES = 8;
 var OCR_MAX_IMAGE_SIZE_MB = 10;
+var OCR_MIN_TEXT_CHARS = 20;
+
+function isPdfOcrEnabled() {
+  var el = document.getElementById('pdf-ocr-enabled');
+  return !el || el.checked;
+}
+
+function getPdfOcrMaxPages() {
+  var el = document.getElementById('pdf-ocr-pages');
+  var value = el ? parseInt(el.value, 10) : PDF_OCR_DEFAULT_MAX_PAGES;
+  if (!value || value < 1) value = PDF_OCR_DEFAULT_MAX_PAGES;
+  return Math.min(value, PDF_OCR_HARD_MAX_PAGES);
+}
 
 function configurePdfJsWorker() {
   if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
@@ -1956,8 +2040,43 @@ function canvasToJpegBlob(canvas, quality) {
     canvas.toBlob(function(blob) {
       if (!blob) return reject(new Error('Nie udało się utworzyć obrazu strony PDF'));
       resolve(blob);
-    }, 'image/jpeg', quality || 0.82);
+    }, 'image/jpeg', quality || 0.88);
   });
+}
+
+function loadImageFromBlob(blob) {
+  return new Promise(function(resolve, reject) {
+    var url = URL.createObjectURL(blob);
+    var img = new Image();
+    img.onload = function() {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = function() {
+      URL.revokeObjectURL(url);
+      reject(new Error('Nie udało się załadować obrazu do OCR'));
+    };
+    img.src = url;
+  });
+}
+
+async function normalizeImageForOcr(blob) {
+  // Lekka normalizacja: zmniejszamy bardzo duże zdjęcia i dajemy białe tło.
+  // Bez agresywnego filtrowania, żeby nie zniszczyć tabelek i małych liczb.
+  var img = await loadImageFromBlob(blob);
+  var maxSide = 2400;
+  var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+  var width = Math.max(1, Math.round(img.width * scale));
+  var height = Math.max(1, Math.round(img.height * scale));
+  var canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  var ctx = canvas.getContext('2d', { alpha: false });
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(img, 0, 0, width, height);
+  return canvasToJpegBlob(canvas, 0.9);
 }
 
 async function runOcrOnImageLike(input, label, statusText) {
@@ -1968,7 +2087,17 @@ async function runOcrOnImageLike(input, label, statusText) {
   try {
     if (statusText) statusText.textContent = 'OCR obrazu: ' + label;
 
-    var result = await window.Tesseract.recognize(input, 'pol+eng', {
+    var ocrInput = input;
+    try {
+      if (input instanceof Blob || input instanceof File) {
+        ocrInput = await normalizeImageForOcr(input);
+      }
+    } catch (prepErr) {
+      console.warn('[OCR normalize warning]', label, prepErr);
+      ocrInput = input;
+    }
+
+    var result = await window.Tesseract.recognize(ocrInput, 'pol+eng', {
       logger: function(m) {
         if (!statusText || !m || !m.status) return;
         if (m.status === 'recognizing text' && typeof m.progress === 'number') {
@@ -1978,19 +2107,21 @@ async function runOcrOnImageLike(input, label, statusText) {
     });
 
     var ocrText = result && result.data && result.data.text ? String(result.data.text).trim() : '';
-    if (!ocrText) {
-      return { text: '', warning: 'OCR nie znalazł tekstu w obrazie "' + label + '".' };
+    ocrText = ocrText.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+
+    if (!ocrText || ocrText.length < OCR_MIN_TEXT_CHARS) {
+      return { text: '', warning: 'OCR nie znalazł czytelnego tekstu w obrazie "' + label + '".' };
     }
 
     console.log('[OCR]', label, 'chars:', ocrText.length, 'preview:', ocrText.slice(0, 500));
-    return { text: '--- OCR OBRAZU: ' + label + ' ---\n' + ocrText, warning: '' };
+    return { text: '--- OCR OBRAZU / STRONY: ' + label + ' ---\n' + ocrText, warning: '' };
   } catch (err) {
     console.error('[OCR error]', label, err);
     return { text: '', warning: 'Błąd OCR dla obrazu "' + label + '": ' + err.message };
   }
 }
 
-async function ocrPdfFirstPagesClientSide(file, statusText) {
+async function ocrPdfFirstPagesClientSide(file, statusText, requestedPageLimit) {
   if (!window.pdfjsLib) {
     return { text: '', warnings: ['Nie załadowała się biblioteka PDF.js — OCR PDF jest niedostępny.'] };
   }
@@ -2001,13 +2132,13 @@ async function ocrPdfFirstPagesClientSide(file, statusText) {
   var chunks = [];
   var arrayBuffer = await file.arrayBuffer();
   var pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  var pageLimit = Math.min(pdf.numPages, PDF_OCR_MAX_PAGES);
+  var pageLimit = Math.min(pdf.numPages, requestedPageLimit || getPdfOcrMaxPages());
 
   for (var pageNo = 1; pageNo <= pageLimit; pageNo++) {
-    if (statusText) statusText.textContent = 'Renderuję PDF do OCR: ' + file.name + ' — strona ' + pageNo + ' / ' + pageLimit;
+    if (statusText) statusText.textContent = 'OCR PDF: ' + file.name + ' — strona ' + pageNo + ' / ' + pageLimit;
 
     var page = await pdf.getPage(pageNo);
-    var viewport = page.getViewport({ scale: 1.7 });
+    var viewport = page.getViewport({ scale: 2.0 });
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d', { alpha: false });
     canvas.width = Math.ceil(viewport.width);
@@ -2017,17 +2148,19 @@ async function ocrPdfFirstPagesClientSide(file, statusText) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     await page.render({ canvasContext: ctx, viewport: viewport }).promise;
 
-    var blob = await canvasToJpegBlob(canvas, 0.82);
-    var ocrResult = await runOcrOnImageLike(blob, file.name + ' — strona ' + pageNo, statusText);
+    var blob = await canvasToJpegBlob(canvas, 0.9);
+    var ocrResult = await runOcrOnImageLike(blob, file.name + ' — PDF strona ' + pageNo, statusText);
     if (ocrResult.text) chunks.push(ocrResult.text);
     if (ocrResult.warning) warnings.push(ocrResult.warning);
   }
 
   if (pdf.numPages > pageLimit) {
-    warnings.push('PDF "' + file.name + '" ma ' + pdf.numPages + ' stron — OCR wykonano tylko dla pierwszych ' + pageLimit + ' stron.');
+    warnings.push('PDF "' + file.name + '" ma ' + pdf.numPages + ' stron — OCR wykonano tylko dla pierwszych ' + pageLimit + ' stron zgodnie z limitem w formularzu.');
   }
 
-  return { text: chunks.join('\n\n'), warnings: warnings };
+  return { text: chunks.join('
+
+'), warnings: warnings };
 }
 
 async function extractTextFromUploadedFilesClientSide(statusText) {
@@ -2045,9 +2178,11 @@ async function extractTextFromUploadedFilesClientSide(statusText) {
         if (pdfResult.text) chunks.push(pdfResult.text);
         if (pdfResult.warning) warnings.push(pdfResult.warning);
 
-        // Jeśli PDF nie ma normalnego tekstu, robimy awaryjny OCR pierwszych stron.
-        if (!pdfResult.text) {
-          var pdfOcr = await ocrPdfFirstPagesClientSide(file, statusText);
+        // OCR PDF działa nie tylko awaryjnie. Jeśli checkbox jest włączony,
+        // renderujemy pierwsze strony jako obraz i czytamy je OCR-em, żeby złapać
+        // screeny, skany, rzuty, tabele i wartości zapisane w PDF jako grafika.
+        if (isPdfOcrEnabled() || !pdfResult.text) {
+          var pdfOcr = await ocrPdfFirstPagesClientSide(file, statusText, getPdfOcrMaxPages());
           if (pdfOcr.text) chunks.push(pdfOcr.text);
           if (pdfOcr.warnings && pdfOcr.warnings.length) warnings = warnings.concat(pdfOcr.warnings);
         }
@@ -2097,13 +2232,13 @@ async function aiExtract() {
   try {
     var extractedFiles = { text: '', warnings: [] };
     if (hasFiles) {
-      statusText.textContent = 'Odczytuję tekst z PDF/TXT...';
+      statusText.textContent = 'Odczytuję PDF/TXT/obrazy...';
       extractedFiles = await extractTextFromUploadedFilesClientSide(statusText);
     }
 
     var combinedParts = [];
     if (text) combinedParts.push('--- TEKST WKLEJONY PRZEZ UŻYTKOWNIKA ---\n' + text);
-    if (extractedFiles.text) combinedParts.push('--- TEKST WYCIĄGNIĘTY Z PLIKÓW PDF/TXT ---\n' + extractedFiles.text);
+    if (extractedFiles.text) combinedParts.push('--- TEKST WYCIĄGNIĘTY Z PLIKÓW PDF/TXT/OBRAZÓW/OCR ---\n' + extractedFiles.text);
     var combinedText = combinedParts.join('\n\n');
 
     if (!combinedText && hasFiles) {
@@ -2120,11 +2255,11 @@ async function aiExtract() {
     // WAŻNE:
     // Nie wysyłamy już surowych PDF/JPG/PNG/WEBP do backendu.
     // Backend dostał stabilną wersję tekstową, więc tutaj robimy:
-    // PDF/TXT/obrazy → tekst w przeglądarce → /api/extract dostaje tylko mały tekst.
+    // PDF/TXT/obrazy/OCR stron PDF → tekst w przeglądarce → /api/extract dostaje tylko mały tekst.
     // Dzięki temu nie przekraczamy limitów Vercela i nie psujemy działającego AI z tekstu.
 
     if (extractedFiles.warnings && extractedFiles.warnings.length) {
-      console.warn('[PDF/TXT extraction warnings]', extractedFiles.warnings);
+      console.warn('[PDF/TXT/OCR extraction warnings]', extractedFiles.warnings);
     }
 
     statusText.textContent = 'AI analizuje' + (hasFiles ? ' (' + uploadedFiles.length + ' plików)' : '') + '...';

@@ -20,6 +20,10 @@ Zasady:
 - Powierzchnie podawaj jako samą liczbę, bez m².
 - Procenty podawaj ze znakiem %, np. "98%".
 - Jeśli cena dla slajdu 3 nie jest osobno podana, przepisz asking_price do asking_price_building.
+- Materiał może zawierać tekst z PDF oraz OCR z obrazów / screenów / stron PDF.
+- OCR może mieć literówki, dziwne znaki albo duplikaty; traktuj go jako pomocniczy materiał źródłowy.
+- Jeśli ta sama informacja pojawia się w tekście PDF i OCR, wybierz bardziej wiarygodną / spójną wersję.
+- Jeżeli OCR odczytał tabelę w sposób chaotyczny, spróbuj logicznie przypisać wartości do pól CRE, ale nie wymyślaj danych.
 
 Zwróć JSON dokładnie w tym schemacie:
 {
