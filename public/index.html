@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
+<!-- BUILD: MPZP_ACT_UPLOAD_UI_2026_05_24_V2_REAL_DIFF -->
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -458,6 +460,135 @@ select:focus {
   .mpzp-resolution-composer {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+}
+
+
+/* === MPZP ACT / RESOLUTION PDF ANALYSIS === */
+.mpzp-act-analysis-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--q-line-soft);
+  background: #fff;
+}
+
+.mpzp-act-panel {
+  padding: 14px 26px 16px;
+  min-height: 94px;
+}
+
+.mpzp-act-panel:first-child {
+  border-right: 1px solid var(--q-line-soft);
+}
+
+.mpzp-act-label {
+  margin-bottom: 8px;
+}
+
+.mpzp-terrain-input-wrap input {
+  width: 100%;
+}
+
+.mpzp-terrain-input-wrap.error input {
+  border-bottom-color: var(--q-danger) !important;
+  box-shadow: inset 0 -2px 0 var(--q-danger) !important;
+  background: #fff6f5 !important;
+}
+
+.mpzp-error-message {
+  display: none;
+  margin-top: 7px;
+  color: var(--q-danger);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .035em;
+}
+
+.mpzp-error-message.visible {
+  display: block;
+}
+
+.mpzp-act-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.mpzp-file-button {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border: 1px dashed #b9c2ca;
+  border-radius: 2px;
+  background: #fbfcfd;
+  color: var(--q-navy);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+  transition: all var(--transition);
+}
+
+.mpzp-file-button:hover,
+.mpzp-file-button.has-file {
+  border-color: var(--q-navy);
+  background: #f7f9fa;
+}
+
+.mpzp-analyze-btn {
+  min-height: 40px;
+  white-space: nowrap;
+  padding: 0 15px;
+  border: none;
+  border-radius: 2px;
+  background: var(--q-navy);
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Lato', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.mpzp-analyze-btn:hover {
+  background: var(--q-navy-2);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(16,42,61,0.12);
+}
+
+.mpzp-analyze-btn:disabled {
+  background: #9aa5b1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.mpzp-file-note {
+  margin-top: 7px;
+  color: var(--q-soft);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: .035em;
+}
+
+@media (max-width: 760px) {
+  .mpzp-act-analysis-row {
+    grid-template-columns: 1fr;
+  }
+  .mpzp-act-panel:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--q-line-soft);
+  }
+  .mpzp-act-controls {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1199,8 +1330,25 @@ select:focus {
     </div>
   </div>
   <div class="card-body sec-fields-off" id="sec5-fields">
+    <div class="mpzp-act-analysis-row">
+      <div class="mpzp-act-panel">
+        <div class="mpzp-act-label"><div class="field-label-pl">Karta terenu</div><div class="field-label-en">Terrain Card / Planning Zone</div></div>
+        <div class="mpzp-terrain-input-wrap" id="terrain-card-wrap">
+          <input id="terrain_card" placeholder="np. 1-P/U, 2PU, 003-P,U">
+          <div class="mpzp-error-message" id="terrain-card-error">Najpierw wprowadź konkretną kartę terenu, np. 1-P/U. Bez tego AI nie wie, który fragment uchwały analizować.</div>
+        </div>
+      </div>
+      <div class="mpzp-act-panel">
+        <div class="mpzp-act-label"><div class="field-label-pl">Plik uchwały / MPZP</div><div class="field-label-en">Resolution PDF Analysis</div></div>
+        <div class="mpzp-act-controls">
+          <button type="button" class="mpzp-file-button" id="mpzp-file-button" onclick="document.getElementById('mpzp-act-file').click()">📄 Wybierz PDF uchwały</button>
+          <button type="button" class="mpzp-analyze-btn" id="mpzp-analyze-btn" onclick="analyzeMpzpActFile()">Analizuj uchwałę</button>
+        </div>
+        <input type="file" id="mpzp-act-file" accept=".pdf,.txt" style="display:none" onchange="handleMpzpActFileSelect(this.files)">
+        <div class="mpzp-file-note" id="mpzp-file-note">Wgraj pełną uchwałę / MPZP. AI wyszuka parametry dla wpisanej karty terenu, tolerując warianty typu 2-PU / 2PU / 2 P/U.</div>
+      </div>
+    </div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Nr uchwały MPZP</div><div class="field-label-en">Resolution Number</div></div><div class="field-value mpzp-resolution-composer"><span class="mpzp-static-text">Uchwała nr</span><input id="mpzp_resolution" class="mpzp-resolution-number" placeholder="XXIII/456/2020"><span class="mpzp-static-text">z dnia</span><input id="mpzp_resolution_date" class="mpzp-resolution-date" placeholder="12 maja 2020 roku"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Karta terenu</div><div class="field-label-en">Terrain Card</div></div><div class="field-value"><input id="terrain_card" placeholder="P/U"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcja terenu</div><div class="field-label-en">Terrain Function</div></div><div class="field-value"><input id="terrain_function" placeholder="PRODUKCJA, SKŁADY, MAGAZYNY"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Funkcje wyłączone</div><div class="field-label-en">Excluded Functions</div></div><div class="field-value"><input id="excluded_functions" placeholder="MIESZKANIOWA, HANDLOWA"></div></div>
     <div class="param-grid">
@@ -1864,6 +2012,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initNumberFormatting(); } catch (e) { console.error('initNumberFormatting failed', e); }
   try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
   try { initMpzpResolutionComposer(); } catch (e) { console.error('initMpzpResolutionComposer failed', e); }
+  try { initMpzpActAnalysis(); } catch (e) { console.error('initMpzpActAnalysis failed', e); }
 });
 
 /* ===== CURRENCY LABEL UPDATER ===== */
@@ -2122,6 +2271,189 @@ function initMpzpResolutionComposer() {
     el.addEventListener('change', normalizeMpzpResolutionComposite);
     el.addEventListener('blur', normalizeMpzpResolutionComposite);
   });
+}
+
+
+/* ===== MPZP ACT / RESOLUTION PDF ANALYSIS ===== */
+var mpzpActFile = null;
+
+function normalizeTerrainCardKey(value) {
+  return String(value || '')
+    .toUpperCase()
+    .replace(/\s+/g, '')
+    .replace(/[–—]/g, '-')
+    .replace(/,/g, '/')
+    .replace(/[^A-Z0-9\/\-]/g, '');
+}
+
+function setTerrainCardError(message) {
+  var wrap = document.getElementById('terrain-card-wrap');
+  var err = document.getElementById('terrain-card-error');
+  if (wrap) wrap.classList.add('error');
+  if (err) {
+    err.textContent = message || 'Najpierw wprowadź konkretną kartę terenu.';
+    err.classList.add('visible');
+  }
+}
+
+function clearTerrainCardError() {
+  var wrap = document.getElementById('terrain-card-wrap');
+  var err = document.getElementById('terrain-card-error');
+  if (wrap) wrap.classList.remove('error');
+  if (err) err.classList.remove('visible');
+}
+
+function handleMpzpActFileSelect(files) {
+  var file = files && files[0] ? files[0] : null;
+  var note = document.getElementById('mpzp-file-note');
+  var btn = document.getElementById('mpzp-file-button');
+  var input = document.getElementById('mpzp-act-file');
+
+  mpzpActFile = null;
+
+  if (!file) return;
+  var ext = getFileExt(file.name);
+  if (['pdf', 'txt'].indexOf(ext) === -1) {
+    if (note) note.textContent = 'Nieobsługiwany format. Wgraj PDF albo TXT z treścią uchwały / MPZP.';
+    if (input) input.value = '';
+    return;
+  }
+  if (file.size > MAX_SIZE) {
+    if (note) note.textContent = 'Plik jest za duży. Limit: 25 MB.';
+    if (input) input.value = '';
+    return;
+  }
+
+  mpzpActFile = file;
+  if (btn) {
+    btn.classList.add('has-file');
+    btn.textContent = '📄 ' + file.name;
+  }
+  if (note) note.textContent = 'Gotowe. Wpisz kartę terenu po lewej i kliknij „Analizuj uchwałę”.';
+}
+
+function initMpzpActAnalysis() {
+  var terrain = document.getElementById('terrain_card');
+  if (terrain && terrain.getAttribute('data-mpzp-act-ready') !== '1') {
+    terrain.setAttribute('data-mpzp-act-ready', '1');
+    terrain.addEventListener('input', function() {
+      if (terrain.value.trim()) clearTerrainCardError();
+    });
+    terrain.addEventListener('blur', function() {
+      terrain.value = normalizeTerrainCardKey(terrain.value);
+    });
+  }
+}
+
+function fillMpzpAnalysisField(id, value) {
+  if (!value || value === 'null' || value === 'brak danych' || !String(value).trim()) return false;
+  var el = document.getElementById(id);
+  if (!el) return false;
+  el.value = String(value).trim();
+  formatNumericFieldById(id);
+  el.classList.add('ai-filled');
+  return true;
+}
+
+async function analyzeMpzpActFile() {
+  var terrainEl = document.getElementById('terrain_card');
+  var terrainCard = terrainEl ? terrainEl.value.trim() : '';
+  var btn = document.getElementById('mpzp-analyze-btn');
+  var note = document.getElementById('mpzp-file-note');
+
+  if (!terrainCard) {
+    setTerrainCardError('Najpierw wprowadź konkretną kartę terenu, np. 1-P/U. Bez tego AI nie wie, który fragment uchwały analizować.');
+    if (terrainEl) terrainEl.focus();
+    return;
+  }
+  clearTerrainCardError();
+
+  if (!mpzpActFile) {
+    if (note) note.textContent = 'Najpierw wybierz PDF albo TXT z uchwałą / MPZP.';
+    return;
+  }
+
+  try {
+    if (btn) btn.disabled = true;
+    if (note) note.textContent = 'Odczytuję plik uchwały...';
+    setStatus('Odczytuję plik uchwały / MPZP...');
+
+    var ext = getFileExt(mpzpActFile.name);
+    var fileText = '';
+    var warnings = [];
+
+    if (ext === 'pdf') {
+      var pdfResult = await extractPdfTextClientSide(mpzpActFile, { textContent: 'Odczytuję uchwałę PDF...' });
+      if (pdfResult.text) fileText += pdfResult.text;
+      if (pdfResult.warning) warnings.push(pdfResult.warning);
+
+      if (!fileText || fileText.length < 300) {
+        var pdfOcr = await ocrPdfFirstPagesClientSide(mpzpActFile, { textContent: 'OCR uchwały PDF...' }, getPdfOcrMaxPages());
+        if (pdfOcr.text) fileText += '\n\n' + pdfOcr.text;
+        if (pdfOcr.warnings && pdfOcr.warnings.length) warnings = warnings.concat(pdfOcr.warnings);
+      }
+    } else if (ext === 'txt') {
+      fileText = await readTextFile(mpzpActFile);
+    }
+
+    if (!fileText || !fileText.trim()) {
+      throw new Error('Nie udało się odczytać tekstu z pliku uchwały.');
+    }
+
+    var normalizedCard = normalizeTerrainCardKey(terrainCard);
+    var analysisPrompt =
+      'TRYB ANALIZY MPZP / UCHWAŁY PLANISTYCZNEJ.\n' +
+      'Analizuj poniższy dokument wyłącznie pod kątem konkretnej karty terenu wskazanej przez użytkownika.\n' +
+      'KARTA TERENU DO ANALIZY: ' + terrainCard + '\n' +
+      'KARTA TERENU W WERSJI ZNORMALIZOWANEJ: ' + normalizedCard + '\n\n' +
+      'Zasady dopasowania karty terenu:\n' +
+      '- Traktuj warianty typu 2-PU, 2PU, 2 P/U, 2-P/U, 2.PU jako potencjalnie tę samą kartę, jeżeli numer i funkcja są logicznie zgodne.\n' +
+      '- Jeżeli dokument zawiera kilka podobnych kart, np. 1-P/U i 2-P/U, wybierz tylko tę zgodną z kartą wpisaną przez użytkownika.\n' +
+      '- Nie mieszaj parametrów z innych kart terenu.\n' +
+      '- Wyciągnij funkcję terenu, funkcje wyłączone, min/max pow. zabudowy, min/max intensywność, max wysokość i min pow. biologicznie czynną.\n' +
+      '- Jeżeli w uchwale widzisz numer uchwały i datę, wyciągnij je do pól mpzp_resolution i mpzp_resolution_date.\n' +
+      '- Jeżeli jakiejś informacji nie ma dla tej konkretnej karty, zostaw puste pole.\n\n' +
+      'TREŚĆ DOKUMENTU MPZP / UCHWAŁY:\n' + fileText;
+
+    if (note) note.textContent = 'AI analizuje kartę terenu ' + terrainCard + '...';
+    setStatus('AI analizuje MPZP dla karty terenu: ' + terrainCard + '...');
+
+    var formData = new FormData();
+    formData.append('text', analysisPrompt);
+
+    var resp = await fetch('/api/extract', { method: 'POST', body: formData });
+    if (!resp.ok) {
+      var errData = await resp.json().catch(function() { return {}; });
+      throw new Error(errData.error || 'Błąd serwera (' + resp.status + ')');
+    }
+
+    var data = await resp.json();
+    var filled = 0;
+    var fields = ['mpzp_resolution','mpzp_resolution_date','terrain_function','excluded_functions','building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'];
+    fields.forEach(function(id) {
+      if (fillMpzpAnalysisField(id, data[id])) filled++;
+    });
+
+    if (terrainEl) {
+      terrainEl.value = normalizeTerrainCardKey(terrainCard);
+      terrainEl.classList.add('ai-filled');
+    }
+    normalizeMpzpResolutionComposite();
+
+    if (!slide5Active) toggleSection('slide5');
+
+    var msg = 'AI uzupełniło ' + filled + ' pól MPZP dla karty terenu: ' + normalizeTerrainCardKey(terrainCard) + '.';
+    if (warnings.length) msg += '\n⚠ ' + warnings.join('\n⚠ ');
+    if (note) note.textContent = msg.replace(/\n/g, ' ');
+    setStatus(msg);
+    setTimeout(function() { setStatus(''); }, warnings.length ? 12000 : 7000);
+  } catch (err) {
+    console.error('[MPZP analysis error]', err);
+    if (note) note.textContent = 'Błąd analizy uchwały: ' + err.message;
+    setStatus('Błąd analizy uchwały: ' + err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 /* ===== SECTION TOGGLES ===== */
@@ -2678,6 +3010,7 @@ async function loadSelectedTemplate() {
 
 // ===== SAFE TEMPLATE INIT / EVENT BINDING =====
 // Wersja naprawcza: 2026-05-23
+// MPZP act analysis version: 2026-05-24
 // Nie polegamy już na inline onchange="..." w HTML.
 // Funkcję przypinamy do window i podpinamy event z poziomu JS.
 window.loadSelectedTemplate = loadSelectedTemplate;
