@@ -1201,8 +1201,165 @@ select:focus {
   padding: 3px;
 }
 
+/* === SUPPLEMENTARY SLIDE 06 MEDIA === */
+.slide6-stack {
+  padding: 0 26px;
+  background: #fff;
+}
+
+.media-block {
+  padding: 18px 0 20px;
+  border-bottom: 1px solid var(--q-line-soft);
+}
+
+.media-block:last-child { border-bottom: none; }
+
+.media-block-head {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  color: var(--q-navy);
+  margin-bottom: 10px;
+}
+
+.media-block-note {
+  margin-top: 8px;
+  color: var(--q-soft);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: .035em;
+  line-height: 1.45;
+}
+
+.gallery-drop {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border: 1px dashed #b9c2ca;
+  border-radius: 2px;
+  background: #fbfcfd;
+  color: var(--q-navy);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.gallery-drop:hover,
+.gallery-drop.drag-over,
+.gallery-drop.has-file {
+  border-color: var(--q-navy);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(16,42,61,0.06);
+}
+
+.gallery-drop-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  border: 1px solid var(--q-line-soft);
+  background: #fff;
+  font-size: 17px;
+}
+
+.gallery-drop-text { min-width: 0; flex: 1; }
+.gallery-drop-title {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+.gallery-drop-name {
+  margin-top: 4px;
+  color: var(--q-soft);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gallery-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.gallery-slot {
+  min-height: 94px;
+  position: relative;
+  padding: 12px 12px 10px;
+  border: 1px dashed #c6cdd4;
+  border-radius: 2px;
+  background: #fbfcfd;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.gallery-slot.filled {
+  border-style: solid;
+  border-color: var(--q-navy);
+  background: #fff;
+}
+
+.gallery-slot-index {
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .085em;
+  text-transform: uppercase;
+  color: var(--q-soft);
+}
+
+.gallery-slot-name {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--q-navy);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.gallery-slot-empty {
+  margin-top: 8px;
+  color: var(--q-soft);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.gallery-slot-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  color: var(--q-danger);
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(16,42,61,0.08);
+}
+
+.gallery-slot-remove:hover {
+  background: #fff6f5;
+}
+
 @media (max-width: 760px) {
   .slide-photo-upload { width: 100%; }
+  .gallery-drop { width: 100%; }
+  .gallery-slots-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .slide6-stack { padding: 0 18px; }
   .card-header-left { flex-wrap: wrap; }
   .slide-toggle-inline { margin-left: 0; padding-left: 0; border-left: none; }
   .card-header-right { min-width: 0; width: 100%; margin-top: 12px; }
@@ -1503,6 +1660,52 @@ select:focus {
   </div>
 </div>
 
+
+<!-- SECTION 6: POZOSTAŁE ZDJĘCIA -->
+<div class="card" id="sec-slide6">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">06</span>
+      <div class="card-title-block"><div class="card-title">Pozostałe zdjęcia</div><div class="card-title-en">Additional Images</div></div>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggle6" onclick="toggleSection('slide6')" style="background:#102A3D" title="Pokaż / ukryj slajdy w prezentacji"><div class="toggle-dot" style="left:18px"></div></button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body" id="sec6-fields">
+    <div class="slide6-stack">
+      <div class="media-block">
+        <div class="media-block-head">Rzut powierzchni</div>
+        <div class="slide-photo-upload" id="slide06-plan-upload" onclick="document.getElementById('slide06-plan-input').click()" ondragover="handleSupplementaryPlanDragOver(event)" ondragleave="handleSupplementaryPlanDragLeave(event)" ondrop="handleSupplementaryPlanDrop(event)">
+          <span class="slide-photo-upload-icon">📐</span>
+          <span class="slide-photo-upload-text">
+            <span class="slide-photo-upload-title">Miejsce na rzut powierzchni</span>
+            <span class="slide-photo-upload-name" id="slide06-plan-name">Przeciągnij albo kliknij — JPG, PNG, WEBP</span>
+          </span>
+          <button type="button" class="slide-photo-remove" id="slide06-plan-remove" onclick="event.stopPropagation();removeSupplementaryPlan()" style="display:none">×</button>
+        </div>
+        <input type="file" id="slide06-plan-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleSupplementaryPlanSelect(this.files)">
+        <div class="media-block-note">Rzut trafi do slajdu „Rzuty powierzchni” i zostanie wyśrodkowany w szarym polu.</div>
+      </div>
+
+      <div class="media-block">
+        <div class="media-block-head">Pozostałe zdjęcia (max 8)</div>
+        <div class="gallery-drop" id="slide06-gallery-upload" onclick="document.getElementById('slide06-gallery-input').click()" ondragover="handleAdditionalGalleryDragOver(event)" ondragleave="handleAdditionalGalleryDragLeave(event)" ondrop="handleAdditionalGalleryDrop(event)">
+          <span class="gallery-drop-icon">🖼️</span>
+          <span class="gallery-drop-text">
+            <span class="gallery-drop-title">Dodaj pozostałe zdjęcia</span>
+            <span class="gallery-drop-name" id="slide06-gallery-count">0 / 8 dodanych</span>
+          </span>
+        </div>
+        <input type="file" id="slide06-gallery-input" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleAdditionalGallerySelect(this.files)">
+        <div class="gallery-slots-grid" id="additional-gallery-grid"></div>
+        <div class="media-block-note">Zdjęcia trafią po kolei do slajdu „Zdjęcia”. Na jednym slajdzie mieszczą się 4 zdjęcia — po dodaniu kolejnych slajd zostanie automatycznie zduplikowany.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <button class="gen-btn" id="gen-btn" onclick="generatePptx()">⬇ GENERUJ PPTX</button>
 <div class="status" id="status"></div>
 
@@ -1518,10 +1721,15 @@ var slide2Active = true;
 var slide3Active = true;
 var slide4Active = true;
 var slide5Active = false;
+var slide6Active = true;
 var slidePhotoState = {
   '02': { file: null, meta: null },
   '03': { file: null, meta: null },
   '04': { file: null, meta: null }
+};
+var supplementarySlideState = {
+  plan: { file: null, meta: null },
+  gallery: []
 };
 
 /* ===== SECTION 03 FIELD VISIBILITY ===== */
@@ -2610,6 +2818,7 @@ function isSlideActive(section) {
   if (section === 'slide3') return slide3Active;
   if (section === 'slide4') return slide4Active;
   if (section === 'slide5') return slide5Active;
+  if (section === 'slide6') return slide6Active;
   return true;
 }
 
@@ -2618,6 +2827,7 @@ function setSlideActive(section, active) {
   if (section === 'slide3') slide3Active = active;
   if (section === 'slide4') slide4Active = active;
   if (section === 'slide5') slide5Active = active;
+  if (section === 'slide6') slide6Active = active;
 
   var num = section.replace('slide', '');
   var toggle = document.getElementById('toggle' + num);
@@ -3307,6 +3517,406 @@ async function insertAllSlideMainPhotos(zip) {
   await insertSlideMainPhoto(zip, '03');
   await insertSlideMainPhoto(zip, '04');
 }
+
+
+/* ===== SUPPLEMENTARY SLIDES: FLOOR PLAN + ADDITIONAL PHOTOS ===== */
+function validatePhotoFile(file) {
+  if (!file) return 'Nie wybrano pliku.';
+  var ext = getFileExt(file.name);
+  if (['jpg', 'jpeg', 'png', 'webp'].indexOf(ext) === -1) return 'Nieobsługiwany format zdjęcia: ' + file.name;
+  return '';
+}
+
+function handleSupplementaryPlanDragOver(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide06-plan-upload');
+  if (upload) upload.classList.add('drag-over');
+}
+
+function handleSupplementaryPlanDragLeave(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide06-plan-upload');
+  if (upload) upload.classList.remove('drag-over');
+}
+
+function handleSupplementaryPlanDrop(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide06-plan-upload');
+  if (upload) upload.classList.remove('drag-over');
+  var files = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
+  handleSupplementaryPlanSelect(files);
+}
+
+function handleSupplementaryPlanSelect(files) {
+  if (!files || !files.length) return;
+  var file = files[0];
+  var err = validatePhotoFile(file);
+  if (err) {
+    setStatus(err);
+    return;
+  }
+
+  supplementarySlideState.plan.file = file;
+  supplementarySlideState.plan.meta = null;
+
+  var upload = document.getElementById('slide06-plan-upload');
+  var nameEl = document.getElementById('slide06-plan-name');
+  var removeBtn = document.getElementById('slide06-plan-remove');
+  if (upload) upload.classList.add('has-file');
+  if (nameEl) nameEl.textContent = file.name;
+  if (removeBtn) removeBtn.style.display = 'inline-flex';
+
+  loadImageFromBlob(file).then(function(img) {
+    supplementarySlideState.plan.meta = { width: img.width, height: img.height };
+  }).catch(function(err) {
+    console.warn('[Floor plan meta error]', err);
+  });
+
+  var input = document.getElementById('slide06-plan-input');
+  if (input) input.value = '';
+}
+
+function removeSupplementaryPlan() {
+  supplementarySlideState.plan.file = null;
+  supplementarySlideState.plan.meta = null;
+  var upload = document.getElementById('slide06-plan-upload');
+  var nameEl = document.getElementById('slide06-plan-name');
+  var removeBtn = document.getElementById('slide06-plan-remove');
+  if (upload) upload.classList.remove('has-file');
+  if (nameEl) nameEl.textContent = 'Przeciągnij albo kliknij — JPG, PNG, WEBP';
+  if (removeBtn) removeBtn.style.display = 'none';
+}
+
+function handleAdditionalGalleryDragOver(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide06-gallery-upload');
+  if (upload) upload.classList.add('drag-over');
+}
+
+function handleAdditionalGalleryDragLeave(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide06-gallery-upload');
+  if (upload) upload.classList.remove('drag-over');
+}
+
+function handleAdditionalGalleryDrop(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var upload = document.getElementById('slide06-gallery-upload');
+  if (upload) upload.classList.remove('drag-over');
+  var files = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
+  handleAdditionalGallerySelect(files);
+}
+
+function handleAdditionalGallerySelect(files) {
+  if (!files || !files.length) return;
+  addAdditionalGalleryFiles(Array.prototype.slice.call(files));
+  var input = document.getElementById('slide06-gallery-input');
+  if (input) input.value = '';
+}
+
+function addAdditionalGalleryFiles(files) {
+  var warnings = [];
+  files.forEach(function(file) {
+    if (supplementarySlideState.gallery.length >= 8) {
+      warnings.push('Możesz dodać maksymalnie 8 pozostałych zdjęć.');
+      return;
+    }
+    var err = validatePhotoFile(file);
+    if (err) {
+      warnings.push(err);
+      return;
+    }
+
+    var item = { file: file, meta: null };
+    supplementarySlideState.gallery.push(item);
+    loadImageFromBlob(file).then(function(img) {
+      item.meta = { width: img.width, height: img.height };
+    }).catch(function(loadErr) {
+      console.warn('[Additional gallery meta error]', loadErr);
+    });
+  });
+
+  renderAdditionalGallerySlots();
+  if (warnings.length) setStatus(warnings.join(' '));
+}
+
+function removeAdditionalGalleryPhoto(index) {
+  if (index < 0 || index >= supplementarySlideState.gallery.length) return;
+  supplementarySlideState.gallery.splice(index, 1);
+  renderAdditionalGallerySlots();
+}
+
+function renderAdditionalGallerySlots() {
+  var grid = document.getElementById('additional-gallery-grid');
+  var countEl = document.getElementById('slide06-gallery-count');
+  var upload = document.getElementById('slide06-gallery-upload');
+  if (countEl) countEl.textContent = supplementarySlideState.gallery.length + ' / 8 dodanych';
+  if (upload) upload.classList.toggle('has-file', supplementarySlideState.gallery.length > 0);
+  if (!grid) return;
+
+  var html = '';
+  for (var i = 0; i < 8; i++) {
+    var item = supplementarySlideState.gallery[i];
+    if (item) {
+      html += '' +
+        '<div class="gallery-slot filled">' +
+          '<div class="gallery-slot-index">Zdjęcie ' + (i + 1) + '</div>' +
+          '<button type="button" class="gallery-slot-remove" onclick="event.stopPropagation();removeAdditionalGalleryPhoto(' + i + ')">×</button>' +
+          '<div class="gallery-slot-name">' + escapeXmlText(item.file && item.file.name ? item.file.name : 'Zdjęcie') + '</div>' +
+        '</div>';
+    } else {
+      html += '' +
+        '<div class="gallery-slot">' +
+          '<div class="gallery-slot-index">Zdjęcie ' + (i + 1) + '</div>' +
+          '<div class="gallery-slot-empty">Miejsce na zdjęcie</div>' +
+        '</div>';
+    }
+  }
+  grid.innerHTML = html;
+}
+
+function chunkArray(arr, size) {
+  var out = [];
+  for (var i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+async function convertGenericImageToPngArrayBuffer(file, stateObj) {
+  var img = await loadImageFromBlob(file);
+  if (stateObj) stateObj.meta = { width: img.width, height: img.height };
+  var canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png', 0.95); });
+  if (!blob) throw new Error('Nie udało się przygotować zdjęcia do PPTX');
+  return await blob.arrayBuffer();
+}
+
+function getSlideSizeFromPresentation(xml) {
+  var match = xml && xml.match(/<p:sldSz[^>]*cx="(\d+)" cy="(\d+)"/);
+  return {
+    cx: match ? parseInt(match[1], 10) : 9906000,
+    cy: match ? parseInt(match[2], 10) : 6858000
+  };
+}
+
+function fitContainPlacement(imgW, imgH, box) {
+  if (!imgW || !imgH) {
+    return { x: box.x, y: box.y, cx: box.cx, cy: box.cy };
+  }
+  var scale = Math.min(box.cx / imgW, box.cy / imgH);
+  var cx = Math.round(imgW * scale);
+  var cy = Math.round(imgH * scale);
+  var x = Math.round(box.x + (box.cx - cx) / 2);
+  var y = Math.round(box.y + (box.cy - cy) / 2);
+  return { x: x, y: y, cx: cx, cy: cy };
+}
+
+function buildGenericPictureXml(name, relId, placement, srcRect) {
+  return '' +
+    '<p:pic>' +
+      '<p:nvPicPr>' +
+        '<p:cNvPr id="' + (Math.floor(Math.random() * 9000) + 1000) + '" name="' + name + '"/>' +
+        '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>' +
+        '<p:nvPr/>' +
+      '</p:nvPicPr>' +
+      '<p:blipFill>' +
+        '<a:blip r:embed="' + relId + '"/>' +
+        (srcRect || '') +
+        '<a:stretch><a:fillRect/></a:stretch>' +
+      '</p:blipFill>' +
+      '<p:spPr>' +
+        '<a:xfrm><a:off x="' + placement.x + '" y="' + placement.y + '"/><a:ext cx="' + placement.cx + '" cy="' + placement.cy + '"/></a:xfrm>' +
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>' +
+      '</p:spPr>' +
+    '</p:pic>';
+}
+
+function buildContainPictureXml(name, relId, meta, box) {
+  var placement = fitContainPlacement(meta && meta.width, meta && meta.height, box);
+  return buildGenericPictureXml(name, relId, placement, '');
+}
+
+function buildCoverPictureXml(name, relId, meta, box) {
+  var srcRect = buildCoverSrcRect(meta && meta.width, meta && meta.height, box.cx, box.cy);
+  return buildGenericPictureXml(name, relId, { x: box.x, y: box.y, cx: box.cx, cy: box.cy }, srcRect);
+}
+
+async function insertPicturesIntoSlide(zip, slideNumber, items, boxBuilder, mediaPrefix) {
+  if (!items || !items.length) return;
+  await ensurePngContentType(zip);
+
+  var slidePath = 'ppt/slides/slide' + slideNumber + '.xml';
+  var relsPath = 'ppt/slides/_rels/slide' + slideNumber + '.xml.rels';
+  var slideFile = zip.file(slidePath);
+  if (!slideFile) return;
+
+  var slideXml = await slideFile.async('string');
+  var relsFile = zip.file(relsPath);
+  var relsXml = relsFile ? await relsFile.async('string') : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+  var pictureXml = '';
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    if (!item || !item.file) continue;
+
+    var arr = await convertGenericImageToPngArrayBuffer(item.file, item);
+    var mediaName = mediaPrefix + '_' + (i + 1) + '.png';
+    var mediaPath = 'ppt/media/' + mediaName;
+    zip.file(mediaPath, arr);
+
+    var relId = getNextRelId(relsXml);
+    relsXml = relsXml.replace('</Relationships>', '<Relationship Id="' + relId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/' + mediaName + '"/></Relationships>');
+    pictureXml += boxBuilder(item, relId, i);
+  }
+
+  slideXml = slideXml.replace('</p:spTree>', pictureXml + '</p:spTree>');
+  zip.file(slidePath, slideXml);
+  zip.file(relsPath, relsXml);
+}
+
+function getNextSlideFileNumber(zip) {
+  var maxNum = 0;
+  zip.forEach(function(relativePath, file) {
+    var match = relativePath.match(/^ppt\/slides\/slide(\d+)\.xml$/);
+    if (match) {
+      var num = parseInt(match[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+  });
+  return maxNum + 1;
+}
+
+function getNextPresentationSlideId(presXml) {
+  var maxId = 255;
+  var matches = presXml.match(/<p:sldId id="(\d+)"/g) || [];
+  matches.forEach(function(match) {
+    var num = parseInt(match.replace(/\D/g, ''), 10);
+    if (!isNaN(num) && num > maxId) maxId = num;
+  });
+  return maxId + 1;
+}
+
+async function addClonedSlideToPresentation(zip, slideNumber) {
+  var presFile = zip.file('ppt/presentation.xml');
+  var relsFile = zip.file('ppt/_rels/presentation.xml.rels');
+  var ctFile = zip.file('[Content_Types].xml');
+  if (!presFile || !relsFile || !ctFile) return;
+
+  var presXml = await presFile.async('string');
+  var relsXml = await relsFile.async('string');
+  var ctXml = await ctFile.async('string');
+
+  var relId = getNextRelId(relsXml);
+  relsXml = relsXml.replace('</Relationships>', '<Relationship Id="' + relId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide' + slideNumber + '.xml"/></Relationships>');
+
+  var sldId = getNextPresentationSlideId(presXml);
+  var sldXml = '<p:sldId id="' + sldId + '" r:id="' + relId + '"/>';
+  var matches = [...presXml.matchAll(/<p:sldId[^/]*\/>/g)];
+  if (matches.length) {
+    var last = matches[matches.length - 1];
+    presXml = presXml.slice(0, last.index) + sldXml + presXml.slice(last.index);
+  } else {
+    presXml = presXml.replace('</p:sldIdLst>', sldXml + '</p:sldIdLst>');
+  }
+
+  var override = '<Override PartName="/ppt/slides/slide' + slideNumber + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>';
+  if (ctXml.indexOf('/ppt/slides/slide' + slideNumber + '.xml') === -1) {
+    ctXml = ctXml.replace('</Types>', override + '</Types>');
+  }
+
+  zip.file('ppt/presentation.xml', presXml);
+  zip.file('ppt/_rels/presentation.xml.rels', relsXml);
+  zip.file('[Content_Types].xml', ctXml);
+}
+
+async function cloneGallerySlide(zip) {
+  var baseSlideFile = zip.file('ppt/slides/slide7.xml');
+  var baseRelsFile = zip.file('ppt/slides/_rels/slide7.xml.rels');
+  if (!baseSlideFile || !baseRelsFile) return null;
+
+  var newSlideNumber = getNextSlideFileNumber(zip);
+  var baseSlideXml = await baseSlideFile.async('string');
+  var baseRelsXml = await baseRelsFile.async('string');
+
+  zip.file('ppt/slides/slide' + newSlideNumber + '.xml', baseSlideXml);
+  zip.file('ppt/slides/_rels/slide' + newSlideNumber + '.xml.rels', baseRelsXml);
+  await addClonedSlideToPresentation(zip, newSlideNumber);
+  return newSlideNumber;
+}
+
+function getFloorPlanBox(presentationXml) {
+  var size = getSlideSizeFromPresentation(presentationXml);
+  var marginX = 381000;
+  var topY = 1066800;
+  var bottomMargin = 330000;
+  return {
+    x: marginX,
+    y: topY,
+    cx: size.cx - (marginX * 2),
+    cy: size.cy - topY - bottomMargin
+  };
+}
+
+function getGalleryBoxes(presentationXml) {
+  var size = getSlideSizeFromPresentation(presentationXml);
+  var x = 381000;
+  var y = 1105000;
+  var w = size.cx - (381000 * 2);
+  var h = size.cy - y - 330000;
+  var gapX = 260000;
+  var gapY = 260000;
+  var cellW = Math.floor((w - gapX) / 2);
+  var cellH = Math.floor((h - gapY) / 2);
+  return [
+    { x: x, y: y, cx: cellW, cy: cellH },
+    { x: x + cellW + gapX, y: y, cx: cellW, cy: cellH },
+    { x: x, y: y + cellH + gapY, cx: cellW, cy: cellH },
+    { x: x + cellW + gapX, y: y + cellH + gapY, cx: cellW, cy: cellH }
+  ];
+}
+
+async function insertSupplementarySlides(zip) {
+  if (!slide6Active) return;
+
+  var presFile = zip.file('ppt/presentation.xml');
+  var presXml = presFile ? await presFile.async('string') : '';
+  var floorPlan = supplementarySlideState.plan;
+  if (floorPlan && floorPlan.file) {
+    var floorPlanBox = getFloorPlanBox(presXml);
+    await insertPicturesIntoSlide(zip, 6, [floorPlan], function(item, relId) {
+      return buildContainPictureXml('floor_plan.png', relId, item.meta || {}, floorPlanBox);
+    }, 'slide6_floor_plan');
+  }
+
+  var groups = chunkArray(supplementarySlideState.gallery, 4);
+  if (!groups.length) return;
+
+  var slideNumbers = [7];
+  for (var g = 1; g < groups.length; g++) {
+    var clonedSlideNum = await cloneGallerySlide(zip);
+    if (clonedSlideNum) slideNumbers.push(clonedSlideNum);
+  }
+
+  var galleryBoxes = getGalleryBoxes(presXml);
+  for (var i = 0; i < groups.length; i++) {
+    var currentSlideNum = slideNumbers[i] || 7;
+    await insertPicturesIntoSlide(zip, currentSlideNum, groups[i], function(item, relId, idx) {
+      return buildCoverPictureXml('gallery_' + (idx + 1) + '.png', relId, item.meta || {}, galleryBoxes[idx]);
+    }, 'slide' + currentSlideNum + '_gallery');
+  }
+}
+
+renderAdditionalGallerySlots();
+
 /* ===== TEMPLATE MAP ===== */
 var TEMPLATE_MAP = {
   'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' }
@@ -3614,6 +4224,7 @@ async function generatePptx() {
     }
 
     await insertAllSlideMainPhotos(zip);
+    await insertSupplementarySlides(zip);
 
     // ===== CURRENCY REPLACEMENT — BRUTE FORCE =====
     // Replace [CUR] in ALL XML files in the PPTX
@@ -3734,6 +4345,7 @@ async function generatePptx() {
       if (!slide3Active) slidesToRemove.push(2);
       if (!slide4Active) slidesToRemove.push(3);
       if (!slide5Active) slidesToRemove.push(4);
+      if (!slide6Active) { slidesToRemove.push(6); slidesToRemove.push(5); }
       slidesToRemove.sort(function(a, b) { return b - a; }).forEach(function(idx) {
         presXml = removeSlideFromPresentation(presXml, idx);
       });
