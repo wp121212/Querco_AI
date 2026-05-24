@@ -1135,6 +1135,9 @@ select:focus {
 }
 
 .upload-loaded { display: none; }
+.office-only { display: none !important; }
+.template-office .office-only { display: flex !important; }
+.template-office .office-only.field-row-wide { display: block !important; }
 
 
 /* === SLIDE MAIN PHOTO UPLOAD === */
@@ -1436,6 +1439,7 @@ select:focus {
   <select id="template-select" class="tmpl-select">
     <option value="">— wybierz szablon —</option>
     <option value="magazyn-sprzedaz">Magazyn — sprzedaż</option>
+    <option value="biurowiec-sprzedaz">Biurowiec — sprzedaż</option>
   </select>
   <div id="template-status" style="display:none;margin-top:8px;font-size:11px;color:var(--text-tertiary);align-items:center;gap:6px"></div>
   <div id="template-loaded" style="display:none" class="tmpl-loaded">
@@ -1526,6 +1530,15 @@ select:focus {
   <div class="card-body" id="sec2-fields">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. UPHAGENA 27"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Link do lokalizacji</div><div class="field-label-en">Location Link</div></div><div class="field-value"><input id="location_link" placeholder="https://maps.google.com/..."></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Powierzchnia najmu [m²]</div><div class="field-label-en">GLA [m²]</div></div><div class="field-value"><input id="office_gla" placeholder="10 000"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Klasa budynku</div><div class="field-label-en">Building Class</div></div><div class="field-value"><input id="building_class" placeholder="A"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Piętra nadziemne</div><div class="field-label-en">Above-ground Floors</div></div><div class="field-value"><input id="above_ground_floors" placeholder="6"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Piętra podziemne</div><div class="field-label-en">Below-ground Floors</div></div><div class="field-value"><input id="below_ground_floors" placeholder="1"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Naziemne miejsca parkingowe</div><div class="field-label-en">Surface Parking Spaces</div></div><div class="field-value"><input id="surface_parking_spaces" placeholder="50"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Podziemne miejsca parkingowe</div><div class="field-label-en">Underground Parking Spaces</div></div><div class="field-value"><input id="underground_parking_spaces" placeholder="100"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Rok oddania do użytku</div><div class="field-label-en">Year of Completion</div></div><div class="field-value"><input id="year_completion" placeholder="2018"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Centrum miasta [km]</div><div class="field-label-en">City Centre</div></div><div class="field-value"><input id="dist_city_center" placeholder="2"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="50 000"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Numer działki</div><div class="field-label-en">Plot Number</div></div><div class="field-value"><input id="plot_number" placeholder="100/1, 101/2-5"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Obręb</div><div class="field-label-en">Precinct</div></div><div class="field-value"><input id="precinct" placeholder="0042"></div></div>
@@ -1605,6 +1618,7 @@ select:focus {
   <div class="card-body" id="sec4-fields">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Liczba najemców</div><div class="field-label-en">Number of Tenants</div></div><div class="field-value"><input id="num_tenants" placeholder="10"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Poziom wynajęcia</div><div class="field-label-en">Occupancy Rate</div></div><div class="field-value"><input id="occupancy" placeholder="95%"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Współczynnik pow. wspólnych %</div><div class="field-label-en">Add-on Factor %</div></div><div class="field-value"><input id="add_on_factor" placeholder="5%"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-noi">NOI [EUR]</div><div class="field-label-en">Net Operating Income</div></div><div class="field-value"><input id="noi" placeholder="1 000 000"><select id="noi_currency" onchange="updateCurrencyLabel('noi','NOI')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Stopa kapitalizacji [%]</div><div class="field-label-en">Yield [%]</div></div><div class="field-value"><input id="yield_pct" placeholder="7,5%"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-price-sale">Cena ofertowa [EUR]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="price_sale" placeholder="10 000 000"><select id="price_sale_currency" onchange="updateCurrencyLabel('price_sale','Cena ofertowa')"><option value="EUR">EUR</option><option value="PLN">PLN</option></select></div></div>
@@ -1717,6 +1731,7 @@ if (window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions) {
   window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 var templateBuffer = null;
+var currentTemplateKey = 'magazyn-sprzedaz';
 var slide2Active = true;
 var slide3Active = true;
 var slide4Active = true;
@@ -3464,6 +3479,12 @@ function buildPictureXmlForSlide(slideKey, relId) {
   var y = 404812;
   var cx = 5114925;
   var cy = 3415158;
+  if (isOfficeTemplate()) {
+    x = 0;
+    y = 779700;
+    cx = 5650000;
+    cy = 3290000;
+  }
   var state = getSlidePhotoState(slideKey);
   var srcRect = buildCoverSrcRect(state.meta && state.meta.width, state.meta && state.meta.height, cx, cy);
   return '' +
@@ -3485,10 +3506,11 @@ function buildPictureXmlForSlide(slideKey, relId) {
     '</p:pic>';
 }
 
-async function insertSlideMainPhoto(zip, slideKey) {
+async function insertSlideMainPhoto(zip, slideKey, targetSlideNumber) {
   var state = getSlidePhotoState(slideKey);
-  var slideNumber = parseInt(slideKey, 10);
-  if (!state.file || !isSlideActive('slide' + slideNumber)) return;
+  var slideNumber = targetSlideNumber || parseInt(slideKey, 10);
+  if (!state.file) return;
+  if (!targetSlideNumber && !isSlideActive('slide' + slideNumber)) return;
 
   await ensurePngContentType(zip);
 
@@ -3513,6 +3535,11 @@ async function insertSlideMainPhoto(zip, slideKey) {
 }
 
 async function insertAllSlideMainPhotos(zip) {
+  if (isOfficeTemplate()) {
+    if (slide2Active) await insertSlideMainPhoto(zip, '02', 2);
+    if (slide4Active) await insertSlideMainPhoto(zip, '04', 3);
+    return;
+  }
   await insertSlideMainPhoto(zip, '02');
   await insertSlideMainPhoto(zip, '03');
   await insertSlideMainPhoto(zip, '04');
@@ -3838,9 +3865,9 @@ async function addClonedSlideToPresentation(zip, slideNumber) {
   zip.file('[Content_Types].xml', ctXml);
 }
 
-async function cloneGallerySlide(zip) {
-  var baseSlideFile = zip.file('ppt/slides/slide7.xml');
-  var baseRelsFile = zip.file('ppt/slides/_rels/slide7.xml.rels');
+async function cloneSlideFromBase(zip, baseSlideNumber) {
+  var baseSlideFile = zip.file('ppt/slides/slide' + baseSlideNumber + '.xml');
+  var baseRelsFile = zip.file('ppt/slides/_rels/slide' + baseSlideNumber + '.xml.rels');
   if (!baseSlideFile || !baseRelsFile) return null;
 
   var newSlideNumber = getNextSlideFileNumber(zip);
@@ -3851,6 +3878,10 @@ async function cloneGallerySlide(zip) {
   zip.file('ppt/slides/_rels/slide' + newSlideNumber + '.xml.rels', baseRelsXml);
   await addClonedSlideToPresentation(zip, newSlideNumber);
   return newSlideNumber;
+}
+
+async function cloneGallerySlide(zip) {
+  return await cloneSlideFromBase(zip, 7);
 }
 
 function getFloorPlanBox(presentationXml) {
@@ -3889,6 +3920,32 @@ async function insertSupplementarySlides(zip) {
 
   var presFile = zip.file('ppt/presentation.xml');
   var presXml = presFile ? await presFile.async('string') : '';
+
+  if (isOfficeTemplate()) {
+    var officePlan = supplementarySlideState.plan;
+    if (officePlan && officePlan.file) {
+      var officeVizBox = getFloorPlanBox(presXml);
+      await insertPicturesIntoSlide(zip, 4, [officePlan], function(item, relId) {
+        return buildContainPictureXml('office_visualisation.png', relId, item.meta || {}, officeVizBox);
+      }, 'slide4_visualisation');
+    }
+
+    var officeGroups = chunkArray(supplementarySlideState.gallery, 4);
+    if (!officeGroups.length) return;
+    var officeSlideNumbers = [5];
+    for (var og = 1; og < officeGroups.length; og++) {
+      var officeClonedSlideNum = await cloneSlideFromBase(zip, 5);
+      if (officeClonedSlideNum) officeSlideNumbers.push(officeClonedSlideNum);
+    }
+    var officeGalleryBoxes = getGalleryBoxes(presXml);
+    for (var oi = 0; oi < officeGroups.length; oi++) {
+      var officeCurrentSlideNum = officeSlideNumbers[oi] || 5;
+      await insertPicturesIntoSlide(zip, officeCurrentSlideNum, officeGroups[oi], function(item, relId, idx) {
+        return buildCoverPictureXml('office_gallery_' + (idx + 1) + '.png', relId, item.meta || {}, officeGalleryBoxes[idx]);
+      }, 'slide' + officeCurrentSlideNum + '_office_gallery');
+    }
+    return;
+  }
   var floorPlan = supplementarySlideState.plan;
   if (floorPlan && floorPlan.file) {
     var floorPlanBox = getFloorPlanBox(presXml);
@@ -3919,11 +3976,72 @@ renderAdditionalGallerySlots();
 
 /* ===== TEMPLATE MAP ===== */
 var TEMPLATE_MAP = {
-  'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' }
+  'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' },
+  'biurowiec-sprzedaz': { path: '/templates/biurowiec-sprzedaz.pptx', label: 'Biurowiec — sprzedaż' }
   // Dodaj kolejne szablony tutaj:
   // 'biuro-wynajem': { path: '/templates/biuro-wynajem.pptx', label: 'Biuro — wynajem' },
   // 'grunt-sprzedaz': { path: '/templates/grunt-sprzedaz.pptx', label: 'Grunt — sprzedaż' },
 };
+
+
+function isOfficeTemplate() {
+  return currentTemplateKey === 'biurowiec-sprzedaz';
+}
+
+function setInputRowVisible(inputId, visible) {
+  var el = document.getElementById(inputId);
+  if (!el) return;
+  var row = el.closest('.field-row') || el.closest('.dist-cell') || el.closest('.field-row-wide');
+  if (row) row.style.display = visible ? '' : 'none';
+}
+
+function setSectionVisible(sectionId, visible) {
+  var el = document.getElementById(sectionId);
+  if (el) el.style.display = visible ? '' : 'none';
+}
+
+function setTextBySelector(selector, textValue) {
+  var el = document.querySelector(selector);
+  if (el) el.textContent = textValue;
+}
+
+function applyTemplateMode(key) {
+  currentTemplateKey = key || 'magazyn-sprzedaz';
+  var isOffice = isOfficeTemplate();
+  document.body.classList.toggle('template-office', isOffice);
+
+  ['land_area','plot_number','precinct','commune','county','ownership'].forEach(function(id) {
+    setInputRowVisible(id, !isOffice);
+  });
+
+  setSectionVisible('sec-slide3', !isOffice);
+  setSectionVisible('sec-slide5', !isOffice);
+
+  setTextBySelector('#sec-slide4 .card-num', isOffice ? '03' : '04');
+  setTextBySelector('#sec-slide4 .card-title', 'Dochody / Najemcy');
+  setTextBySelector('#sec-slide4 .card-title-en', 'Income / Tenants');
+
+  setTextBySelector('#sec-slide6 .card-num', isOffice ? '04–05' : '06');
+  setTextBySelector('#sec-slide6 .card-title', isOffice ? 'Wizualizacje / Zdjęcia' : 'Pozostałe zdjęcia');
+  setTextBySelector('#sec-slide6 .card-title-en', isOffice ? 'Visualisations / Photos' : 'Additional Images');
+  setTextBySelector('#sec-slide6 .media-block-head', isOffice ? 'Wizualizacje' : 'Rzut powierzchni');
+  setTextBySelector('#slide06-plan-upload .slide-photo-upload-title', isOffice ? 'Miejsce na wizualizację' : 'Miejsce na rzut powierzchni');
+
+  ['noi','service_charge','gross_income','eur_pln_rate'].forEach(function(id) { setInputRowVisible(id, !isOffice); });
+  setInputRowVisible('add_on_factor', isOffice);
+
+  if (isOffice) {
+    var rentLabel = document.getElementById('label-rent-income');
+    if (rentLabel) rentLabel.textContent = 'Roczny przychód z czynszów [EUR]';
+    var rentCur = document.getElementById('rent_income_currency');
+    if (rentCur) rentCur.value = 'EUR';
+    var priceCur = document.getElementById('price_sale_currency');
+    if (priceCur) priceCur.value = 'EUR';
+  } else {
+    var rentLabel2 = document.getElementById('label-rent-income');
+    if (rentLabel2) updateCurrencyLabel('rent_income','Przychód z najmu','/m²');
+  }
+}
 
 /* ===== TEMPLATE HANDLING ===== */
 async function loadSelectedTemplate() {
@@ -3938,6 +4056,7 @@ async function loadSelectedTemplate() {
 
   var tmpl = TEMPLATE_MAP[key];
   if (!tmpl) return;
+  applyTemplateMode(key);
 
   var statusEl = document.getElementById('template-status');
   statusEl.style.display = 'flex';
@@ -4000,6 +4119,104 @@ function replaceAll(str, find, rep) {
   if (!find || find === rep) return str;
   while (str.indexOf(find) !== -1) str = str.replace(find, rep);
   return str;
+}
+
+
+function writeValueIntoTableRow(rowXml, value) {
+  var safe = escapeXmlText(value || '');
+  if (/<a:t>/.test(rowXml)) {
+    return rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/, '<a:t>' + safe + '</a:t>');
+  }
+  var runXml = '<a:r><a:rPr lang="pl-PL" sz="1000" b="1" dirty="0"><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr><a:t>' + safe + '</a:t></a:r>';
+  if (rowXml.indexOf('<a:endParaRPr') !== -1) {
+    return rowXml.replace(/<a:endParaRPr/, runXml + '<a:endParaRPr');
+  }
+  return rowXml.replace('</a:p>', runXml + '</a:p>');
+}
+
+function replaceEmptyTableRowsText(tableXml, rowsValues) {
+  var rowIndex = 0;
+  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+    var value = rowsValues[rowIndex] || '';
+    rowIndex++;
+    return writeValueIntoTableRow(rowXml, value);
+  });
+}
+
+function officeDistValues() {
+  return [
+    val('dist_city_center'),
+    val('dist_railway'),
+    val('dist_highway'),
+    val('dist_expressway'),
+    val('dist_airport'),
+    val('dist_transit')
+  ];
+}
+
+function processOfficeSlide1(xml) {
+  var name = val('broker_name') || 'Karolina Bomba';
+  var phone = val('broker_phone');
+  var email = val('broker_email');
+  xml = xml.replace(/>Karolina Bomba</, '>' + escapeXmlText(name) + '<');
+  xml = xml.replace(/>, tel\. 509 778 879 karolina\.bomba@quercoproperty\.pl</, '>' + escapeXmlText((phone ? ', tel. ' + phone : '') + (email ? ' ' + email : '')) + '<');
+  return xml;
+}
+
+function processOfficeCommonLocation(xml, includeDescription) {
+  xml = replaceAll(xml, '>Miasto<', '>' + escapeXmlText(valUpper('city') || 'MIASTO') + '<');
+  xml = replaceAll(xml, '>Ulica<', '>' + escapeXmlText(valUpper('street') || 'ULICA') + '<');
+  if (includeDescription) xml = replaceAll(xml, '>Opis<', '>' + escapeXmlText(val('description') || '') + '<');
+  var dists = officeDistValues();
+  var di = 0;
+  xml = xml.replace(/>KM</g, function() {
+    var v = dists[di++] || '';
+    return '>' + escapeXmlText(v ? v + ' KM' : '-') + '<';
+  });
+  var link = val('location_link');
+  if (link) xml = replaceAll(xml, '>LINK DO LOKALIZACJI<', '>' + escapeXmlText(link) + '<');
+  return xml;
+}
+
+function processOfficeSlide2(xml) {
+  xml = processOfficeCommonLocation(xml, true);
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [
+      val('office_gla'),
+      valUpper('building_class'),
+      val('above_ground_floors'),
+      val('below_ground_floors'),
+      val('surface_parking_spaces'),
+      val('underground_parking_spaces')
+    ]);
+  });
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [val('asking_price') || val('price_sale')]);
+  });
+  if (val('year_completion')) {
+    xml = xml.replace('</p:spTree>', buildOfficeTextBoxXml('office_year_completion', val('year_completion'), 8119431, 3332500, 1707349, 220000) + '</p:spTree>');
+  }
+  return xml;
+}
+
+function processOfficeSlide3(xml) {
+  xml = processOfficeCommonLocation(xml, false);
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [val('num_tenants'), val('occupancy'), val('add_on_factor'), '']);
+  });
+  xml = replaceTableByIndex(xml, 3, function(tableXml) { return replaceEmptyTableRowsText(tableXml, [val('yield_pct')]); });
+  xml = replaceTableByIndex(xml, 2, function(tableXml) { return replaceEmptyTableRowsText(tableXml, [val('rent_income')]); });
+  xml = replaceTableByIndex(xml, 1, function(tableXml) { return replaceEmptyTableRowsText(tableXml, [val('price_sale') || val('asking_price')]); });
+  return xml;
+}
+
+function buildOfficeTextBoxXml(name, textValue, x, y, cx, cy) {
+  return '' +
+    '<p:sp>' +
+      '<p:nvSpPr><p:cNvPr id="' + (Math.floor(Math.random()*9000)+1000) + '" name="' + name + '"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>' +
+      '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>' +
+      '<p:txBody><a:bodyPr anchor="ctr"/><a:lstStyle/><a:p><a:pPr algn="r"/><a:r><a:rPr lang="pl-PL" sz="1000" b="1"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="Lato"/></a:rPr><a:t>' + escapeXmlText(textValue || '') + '</a:t></a:r></a:p></p:txBody>' +
+    '</p:sp>';
 }
 
 /* ===== PPTX SLIDE PROCESSORS ===== */
@@ -4206,13 +4423,18 @@ async function generatePptx() {
   setStatus('');
   try {
     var zip = await JSZip.loadAsync(templateBuffer);
-    var processors = {
-      'ppt/slides/slide1.xml': processSlide1,
-    };
-    if (slide2Active) processors['ppt/slides/slide2.xml'] = processSlide2;
-    if (slide3Active) processors['ppt/slides/slide3.xml'] = processSlide3;
-    if (slide4Active) processors['ppt/slides/slide4.xml'] = processSlide4;
-    if (slide5Active) processors['ppt/slides/slide5.xml'] = processSlide5;
+    var processors = {};
+    if (isOfficeTemplate()) {
+      processors['ppt/slides/slide1.xml'] = processOfficeSlide1;
+      if (slide2Active) processors['ppt/slides/slide2.xml'] = processOfficeSlide2;
+      if (slide4Active) processors['ppt/slides/slide3.xml'] = processOfficeSlide3;
+    } else {
+      processors['ppt/slides/slide1.xml'] = processSlide1;
+      if (slide2Active) processors['ppt/slides/slide2.xml'] = processSlide2;
+      if (slide3Active) processors['ppt/slides/slide3.xml'] = processSlide3;
+      if (slide4Active) processors['ppt/slides/slide4.xml'] = processSlide4;
+      if (slide5Active) processors['ppt/slides/slide5.xml'] = processSlide5;
+    }
 
     for (var path in processors) {
       var file = zip.file(path);
@@ -4341,11 +4563,17 @@ async function generatePptx() {
     if (presFile) {
       var presXml = await presFile.async('string');
       var slidesToRemove = [];
-      if (!slide2Active) slidesToRemove.push(1);
-      if (!slide3Active) slidesToRemove.push(2);
-      if (!slide4Active) slidesToRemove.push(3);
-      if (!slide5Active) slidesToRemove.push(4);
-      if (!slide6Active) { slidesToRemove.push(6); slidesToRemove.push(5); }
+      if (isOfficeTemplate()) {
+        if (!slide2Active) slidesToRemove.push(1);
+        if (!slide4Active) slidesToRemove.push(2);
+        if (!slide6Active) { slidesToRemove.push(4); slidesToRemove.push(3); }
+      } else {
+        if (!slide2Active) slidesToRemove.push(1);
+        if (!slide3Active) slidesToRemove.push(2);
+        if (!slide4Active) slidesToRemove.push(3);
+        if (!slide5Active) slidesToRemove.push(4);
+        if (!slide6Active) { slidesToRemove.push(6); slidesToRemove.push(5); }
+      }
       slidesToRemove.sort(function(a, b) { return b - a; }).forEach(function(idx) {
         presXml = removeSlideFromPresentation(presXml, idx);
       });
@@ -4357,7 +4585,7 @@ async function generatePptx() {
     var a = document.createElement('a');
     var city = val('city').replace(/\s/g, '_') || 'Obiekt';
     a.href = url;
-    a.download = 'Oferta_' + city + '.pptx';
+    a.download = (isOfficeTemplate() ? 'Oferta_biurowiec_' : 'Oferta_') + city + '.pptx';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
