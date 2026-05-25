@@ -1018,11 +1018,15 @@ select:focus {
 
 
 /* === FIELD VISIBILITY TOGGLES === */
-.field-row.has-visibility-toggle {
+.field-row.has-visibility-toggle,
+.field-row-wide.has-visibility-toggle,
+.dist-cell.has-visibility-toggle {
   position: relative;
 }
 
-.field-row.has-visibility-toggle .field-value {
+.field-row.has-visibility-toggle .field-value,
+.field-row-wide.has-visibility-toggle .field-value,
+.dist-cell.has-visibility-toggle .field-value {
   padding-right: 4px;
 }
 
@@ -1099,7 +1103,9 @@ select:focus {
   box-shadow: 0 3px 8px rgba(16,42,61,.12);
 }
 
-.field-row.field-disabled {
+.field-row.field-disabled,
+.field-row-wide.field-disabled,
+.dist-cell.field-disabled {
   background: #f4f6f7;
   opacity: .62;
 }
@@ -1107,9 +1113,23 @@ select:focus {
 .field-row.field-disabled .field-label-pl,
 .field-row.field-disabled .field-label-en,
 .field-row.field-disabled input,
-.field-row.field-disabled select {
+.field-row.field-disabled select,
+.field-row.field-disabled textarea,
+.field-row-wide.field-disabled .field-label-pl,
+.field-row-wide.field-disabled .field-label-en,
+.field-row-wide.field-disabled input,
+.field-row-wide.field-disabled select,
+.field-row-wide.field-disabled textarea,
+.dist-cell.field-disabled .field-label-pl,
+.dist-cell.field-disabled .field-label-en,
+.dist-cell.field-disabled input,
+.dist-cell.field-disabled select,
+.dist-cell.field-disabled textarea {
   color: #9aa5b1 !important;
 }
+
+.office-only-card { display: none; }
+.template-office .office-only-card { display: block; }
 
 /* === GENERATE BUTTON === */
 .gen-btn {
@@ -1629,6 +1649,97 @@ select:focus {
   </div>
 </div>
 
+
+<!-- OFFICE SECTION 04: RZUT POWIERZCHNI -->
+<div class="card office-only-card" id="sec-office-slide4">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">04</span>
+      <div class="card-title-block"><div class="card-title">Rzut powierzchni</div><div class="card-title-en">Floor Plan</div></div>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggleOffice4" onclick="toggleSection('office-slide4')" style="background:#102A3D" title="Pokaż / ukryj slajd w prezentacji"><div class="toggle-dot" style="left:18px"></div></button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="slide6-stack">
+      <div class="media-block" style="padding-top:0;border-bottom:none;">
+        <div class="slide-photo-upload" id="office-slide4-plan-upload" onclick="document.getElementById('office-slide4-plan-input').click()" ondragover="handleOfficeFloorPlanDragOver(event)" ondragleave="handleOfficeFloorPlanDragLeave(event)" ondrop="handleOfficeFloorPlanDrop(event)">
+          <span class="slide-photo-upload-icon">📐</span>
+          <span class="slide-photo-upload-text">
+            <span class="slide-photo-upload-title">Miejsce na rzut powierzchni</span>
+            <span class="slide-photo-upload-name" id="office-slide4-plan-name">Przeciągnij albo kliknij — JPG, PNG, WEBP</span>
+          </span>
+          <button type="button" class="slide-photo-remove" id="office-slide4-plan-remove" onclick="event.stopPropagation();removeOfficeFloorPlan()" style="display:none">×</button>
+        </div>
+        <input type="file" id="office-slide4-plan-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficeFloorPlanSelect(this.files)">
+        <div class="media-block-note">Rzut trafi do slajdu 04 i zostanie ustawiony centralnie na szarym polu.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OFFICE SECTION 05: ZDJĘCIA -->
+<div class="card office-only-card" id="sec-office-slide5">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">05</span>
+      <div class="card-title-block"><div class="card-title">Zdjęcia</div><div class="card-title-en">Photos</div></div>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggleOffice5" onclick="toggleSection('office-slide5')" style="background:#102A3D" title="Pokaż / ukryj slajd w prezentacji"><div class="toggle-dot" style="left:18px"></div></button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="slide6-stack">
+      <div class="media-block" style="padding-top:0;border-bottom:none;">
+        <div class="gallery-drop" id="office-slide5-photos-upload" onclick="document.getElementById('office-slide5-photos-input').click()" ondragover="handleOfficePhotosDragOver(event)" ondragleave="handleOfficePhotosDragLeave(event)" ondrop="handleOfficePhotosDrop(event)">
+          <span class="gallery-drop-icon">🖼️</span>
+          <span class="gallery-drop-text">
+            <span class="gallery-drop-title">Dodaj zdjęcia</span>
+            <span class="gallery-drop-name" id="office-slide5-photos-count">0 / 8 dodanych</span>
+          </span>
+        </div>
+        <input type="file" id="office-slide5-photos-input" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficePhotosSelect(this.files)">
+        <div class="gallery-slots-grid" id="office-slide5-photos-grid"></div>
+        <div class="media-block-note">Maksymalnie 8 zdjęć. Układ na slajdach 05 zostanie ustawiony automatycznie zgodnie z liczbą zdjęć.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OFFICE SECTION 06: ZIELONE CERTYFIKATY -->
+<div class="card office-only-card" id="sec-office-slide6">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">06</span>
+      <div class="card-title-block"><div class="card-title">Zielone certyfikaty</div><div class="card-title-en">Green Certificates</div></div>
+      <div class="slide-toggle-inline">
+        <span class="opt-label">w PPTX</span>
+        <button class="toggle" id="toggleOffice6" onclick="toggleSection('office-slide6')" style="background:#102A3D" title="Pokaż / ukryj slajd w prezentacji"><div class="toggle-dot" style="left:18px"></div></button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="slide6-stack">
+      <div class="media-block" style="padding-top:0;border-bottom:none;">
+        <div class="gallery-drop" id="office-slide6-certs-upload" onclick="document.getElementById('office-slide6-certs-input').click()" ondragover="handleOfficeCertsDragOver(event)" ondragleave="handleOfficeCertsDragLeave(event)" ondrop="handleOfficeCertsDrop(event)">
+          <span class="gallery-drop-icon">🌿</span>
+          <span class="gallery-drop-text">
+            <span class="gallery-drop-title">Dodaj zielone certyfikaty</span>
+            <span class="gallery-drop-name" id="office-slide6-certs-count">0 / 2 dodanych</span>
+          </span>
+        </div>
+        <input type="file" id="office-slide6-certs-input" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficeCertsSelect(this.files)">
+        <div class="gallery-slots-grid" id="office-slide6-certs-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));"></div>
+        <div class="media-block-note">Na slajdzie 06 może znaleźć się 1 lub 2 certyfikaty.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SECTION 5: MPZP -->
 <div class="card" id="sec-slide5">
   <div class="card-header">
@@ -1737,6 +1848,9 @@ var slide3Active = true;
 var slide4Active = true;
 var slide5Active = false;
 var slide6Active = true;
+var officeSlide4Active = true;
+var officeSlide5Active = true;
+var officeSlide6Active = true;
 var slidePhotoState = {
   '02': { file: null, meta: null },
   '03': { file: null, meta: null },
@@ -1745,6 +1859,11 @@ var slidePhotoState = {
 var supplementarySlideState = {
   plan: { file: null, meta: null },
   gallery: []
+};
+var officeMediaState = {
+  floorPlan: { file: null, meta: null },
+  photos: [],
+  certificates: []
 };
 
 /* ===== SECTION 03 FIELD VISIBILITY ===== */
@@ -2057,6 +2176,119 @@ function processLandMasterLabels(xml) {
   }
 
   return xml;
+}
+
+
+/* ===== OFFICE SECTION 02 FIELD VISIBILITY ===== */
+var OFFICE_LOCATION_FIELD_CONFIG = [
+  { key: 'city', upper: true },
+  { key: 'street', upper: true },
+  { key: 'location_link' },
+  { key: 'office_gla' },
+  { key: 'building_class', upper: true },
+  { key: 'above_ground_floors' },
+  { key: 'below_ground_floors' },
+  { key: 'surface_parking_spaces' },
+  { key: 'underground_parking_spaces' },
+  { key: 'year_completion' },
+  { key: 'dist_city_center' },
+  { key: 'dist_railway' },
+  { key: 'dist_highway' },
+  { key: 'dist_expressway' },
+  { key: 'dist_airport' },
+  { key: 'dist_transit' },
+  { key: 'description' }
+];
+var officeLocationFieldState = {};
+
+function initOfficeLocationFieldToggles() {
+  OFFICE_LOCATION_FIELD_CONFIG.forEach(function(cfg) {
+    var input = document.getElementById(cfg.key);
+    if (!input) return;
+    var row = input.closest('.field-row') || input.closest('.field-row-wide') || input.closest('.dist-cell');
+    if (!row || row.getAttribute('data-office-location-toggle-ready') === '1') return;
+
+    row.setAttribute('data-office-location-toggle-ready', '1');
+    row.setAttribute('data-office-location-field', cfg.key);
+    row.classList.add('has-visibility-toggle');
+    officeLocationFieldState[cfg.key] = true;
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'field-visible-switch';
+    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
+    toggle.title = 'Pokaż / ukryj pole w prezentacji';
+    toggle.setAttribute('data-office-location-toggle', cfg.key);
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleOfficeLocationField(cfg.key);
+    });
+    row.appendChild(toggle);
+  });
+}
+
+function toggleOfficeLocationField(key) {
+  officeLocationFieldState[key] = !officeLocationFieldState[key];
+  var row = document.querySelector('[data-office-location-field="' + key + '"]');
+  var toggle = document.querySelector('[data-office-location-toggle="' + key + '"]');
+  if (row) row.classList.toggle('field-disabled', !officeLocationFieldState[key]);
+  if (toggle) toggle.classList.toggle('off', !officeLocationFieldState[key]);
+}
+
+function isOfficeLocationFieldEnabled(key) {
+  return officeLocationFieldState[key] !== false;
+}
+
+function getOfficeLocationValue(key, upper) {
+  if (!isOfficeLocationFieldEnabled(key)) return '';
+  return upper ? valUpper(key) : val(key);
+}
+
+/* ===== OFFICE SECTION 03 EXTRA FIELD VISIBILITY ===== */
+var OFFICE_INCOME_EXTRA_FIELD_CONFIG = [
+  { key: 'add_on_factor' },
+  { key: 'rent_income' }
+];
+var officeIncomeExtraFieldState = {};
+
+function initOfficeIncomeExtraFieldToggles() {
+  OFFICE_INCOME_EXTRA_FIELD_CONFIG.forEach(function(cfg) {
+    var input = document.getElementById(cfg.key);
+    if (!input) return;
+    var row = input.closest('.field-row') || input.closest('.field-row-wide') || input.closest('.dist-cell');
+    if (!row || row.getAttribute('data-office-income-extra-toggle-ready') === '1') return;
+
+    row.setAttribute('data-office-income-extra-toggle-ready', '1');
+    row.setAttribute('data-office-income-extra-field', cfg.key);
+    row.classList.add('has-visibility-toggle');
+    officeIncomeExtraFieldState[cfg.key] = true;
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'field-visible-switch';
+    toggle.setAttribute('aria-label', 'Pokaż / ukryj pole w prezentacji');
+    toggle.title = 'Pokaż / ukryj pole w prezentacji';
+    toggle.setAttribute('data-office-income-extra-toggle', cfg.key);
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleOfficeIncomeExtraField(cfg.key);
+    });
+    row.appendChild(toggle);
+  });
+}
+
+function toggleOfficeIncomeExtraField(key) {
+  officeIncomeExtraFieldState[key] = !officeIncomeExtraFieldState[key];
+  var row = document.querySelector('[data-office-income-extra-field="' + key + '"]');
+  var toggle = document.querySelector('[data-office-income-extra-toggle="' + key + '"]');
+  if (row) row.classList.toggle('field-disabled', !officeIncomeExtraFieldState[key]);
+  if (toggle) toggle.classList.toggle('off', !officeIncomeExtraFieldState[key]);
+}
+
+function isOfficeIncomeExtraFieldEnabled(key) {
+  return officeIncomeExtraFieldState[key] !== false;
 }
 
 /* ===== SECTION 04 FIELD VISIBILITY ===== */
@@ -2834,6 +3066,9 @@ function isSlideActive(section) {
   if (section === 'slide4') return slide4Active;
   if (section === 'slide5') return slide5Active;
   if (section === 'slide6') return slide6Active;
+  if (section === 'office-slide4') return officeSlide4Active;
+  if (section === 'office-slide5') return officeSlide5Active;
+  if (section === 'office-slide6') return officeSlide6Active;
   return true;
 }
 
@@ -2843,6 +3078,9 @@ function setSlideActive(section, active) {
   if (section === 'slide4') slide4Active = active;
   if (section === 'slide5') slide5Active = active;
   if (section === 'slide6') slide6Active = active;
+  if (section === 'office-slide4') officeSlide4Active = active;
+  if (section === 'office-slide5') officeSlide5Active = active;
+  if (section === 'office-slide6') officeSlide6Active = active;
 
   var num = section.replace('slide', '');
   var toggle = document.getElementById('toggle' + num);
@@ -3670,6 +3908,242 @@ function addAdditionalGalleryFiles(files) {
   });
 
   renderAdditionalGallerySlots();
+
+/* ===== OFFICE SUPPLEMENTARY MEDIA ===== */
+function updateSingleUploadUi(uploadId, nameId, removeId, file, emptyText) {
+  var upload = document.getElementById(uploadId);
+  var nameEl = document.getElementById(nameId);
+  var removeBtn = document.getElementById(removeId);
+  if (upload) upload.classList.toggle('has-file', !!file);
+  if (nameEl) nameEl.textContent = file ? file.name : emptyText;
+  if (removeBtn) removeBtn.style.display = file ? 'inline-flex' : 'none';
+}
+
+function updateGalleryUploadUi(uploadId, countId, items, maxCount) {
+  var upload = document.getElementById(uploadId);
+  var countEl = document.getElementById(countId);
+  if (upload) upload.classList.toggle('has-file', items.length > 0);
+  if (countEl) countEl.textContent = items.length + ' / ' + maxCount + ' dodanych';
+}
+
+function renderMediaSlots(gridId, items, maxCount, removeFnName) {
+  var grid = document.getElementById(gridId);
+  if (!grid) return;
+  var html = '';
+  for (var i = 0; i < maxCount; i++) {
+    var item = items[i];
+    if (item) {
+      html += '<div class="gallery-slot filled">' +
+        '<div class="gallery-slot-index">Zdjęcie ' + (i + 1) + '</div>' +
+        '<button type="button" class="gallery-slot-remove" onclick="event.stopPropagation();' + removeFnName + '(' + i + ')">×</button>' +
+        '<div class="gallery-slot-name">' + escapeXmlText(item.file && item.file.name ? item.file.name : 'Zdjęcie') + '</div>' +
+      '</div>';
+    } else {
+      html += '<div class="gallery-slot">' +
+        '<div class="gallery-slot-index">Zdjęcie ' + (i + 1) + '</div>' +
+        '<div class="gallery-slot-empty">Miejsce na zdjęcie</div>' +
+      '</div>';
+    }
+  }
+  grid.innerHTML = html;
+}
+
+function addFilesToMediaArray(files, arr, maxCount) {
+  var warnings = [];
+  files.forEach(function(file) {
+    if (arr.length >= maxCount) { warnings.push('Możesz dodać maksymalnie ' + maxCount + ' plików.'); return; }
+    var err = validatePhotoFile(file);
+    if (err) { warnings.push(err); return; }
+    var item = { file: file, meta: null };
+    arr.push(item);
+    loadImageFromBlob(file).then(function(img) { item.meta = { width: img.width, height: img.height }; }).catch(function(e) { console.warn('[Office media meta error]', e); });
+  });
+  if (warnings.length) setStatus(warnings.join(' '));
+}
+
+function bindDragClass(event, elementId, on) {
+  event.preventDefault();
+  event.stopPropagation();
+  var el = document.getElementById(elementId);
+  if (el) el.classList[on ? 'add' : 'remove']('drag-over');
+}
+
+function handleOfficeFloorPlanDragOver(event) { bindDragClass(event, 'office-slide4-plan-upload', true); }
+function handleOfficeFloorPlanDragLeave(event) { bindDragClass(event, 'office-slide4-plan-upload', false); }
+function handleOfficeFloorPlanDrop(event) { bindDragClass(event, 'office-slide4-plan-upload', false); handleOfficeFloorPlanSelect(event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null); }
+function handleOfficeFloorPlanSelect(files) {
+  if (!files || !files.length) return;
+  var file = files[0];
+  var err = validatePhotoFile(file);
+  if (err) { setStatus(err); return; }
+  officeMediaState.floorPlan.file = file;
+  officeMediaState.floorPlan.meta = null;
+  updateSingleUploadUi('office-slide4-plan-upload', 'office-slide4-plan-name', 'office-slide4-plan-remove', file, 'Przeciągnij albo kliknij — JPG, PNG, WEBP');
+  loadImageFromBlob(file).then(function(img) { officeMediaState.floorPlan.meta = { width: img.width, height: img.height }; }).catch(function(e) { console.warn('[Office floor plan meta]', e); });
+  var input = document.getElementById('office-slide4-plan-input'); if (input) input.value = '';
+}
+function removeOfficeFloorPlan() { officeMediaState.floorPlan = { file: null, meta: null }; updateSingleUploadUi('office-slide4-plan-upload', 'office-slide4-plan-name', 'office-slide4-plan-remove', null, 'Przeciągnij albo kliknij — JPG, PNG, WEBP'); }
+
+function handleOfficePhotosDragOver(event) { bindDragClass(event, 'office-slide5-photos-upload', true); }
+function handleOfficePhotosDragLeave(event) { bindDragClass(event, 'office-slide5-photos-upload', false); }
+function handleOfficePhotosDrop(event) { bindDragClass(event, 'office-slide5-photos-upload', false); handleOfficePhotosSelect(event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null); }
+function handleOfficePhotosSelect(files) {
+  if (!files || !files.length) return;
+  addFilesToMediaArray(Array.prototype.slice.call(files), officeMediaState.photos, 8);
+  renderOfficePhotosSlots();
+  var input = document.getElementById('office-slide5-photos-input'); if (input) input.value = '';
+}
+function removeOfficePhoto(index) { if (index < 0 || index >= officeMediaState.photos.length) return; officeMediaState.photos.splice(index, 1); renderOfficePhotosSlots(); }
+function renderOfficePhotosSlots() { updateGalleryUploadUi('office-slide5-photos-upload', 'office-slide5-photos-count', officeMediaState.photos, 8); renderMediaSlots('office-slide5-photos-grid', officeMediaState.photos, 8, 'removeOfficePhoto'); }
+
+function handleOfficeCertsDragOver(event) { bindDragClass(event, 'office-slide6-certs-upload', true); }
+function handleOfficeCertsDragLeave(event) { bindDragClass(event, 'office-slide6-certs-upload', false); }
+function handleOfficeCertsDrop(event) { bindDragClass(event, 'office-slide6-certs-upload', false); handleOfficeCertsSelect(event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null); }
+function handleOfficeCertsSelect(files) {
+  if (!files || !files.length) return;
+  addFilesToMediaArray(Array.prototype.slice.call(files), officeMediaState.certificates, 2);
+  renderOfficeCertsSlots();
+  var input = document.getElementById('office-slide6-certs-input'); if (input) input.value = '';
+}
+function removeOfficeCert(index) { if (index < 0 || index >= officeMediaState.certificates.length) return; officeMediaState.certificates.splice(index, 1); renderOfficeCertsSlots(); }
+function renderOfficeCertsSlots() { updateGalleryUploadUi('office-slide6-certs-upload', 'office-slide6-certs-count', officeMediaState.certificates, 2); renderMediaSlots('office-slide6-certs-grid', officeMediaState.certificates, 2, 'removeOfficeCert'); }
+
+function getOfficeSingleImageBox(presentationXml) {
+  var size = getSlideSizeFromPresentation(presentationXml);
+  var marginX = 420000;
+  var topY = 1100000;
+  var bottomMargin = 360000;
+  return { x: marginX, y: topY, cx: size.cx - marginX * 2, cy: size.cy - topY - bottomMargin };
+}
+
+function getOfficeTwoImageBoxes(presentationXml) {
+  var box = getOfficeSingleImageBox(presentationXml);
+  var gap = 220000;
+  var cellW = Math.floor((box.cx - gap) / 2);
+  return [
+    { x: box.x, y: box.y, cx: cellW, cy: box.cy },
+    { x: box.x + cellW + gap, y: box.y, cx: cellW, cy: box.cy }
+  ];
+}
+
+function getOfficeFourImageBoxes(presentationXml) {
+  var box = getOfficeSingleImageBox(presentationXml);
+  var gapX = 220000;
+  var gapY = 220000;
+  var cellW = Math.floor((box.cx - gapX) / 2);
+  var cellH = Math.floor((box.cy - gapY) / 2);
+  return [
+    { x: box.x, y: box.y, cx: cellW, cy: cellH },
+    { x: box.x + cellW + gapX, y: box.y, cx: cellW, cy: cellH },
+    { x: box.x, y: box.y + cellH + gapY, cx: cellW, cy: cellH },
+    { x: box.x + cellW + gapX, y: box.y + cellH + gapY, cx: cellW, cy: cellH }
+  ];
+}
+
+function getOfficePhotoLayouts(items) {
+  var map = { 0: [], 1: [1], 2: [2], 3: [1,2], 4: [4], 5: [1,4], 6: [2,4], 7: [1,2,4], 8: [4,4] };
+  var layout = map[Math.min(items.length, 8)] || [];
+  var out = [];
+  var cursor = 0;
+  layout.forEach(function(size) { out.push(items.slice(cursor, cursor + size)); cursor += size; });
+  return out;
+}
+
+async function addClonedSlideToPresentationAtIndex(zip, slideNumber, insertIndex) {
+  var presFile = zip.file('ppt/presentation.xml');
+  var relsFile = zip.file('ppt/_rels/presentation.xml.rels');
+  var ctFile = zip.file('[Content_Types].xml');
+  if (!presFile || !relsFile || !ctFile) return;
+  var presXml = await presFile.async('string');
+  var relsXml = await relsFile.async('string');
+  var ctXml = await ctFile.async('string');
+  var relId = getNextRelId(relsXml);
+  relsXml = relsXml.replace('</Relationships>', '<Relationship Id="' + relId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide' + slideNumber + '.xml"/></Relationships>');
+  var sldId = getNextPresentationSlideId(presXml);
+  var sldXml = '<p:sldId id="' + sldId + '" r:id="' + relId + '"/>';
+  var matches = [...presXml.matchAll(/<p:sldId[^/]*\/>/g)];
+  if (matches.length && insertIndex < matches.length) {
+    var target = matches[insertIndex];
+    presXml = presXml.slice(0, target.index) + sldXml + presXml.slice(target.index);
+  } else if (matches.length) {
+    var last = matches[matches.length - 1];
+    presXml = presXml.slice(0, last.index + last[0].length) + sldXml + presXml.slice(last.index + last[0].length);
+  } else {
+    presXml = presXml.replace('</p:sldIdLst>', sldXml + '</p:sldIdLst>');
+  }
+  var override = '<Override PartName="/ppt/slides/slide' + slideNumber + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>';
+  if (ctXml.indexOf('/ppt/slides/slide' + slideNumber + '.xml') === -1) { ctXml = ctXml.replace('</Types>', override + '</Types>'); }
+  zip.file('ppt/presentation.xml', presXml);
+  zip.file('ppt/_rels/presentation.xml.rels', relsXml);
+  zip.file('[Content_Types].xml', ctXml);
+}
+
+async function cloneSlideFromBaseAtIndex(zip, baseSlideNumber, insertIndex) {
+  var baseSlideFile = zip.file('ppt/slides/slide' + baseSlideNumber + '.xml');
+  var baseRelsFile = zip.file('ppt/slides/_rels/slide' + baseSlideNumber + '.xml.rels');
+  if (!baseSlideFile || !baseRelsFile) return null;
+  var newSlideNumber = getNextSlideFileNumber(zip);
+  zip.file('ppt/slides/slide' + newSlideNumber + '.xml', await baseSlideFile.async('string'));
+  zip.file('ppt/slides/_rels/slide' + newSlideNumber + '.xml.rels', await baseRelsFile.async('string'));
+  await addClonedSlideToPresentationAtIndex(zip, newSlideNumber, insertIndex);
+  return newSlideNumber;
+}
+
+async function insertOfficeMediaSlides(zip) {
+  var presFile = zip.file('ppt/presentation.xml');
+  var presXml = presFile ? await presFile.async('string') : '';
+
+  if (officeSlide4Active && officeMediaState.floorPlan.file) {
+    var floorBox = getOfficeSingleImageBox(presXml);
+    await insertPicturesIntoSlide(zip, 4, [officeMediaState.floorPlan], function(item, relId) {
+      return buildContainPictureXml('office_floor_plan.png', relId, item.meta || {}, floorBox);
+    }, 'office_slide4_floorplan');
+  }
+
+  if (officeSlide5Active && officeMediaState.photos.length) {
+    var layoutGroups = getOfficePhotoLayouts(officeMediaState.photos);
+    var slideNumbers = [5];
+    for (var gi = 1; gi < layoutGroups.length; gi++) {
+      var currentPresXml = await zip.file('ppt/presentation.xml').async('string');
+      var slideCount = (currentPresXml.match(/<p:sldId[^/]*\/>/g) || []).length;
+      var tailCount = officeSlide6Active ? 2 : 1;
+      var insertIndex = Math.max(0, slideCount - tailCount);
+      var cloned = await cloneSlideFromBaseAtIndex(zip, 5, insertIndex);
+      if (cloned) slideNumbers.push(cloned);
+    }
+    var singleBox = getOfficeSingleImageBox(presXml);
+    var twoBoxes = getOfficeTwoImageBoxes(presXml);
+    var fourBoxes = getOfficeFourImageBoxes(presXml);
+
+    for (var li = 0; li < layoutGroups.length; li++) {
+      var group = layoutGroups[li];
+      var targetSlide = slideNumbers[li] || 5;
+      var builder;
+      if (group.length === 1) {
+        builder = function(item, relId) { return buildCoverPictureXml('office_photo_single.png', relId, item.meta || {}, singleBox); };
+      } else if (group.length === 2) {
+        builder = function(item, relId, idx) { return buildCoverPictureXml('office_photo_double_' + idx + '.png', relId, item.meta || {}, twoBoxes[idx]); };
+      } else {
+        builder = function(item, relId, idx) { return buildCoverPictureXml('office_photo_grid_' + idx + '.png', relId, item.meta || {}, fourBoxes[idx]); };
+      }
+      await insertPicturesIntoSlide(zip, targetSlide, group, builder, 'office_slide' + targetSlide + '_photos');
+    }
+  }
+
+  if (officeSlide6Active && officeMediaState.certificates.length) {
+    var certItems = officeMediaState.certificates.slice(0, 2);
+    var singleCertBox = getOfficeSingleImageBox(presXml);
+    var twoCertBoxes = getOfficeTwoImageBoxes(presXml);
+    var certBuilder = certItems.length === 1
+      ? function(item, relId) { return buildCoverPictureXml('office_cert_single.png', relId, item.meta || {}, singleCertBox); }
+      : function(item, relId, idx) { return buildCoverPictureXml('office_cert_' + idx + '.png', relId, item.meta || {}, twoCertBoxes[idx]); };
+    await insertPicturesIntoSlide(zip, 6, certItems, certBuilder, 'office_slide6_certs');
+  }
+}
+
+renderOfficePhotosSlots();
+renderOfficeCertsSlots();
+
   if (warnings.length) setStatus(warnings.join(' '));
 }
 
@@ -3920,32 +4394,6 @@ async function insertSupplementarySlides(zip) {
 
   var presFile = zip.file('ppt/presentation.xml');
   var presXml = presFile ? await presFile.async('string') : '';
-
-  if (isOfficeTemplate()) {
-    var officePlan = supplementarySlideState.plan;
-    if (officePlan && officePlan.file) {
-      var officeVizBox = getFloorPlanBox(presXml);
-      await insertPicturesIntoSlide(zip, 4, [officePlan], function(item, relId) {
-        return buildContainPictureXml('office_visualisation.png', relId, item.meta || {}, officeVizBox);
-      }, 'slide4_visualisation');
-    }
-
-    var officeGroups = chunkArray(supplementarySlideState.gallery, 4);
-    if (!officeGroups.length) return;
-    var officeSlideNumbers = [5];
-    for (var og = 1; og < officeGroups.length; og++) {
-      var officeClonedSlideNum = await cloneSlideFromBase(zip, 5);
-      if (officeClonedSlideNum) officeSlideNumbers.push(officeClonedSlideNum);
-    }
-    var officeGalleryBoxes = getGalleryBoxes(presXml);
-    for (var oi = 0; oi < officeGroups.length; oi++) {
-      var officeCurrentSlideNum = officeSlideNumbers[oi] || 5;
-      await insertPicturesIntoSlide(zip, officeCurrentSlideNum, officeGroups[oi], function(item, relId, idx) {
-        return buildCoverPictureXml('office_gallery_' + (idx + 1) + '.png', relId, item.meta || {}, officeGalleryBoxes[idx]);
-      }, 'slide' + officeCurrentSlideNum + '_office_gallery');
-    }
-    return;
-  }
   var floorPlan = supplementarySlideState.plan;
   if (floorPlan && floorPlan.file) {
     var floorPlanBox = getFloorPlanBox(presXml);
@@ -4016,16 +4464,17 @@ function applyTemplateMode(key) {
 
   setSectionVisible('sec-slide3', !isOffice);
   setSectionVisible('sec-slide5', !isOffice);
+  setSectionVisible('sec-slide6', !isOffice);
+  setSectionVisible('sec-office-slide4', isOffice);
+  setSectionVisible('sec-office-slide5', isOffice);
+  setSectionVisible('sec-office-slide6', isOffice);
+
+  setTextBySelector('#sec-slide2 .card-title', isOffice ? 'Biurowiec / Lokalizacja' : 'Grunt / Lokalizacja');
+  setTextBySelector('#sec-slide2 .card-title-en', isOffice ? 'Office Building / Location' : 'Land / Location');
 
   setTextBySelector('#sec-slide4 .card-num', isOffice ? '03' : '04');
   setTextBySelector('#sec-slide4 .card-title', 'Dochody / Najemcy');
   setTextBySelector('#sec-slide4 .card-title-en', 'Income / Tenants');
-
-  setTextBySelector('#sec-slide6 .card-num', isOffice ? '04–05' : '06');
-  setTextBySelector('#sec-slide6 .card-title', isOffice ? 'Wizualizacje / Zdjęcia' : 'Pozostałe zdjęcia');
-  setTextBySelector('#sec-slide6 .card-title-en', isOffice ? 'Visualisations / Photos' : 'Additional Images');
-  setTextBySelector('#sec-slide6 .media-block-head', isOffice ? 'Wizualizacje' : 'Rzut powierzchni');
-  setTextBySelector('#slide06-plan-upload .slide-photo-upload-title', isOffice ? 'Miejsce na wizualizację' : 'Miejsce na rzut powierzchni');
 
   ['noi','service_charge','gross_income','eur_pln_rate'].forEach(function(id) { setInputRowVisible(id, !isOffice); });
   setInputRowVisible('add_on_factor', isOffice);
@@ -4037,11 +4486,14 @@ function applyTemplateMode(key) {
     if (rentCur) rentCur.value = 'EUR';
     var priceCur = document.getElementById('price_sale_currency');
     if (priceCur) priceCur.value = 'EUR';
+    var askingCur = document.getElementById('asking_price_currency');
+    if (askingCur) askingCur.value = 'EUR';
   } else {
     var rentLabel2 = document.getElementById('label-rent-income');
     if (rentLabel2) updateCurrencyLabel('rent_income','Przychód z najmu','/m²');
   }
 }
+
 
 /* ===== TEMPLATE HANDLING ===== */
 async function loadSelectedTemplate() {
@@ -4145,12 +4597,12 @@ function replaceEmptyTableRowsText(tableXml, rowsValues) {
 
 function officeDistValues() {
   return [
-    val('dist_city_center'),
-    val('dist_railway'),
-    val('dist_highway'),
-    val('dist_expressway'),
-    val('dist_airport'),
-    val('dist_transit')
+    getOfficeLocationValue('dist_city_center'),
+    getOfficeLocationValue('dist_railway'),
+    getOfficeLocationValue('dist_highway'),
+    getOfficeLocationValue('dist_expressway'),
+    getOfficeLocationValue('dist_airport'),
+    getOfficeLocationValue('dist_transit')
   ];
 }
 
@@ -4164,17 +4616,16 @@ function processOfficeSlide1(xml) {
 }
 
 function processOfficeCommonLocation(xml, includeDescription) {
-  xml = replaceAll(xml, '>Miasto<', '>' + escapeXmlText(valUpper('city') || 'MIASTO') + '<');
-  xml = replaceAll(xml, '>Ulica<', '>' + escapeXmlText(valUpper('street') || 'ULICA') + '<');
-  if (includeDescription) xml = replaceAll(xml, '>Opis<', '>' + escapeXmlText(val('description') || '') + '<');
+  xml = replaceAll(xml, '>Miasto<', '>' + escapeXmlText(getOfficeLocationValue('city', true)) + '<');
+  xml = replaceAll(xml, '>Ulica<', '>' + escapeXmlText(getOfficeLocationValue('street', true)) + '<');
+  if (includeDescription) xml = replaceAll(xml, '>Opis<', '>' + escapeXmlText(getOfficeLocationValue('description') || '') + '<');
   var dists = officeDistValues();
   var di = 0;
   xml = xml.replace(/>KM</g, function() {
     var v = dists[di++] || '';
-    return '>' + escapeXmlText(v ? v + ' KM' : '-') + '<';
+    return '>' + escapeXmlText(v ? v + ' KM' : '') + '<';
   });
-  var link = val('location_link');
-  if (link) xml = replaceAll(xml, '>LINK DO LOKALIZACJI<', '>' + escapeXmlText(link) + '<');
+  xml = replaceAll(xml, '>LINK DO LOKALIZACJI<', '>' + escapeXmlText(getOfficeLocationValue('location_link') || '') + '<');
   return xml;
 }
 
@@ -4182,19 +4633,20 @@ function processOfficeSlide2(xml) {
   xml = processOfficeCommonLocation(xml, true);
   xml = replaceTableByIndex(xml, 1, function(tableXml) {
     return replaceEmptyTableRowsText(tableXml, [
-      val('office_gla'),
-      valUpper('building_class'),
-      val('above_ground_floors'),
-      val('below_ground_floors'),
-      val('surface_parking_spaces'),
-      val('underground_parking_spaces')
+      getOfficeLocationValue('office_gla'),
+      getOfficeLocationValue('building_class', true),
+      getOfficeLocationValue('above_ground_floors'),
+      getOfficeLocationValue('below_ground_floors'),
+      getOfficeLocationValue('surface_parking_spaces'),
+      getOfficeLocationValue('underground_parking_spaces')
     ]);
   });
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceEmptyTableRowsText(tableXml, [val('asking_price') || val('price_sale')]);
+    return replaceEmptyTableRowsText(tableXml, [isLandFieldEnabled('asking_price') ? (val('asking_price') || val('price_sale')) : '']);
   });
-  if (val('year_completion')) {
-    xml = xml.replace('</p:spTree>', buildOfficeTextBoxXml('office_year_completion', val('year_completion'), 8119431, 3332500, 1707349, 220000) + '</p:spTree>');
+  var yearCompletion = getOfficeLocationValue('year_completion');
+  if (yearCompletion) {
+    xml = xml.replace('</p:spTree>', buildOfficeTextBoxXml('office_year_completion', yearCompletion, 8119431, 3332500, 1707349, 220000) + '</p:spTree>');
   }
   return xml;
 }
@@ -4202,11 +4654,22 @@ function processOfficeSlide2(xml) {
 function processOfficeSlide3(xml) {
   xml = processOfficeCommonLocation(xml, false);
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceEmptyTableRowsText(tableXml, [val('num_tenants'), val('occupancy'), val('add_on_factor'), '']);
+    return replaceEmptyTableRowsText(tableXml, [
+      isIncomeFieldEnabled('num_tenants') ? val('num_tenants') : '',
+      isIncomeFieldEnabled('occupancy') ? val('occupancy') : '',
+      isOfficeIncomeExtraFieldEnabled('add_on_factor') ? val('add_on_factor') : '',
+      ''
+    ]);
   });
-  xml = replaceTableByIndex(xml, 3, function(tableXml) { return replaceEmptyTableRowsText(tableXml, [val('yield_pct')]); });
-  xml = replaceTableByIndex(xml, 2, function(tableXml) { return replaceEmptyTableRowsText(tableXml, [val('rent_income')]); });
-  xml = replaceTableByIndex(xml, 1, function(tableXml) { return replaceEmptyTableRowsText(tableXml, [val('price_sale') || val('asking_price')]); });
+  xml = replaceTableByIndex(xml, 2, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [isIncomeFieldEnabled('yield_pct') ? val('yield_pct') : '']);
+  });
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [isOfficeIncomeExtraFieldEnabled('rent_income') ? val('rent_income') : '']);
+  });
+  xml = replaceTableByIndex(xml, 3, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [isIncomeFieldEnabled('price_sale') ? (val('price_sale') || val('asking_price')) : '']);
+  });
   return xml;
 }
 
@@ -4445,8 +4908,29 @@ async function generatePptx() {
       }
     }
 
+    if (isOfficeTemplate()) {
+      var presFileOffice = zip.file('ppt/presentation.xml');
+      if (presFileOffice) {
+        var presXmlOffice = await presFileOffice.async('string');
+        var officeSlidesToRemove = [];
+        if (!slide2Active) officeSlidesToRemove.push(1);
+        if (!slide4Active) officeSlidesToRemove.push(2);
+        if (!officeSlide4Active) officeSlidesToRemove.push(3);
+        if (!officeSlide5Active) officeSlidesToRemove.push(4);
+        if (!officeSlide6Active) officeSlidesToRemove.push(5);
+        officeSlidesToRemove.sort(function(a, b) { return b - a; }).forEach(function(idx) {
+          presXmlOffice = removeSlideFromPresentation(presXmlOffice, idx);
+        });
+        zip.file('ppt/presentation.xml', presXmlOffice);
+      }
+    }
+
     await insertAllSlideMainPhotos(zip);
-    await insertSupplementarySlides(zip);
+    if (isOfficeTemplate()) {
+      await insertOfficeMediaSlides(zip);
+    } else {
+      await insertSupplementarySlides(zip);
+    }
 
     // ===== CURRENCY REPLACEMENT — BRUTE FORCE =====
     // Replace [CUR] in ALL XML files in the PPTX
@@ -4564,9 +5048,7 @@ async function generatePptx() {
       var presXml = await presFile.async('string');
       var slidesToRemove = [];
       if (isOfficeTemplate()) {
-        if (!slide2Active) slidesToRemove.push(1);
-        if (!slide4Active) slidesToRemove.push(2);
-        if (!slide6Active) { slidesToRemove.push(4); slidesToRemove.push(3); }
+        // Base office slides were already removed before media duplication to keep photo slide order stable.
       } else {
         if (!slide2Active) slidesToRemove.push(1);
         if (!slide3Active) slidesToRemove.push(2);
