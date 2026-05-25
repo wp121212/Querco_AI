@@ -1556,7 +1556,6 @@ select:focus {
   <div class="card-body" id="sec2-fields">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. UPHAGENA 27"></div></div>
-    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Link do lokalizacji</div><div class="field-label-en">Location Link</div></div><div class="field-value"><input id="location_link" placeholder="https://maps.google.com/..."></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Powierzchnia najmu [m²]</div><div class="field-label-en">GLA [m²]</div></div><div class="field-value"><input id="office_gla" placeholder="10 000"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Klasa budynku</div><div class="field-label-en">Building Class</div></div><div class="field-value"><input id="building_class" placeholder="A"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Piętra nadziemne</div><div class="field-label-en">Above-ground Floors</div></div><div class="field-value"><input id="above_ground_floors" placeholder="6"></div></div>
@@ -1680,7 +1679,6 @@ select:focus {
           <button type="button" class="slide-photo-remove" id="office-slide4-plan-remove" onclick="event.stopPropagation();removeOfficeFloorPlan()" style="display:none">×</button>
         </div>
         <input type="file" id="office-slide4-plan-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficeFloorPlanSelect(this.files)">
-        <div class="media-block-note">Rzut trafi do slajdu 04 i zostanie ustawiony centralnie na szarym polu.</div>
       </div>
     </div>
   </div>
@@ -1702,7 +1700,7 @@ select:focus {
     <div class="slide6-stack">
       <div class="media-block" style="padding-top:0;border-bottom:none;">
         <div class="gallery-slots-grid" id="office-slide5-photos-grid"></div>
-        <div class="media-block-note" id="office-slide5-photos-count">0 / 8 dodanych. Każde pole przyjmuje jedno zdjęcie — kliknij albo przeciągnij plik na wybrane miejsce.</div>
+        <div class="media-block-note" id="office-slide5-photos-count">0 / 8 dodanych</div>
       </div>
     </div>
   </div>
@@ -1724,7 +1722,7 @@ select:focus {
     <div class="slide6-stack">
       <div class="media-block" style="padding-top:0;border-bottom:none;">
         <div class="gallery-slots-grid" id="office-slide6-certs-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));"></div>
-        <div class="media-block-note" id="office-slide6-certs-count">0 / 2 dodanych. Każde pole przyjmuje jeden certyfikat — kliknij albo przeciągnij plik na wybrane miejsce.</div>
+        <div class="media-block-note" id="office-slide6-certs-count">0 / 2 dodanych</div>
       </div>
     </div>
   </div>
@@ -2173,7 +2171,7 @@ function processLandMasterLabels(xml) {
 var OFFICE_LOCATION_FIELD_CONFIG = [
   { key: 'city', upper: true },
   { key: 'street', upper: true },
-  { key: 'location_link' },
+  { key: 'land_area' },
   { key: 'office_gla' },
   { key: 'building_class', upper: true },
   { key: 'above_ground_floors' },
@@ -2181,12 +2179,12 @@ var OFFICE_LOCATION_FIELD_CONFIG = [
   { key: 'surface_parking_spaces' },
   { key: 'underground_parking_spaces' },
   { key: 'year_completion' },
-  { key: 'dist_city_center' },
-  { key: 'dist_railway' },
-  { key: 'dist_highway' },
-  { key: 'dist_expressway' },
-  { key: 'dist_airport' },
-  { key: 'dist_transit' },
+  { key: 'dist_city_center', noToggle: true },
+  { key: 'dist_railway', noToggle: true },
+  { key: 'dist_highway', noToggle: true },
+  { key: 'dist_expressway', noToggle: true },
+  { key: 'dist_airport', noToggle: true },
+  { key: 'dist_transit', noToggle: true },
   { key: 'description' }
 ];
 var officeLocationFieldState = {};
@@ -2195,6 +2193,7 @@ function initOfficeLocationFieldToggles() {
   OFFICE_LOCATION_FIELD_CONFIG.forEach(function(cfg) {
     var input = document.getElementById(cfg.key);
     if (!input) return;
+    if (cfg.noToggle) return; // Distance fields — no visibility toggle
     var row = input.closest('.field-row') || input.closest('.field-row-wide') || input.closest('.dist-cell');
     if (!row || row.getAttribute('data-office-location-toggle-ready') === '1') return;
 
@@ -3078,7 +3077,8 @@ function setSlideActive(section, active) {
   if (section.indexOf('office-') === 0) {
     var officeNum = section.replace('office-slide', '');
     toggle = document.getElementById('toggleOffice' + officeNum);
-    fields = document.getElementById('sec-office-slide' + officeNum);
+    var card = document.getElementById('sec-office-slide' + officeNum);
+    fields = card ? card.querySelector('.card-body') : null;
   } else {
     var num = section.replace('slide', '');
     toggle = document.getElementById('toggle' + num);
@@ -4049,7 +4049,7 @@ function renderOfficePhotosSlots() {
   var grid = document.getElementById('office-slide5-photos-grid');
   var countEl = document.getElementById('office-slide5-photos-count');
   var count = countFilledMediaItems(officeMediaState.photos);
-  if (countEl) countEl.textContent = count + ' / 8 dodanych. Każde pole przyjmuje jedno zdjęcie — kliknij albo przeciągnij plik na wybrane miejsce.';
+  if (countEl) countEl.textContent = count + ' / 8 dodanych';
   if (!grid) return;
   var html = '';
   for (var i = 0; i < 8; i++) {
@@ -4105,7 +4105,7 @@ function renderOfficeCertsSlots() {
   var grid = document.getElementById('office-slide6-certs-grid');
   var countEl = document.getElementById('office-slide6-certs-count');
   var count = countFilledMediaItems(officeMediaState.certificates);
-  if (countEl) countEl.textContent = count + ' / 2 dodanych. Każde pole przyjmuje jeden certyfikat — kliknij albo przeciągnij plik na wybrane miejsce.';
+  if (countEl) countEl.textContent = count + ' / 2 dodanych';
   if (!grid) return;
   var html = '';
   for (var i = 0; i < 2; i++) {
@@ -4233,7 +4233,7 @@ async function insertOfficeMediaSlides(zip) {
       var targetSlide = slideNumbers[li] || 5;
       var builder;
       if (group.length === 1) {
-        builder = function(item, relId) { return buildCoverPictureXml('office_photo_single.png', relId, item.meta || {}, singleBox); };
+        builder = function(item, relId) { return buildContainPictureXml('office_photo_single.png', relId, item.meta || {}, singleBox); };
       } else if (group.length === 2) {
         builder = function(item, relId, idx) { return buildCoverPictureXml('office_photo_double_' + idx + '.png', relId, item.meta || {}, twoBoxes[idx]); };
       } else {
@@ -4569,7 +4569,7 @@ function applyTemplateMode(key) {
   var isOffice = isOfficeTemplate();
   document.body.classList.toggle('template-office', isOffice);
 
-  ['land_area','plot_number','precinct','commune','county','ownership'].forEach(function(id) {
+  ['plot_number','precinct','commune','county','ownership'].forEach(function(id) {
     setInputRowVisible(id, !isOffice);
   });
 
@@ -4743,7 +4743,6 @@ function processOfficeCommonLocation(xml, includeDescription) {
     var v = dists[di++] || '';
     return '>' + escapeXmlText(v ? v + ' KM' : '') + '<';
   });
-  xml = replaceAll(xml, '>LINK DO LOKALIZACJI<', '>' + escapeXmlText(getOfficeLocationValue('location_link') || '') + '<');
   return xml;
 }
 
@@ -4767,7 +4766,7 @@ function processOfficeSlide2(xml) {
   }
   xml = replaceTableByIndex(xml, 1, function(tableXml) {
     return replaceEmptyTableRowsText(tableXml, [
-      '',
+      getOfficeLocationValue('land_area'),
       getOfficeLocationValue('office_gla'),
       getOfficeLocationValue('building_class', true),
       getOfficeLocationValue('above_ground_floors'),
