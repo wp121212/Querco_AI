@@ -1158,6 +1158,10 @@ select:focus {
 .office-only { display: none !important; }
 .template-office .office-only { display: flex !important; }
 .template-office .office-only.field-row-wide { display: block !important; }
+.template-hotel .hotel-compatible { display: flex !important; }
+.template-hotel .hotel-only { display: flex !important; }
+.template-hotel .hotel-only.field-row-wide { display: block !important; }
+.hotel-only { display: none !important; }
 .warehouse-only { display: flex !important; }
 .template-office .warehouse-only { display: none !important; }
 
@@ -1468,6 +1472,8 @@ select:focus {
     <option value="">— wybierz szablon —</option>
     <option value="magazyn-sprzedaz">Magazyn — sprzedaż</option>
     <option value="biurowiec-sprzedaz">Biurowiec — sprzedaż</option>
+    <option value="grunt-sprzedaz">Grunt — sprzedaż</option>
+    <option value="hotel-sprzedaz">Hotel — sprzedaż</option>
   </select>
   <div id="template-status" style="display:none;margin-top:8px;font-size:11px;color:var(--text-tertiary);align-items:center;gap:6px"></div>
   <div id="template-loaded" style="display:none" class="tmpl-loaded">
@@ -1559,12 +1565,14 @@ select:focus {
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. UPHAGENA 27"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="50 000"></div></div>
-    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Powierzchnia najmu [m²]</div><div class="field-label-en">GLA [m²]</div></div><div class="field-value"><input id="office_gla" placeholder="10 000"></div></div>
+    <div class="field-row office-only hotel-compatible"><div class="field-label"><div class="field-label-pl">Powierzchnia najmu [m²]</div><div class="field-label-en">GLA [m²]</div></div><div class="field-value"><input id="office_gla" placeholder="10 000"></div></div>
+    <div class="field-row hotel-only"><div class="field-label"><div class="field-label-pl">Ilość gwiazdek</div><div class="field-label-en">Star Rating</div></div><div class="field-value"><input id="hotel_star_rating" placeholder="4"></div></div>
+    <div class="field-row hotel-only"><div class="field-label"><div class="field-label-pl">Liczba pomieszczeń</div><div class="field-label-en">Number of Units</div></div><div class="field-value"><input id="hotel_units" placeholder="120"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Klasa budynku</div><div class="field-label-en">Building Class</div></div><div class="field-value"><input id="building_class" placeholder="A"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Piętra nadziemne</div><div class="field-label-en">Above-ground Floors</div></div><div class="field-value"><input id="above_ground_floors" placeholder="6"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Piętra podziemne</div><div class="field-label-en">Below-ground Floors</div></div><div class="field-value"><input id="below_ground_floors" placeholder="1"></div></div>
-    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Miejsca parkingowe</div><div class="field-label-en">Parking Spaces</div></div><div class="field-value"><input id="office_parking" placeholder="150"></div></div>
-    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Rok oddania do użytku</div><div class="field-label-en">Year of Completion</div></div><div class="field-value"><input id="year_completion" placeholder="2018"></div></div>
+    <div class="field-row office-only hotel-compatible"><div class="field-label"><div class="field-label-pl">Miejsca parkingowe</div><div class="field-label-en">Parking Spaces</div></div><div class="field-value"><input id="office_parking" placeholder="150"></div></div>
+    <div class="field-row office-only hotel-compatible"><div class="field-label"><div class="field-label-pl">Rok oddania do użytku</div><div class="field-label-en">Year of Completion</div></div><div class="field-value"><input id="year_completion" placeholder="2018"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Numer działki</div><div class="field-label-en">Plot Number</div></div><div class="field-value"><input id="plot_number" placeholder="100/1, 101/2-5"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Obręb</div><div class="field-label-en">Precinct</div></div><div class="field-value"><input id="precinct" placeholder="0042"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Gmina / Miasto</div><div class="field-label-en">Commune / City</div></div><div class="field-value"><input id="commune" placeholder="GDAŃSK"></div></div>
@@ -2174,6 +2182,8 @@ var OFFICE_LOCATION_FIELD_CONFIG = [
   { key: 'street', upper: true },
   { key: 'land_area' },
   { key: 'office_gla' },
+  { key: 'hotel_star_rating' },
+  { key: 'hotel_units' },
   { key: 'building_class', upper: true },
   { key: 'above_ground_floors' },
   { key: 'below_ground_floors' },
@@ -3720,6 +3730,11 @@ function buildPictureXmlForSlide(slideKey, relId) {
     y = 375278;
     cx = 5114925;
     cy = 3415158;
+  } else if (isGroundSaleTemplate() || isHotelTemplate()) {
+    x = 0;
+    y = 779700;
+    cx = 5650000;
+    cy = 3290000;
   }
   var state = getSlidePhotoState(slideKey);
   var srcRect = buildCoverSrcRect(state.meta && state.meta.width, state.meta && state.meta.height, cx, cy);
@@ -3774,6 +3789,10 @@ async function insertAllSlideMainPhotos(zip) {
   if (isOfficeTemplate()) {
     if (slide2Active) await insertSlideMainPhoto(zip, '02', 2);
     if (slide4Active) await insertSlideMainPhoto(zip, '04', 3);
+    return;
+  }
+  if (isGroundSaleTemplate() || isHotelTemplate()) {
+    if (slide2Active) await insertSlideMainPhoto(zip, '02', 2);
     return;
   }
   await insertSlideMainPhoto(zip, '02');
@@ -4535,7 +4554,9 @@ renderAdditionalGallerySlots();
 /* ===== TEMPLATE MAP ===== */
 var TEMPLATE_MAP = {
   'magazyn-sprzedaz': { path: '/templates/magazyn-sprzedaz.pptx', label: 'Magazyn — sprzedaż' },
-  'biurowiec-sprzedaz': { path: '/templates/biurowiec-sprzedaz.pptx', label: 'Biurowiec — sprzedaż' }
+  'biurowiec-sprzedaz': { path: '/templates/biurowiec-sprzedaz.pptx', label: 'Biurowiec — sprzedaż' },
+  'grunt-sprzedaz': { path: '/templates/Grunt-sprzedaz.pptx', label: 'Grunt — sprzedaż' },
+  'hotel-sprzedaz': { path: '/templates/hotel-sprzedaz.pptx', label: 'Hotel — sprzedaż' }
   // Dodaj kolejne szablony tutaj:
   // 'biuro-wynajem': { path: '/templates/biuro-wynajem.pptx', label: 'Biuro — wynajem' },
   // 'grunt-sprzedaz': { path: '/templates/grunt-sprzedaz.pptx', label: 'Grunt — sprzedaż' },
@@ -4544,6 +4565,15 @@ var TEMPLATE_MAP = {
 
 function isOfficeTemplate() {
   return currentTemplateKey === 'biurowiec-sprzedaz';
+}
+function isGroundSaleTemplate() {
+  return currentTemplateKey === 'grunt-sprzedaz';
+}
+function isHotelTemplate() {
+  return currentTemplateKey === 'hotel-sprzedaz';
+}
+function isWarehouseTemplate() {
+  return currentTemplateKey === 'magazyn-sprzedaz';
 }
 
 function setInputRowVisible(inputId, visible) {
@@ -4566,7 +4596,12 @@ function setTextBySelector(selector, textValue) {
 function applyTemplateMode(key) {
   currentTemplateKey = key || 'magazyn-sprzedaz';
   var isOffice = isOfficeTemplate();
+  var isGroundSale = isGroundSaleTemplate();
+  var isHotel = isHotelTemplate();
+  var isWarehouse = isWarehouseTemplate();
   document.body.classList.toggle('template-office', isOffice);
+  document.body.classList.toggle('template-ground-sale', isGroundSale);
+  document.body.classList.toggle('template-hotel', isHotel);
 
   // Remove any existing visibility toggles before re-initializing
   document.querySelectorAll('.field-visible-switch').forEach(function(btn) { btn.remove(); });
@@ -4577,62 +4612,92 @@ function applyTemplateMode(key) {
   document.querySelectorAll('[data-income-visibility-toggle-ready]').forEach(function(el) { el.removeAttribute('data-income-visibility-toggle-ready'); });
   document.querySelectorAll('[data-office-income-extra-toggle-ready]').forEach(function(el) { el.removeAttribute('data-office-income-extra-toggle-ready'); });
 
-  if (isOffice) {
-    try { initOfficeLocationFieldToggles(); } catch(e) { console.error(e); }
-    try { initOfficeIncomeExtraFieldToggles(); } catch(e) { console.error(e); }
-    try { initIncomeFieldToggles(); } catch(e) { console.error(e); }
-  } else {
-    try { initLandFieldToggles(); } catch(e) { console.error(e); }
-    try { initBuildingFieldToggles(); } catch(e) { console.error(e); }
-    try { initIncomeFieldToggles(); } catch(e) { console.error(e); }
-  }
-
-  ['plot_number','precinct','commune','county','ownership'].forEach(function(id) {
-    setInputRowVisible(id, !isOffice);
+  // Reset commonly hidden rows first
+  ['plot_number','precinct','commune','county','ownership','office_gla','hotel_star_rating','hotel_units','building_class','above_ground_floors','below_ground_floors','office_parking','year_completion','noi','service_charge','gross_income','eur_pln_rate','add_on_factor'].forEach(function(id) {
+    setInputRowVisible(id, true);
   });
 
-  setSectionVisible('sec-slide3', !isOffice);
-  setSectionVisible('sec-slide5', !isOffice);
-  setSectionVisible('sec-slide6', !isOffice);
-  setSectionVisible('sec-office-slide4', isOffice);
-  setSectionVisible('sec-office-slide5', isOffice);
+  if (isOffice || isHotel) {
+    try { initOfficeLocationFieldToggles(); } catch(e) { console.error(e); }
+    if (isOffice) {
+      try { initOfficeIncomeExtraFieldToggles(); } catch(e) { console.error(e); }
+      try { initIncomeFieldToggles(); } catch(e) { console.error(e); }
+    }
+  } else {
+    try { initLandFieldToggles(); } catch(e) { console.error(e); }
+    if (isWarehouse) {
+      try { initBuildingFieldToggles(); } catch(e) { console.error(e); }
+      try { initIncomeFieldToggles(); } catch(e) { console.error(e); }
+    }
+  }
+
+  // Main section visibility
+  setSectionVisible('sec-slide3', isWarehouse);
+  setSectionVisible('sec-slide4', isOffice || isWarehouse);
+  setSectionVisible('sec-slide5', isWarehouse || isGroundSale || isHotel);
+  setSectionVisible('sec-slide6', isWarehouse);
+  setSectionVisible('sec-office-slide4', isOffice || isHotel);
+  setSectionVisible('sec-office-slide5', isOffice || isHotel);
   setSectionVisible('sec-office-slide6', isOffice);
 
-  setTextBySelector('#sec-slide2 .card-title', isOffice ? 'Biurowiec / Lokalizacja' : 'Grunt / Lokalizacja');
-  setTextBySelector('#sec-slide2 .card-title-en', isOffice ? 'Office Building / Location' : 'Land / Location');
+  // Field rows per template
+  ['plot_number','precinct','commune','county','ownership'].forEach(function(id) {
+    setInputRowVisible(id, isWarehouse || isGroundSale);
+  });
+  ['office_gla','building_class','above_ground_floors','below_ground_floors','office_parking','year_completion'].forEach(function(id) {
+    setInputRowVisible(id, isOffice || isHotel);
+  });
+  ['hotel_star_rating','hotel_units'].forEach(function(id) {
+    setInputRowVisible(id, isHotel);
+  });
+  ['building_class','above_ground_floors','below_ground_floors'].forEach(function(id) {
+    if (isHotel) setInputRowVisible(id, false);
+  });
+  ['noi','service_charge','gross_income','eur_pln_rate'].forEach(function(id) { setInputRowVisible(id, isWarehouse); });
+  setInputRowVisible('add_on_factor', isOffice);
+
+  // Titles / section numbers
+  setTextBySelector('#sec-slide2 .card-title', isOffice ? 'Biurowiec / Lokalizacja' : (isHotel ? 'Hotel / Lokalizacja' : 'Grunt / Lokalizacja'));
+  setTextBySelector('#sec-slide2 .card-title-en', isOffice ? 'Office Building / Location' : (isHotel ? 'Hotel / Location' : 'Land / Location'));
 
   setTextBySelector('#sec-slide4 .card-num', isOffice ? '03' : '04');
   setTextBySelector('#sec-slide4 .card-title', 'Dochody / Najemcy');
   setTextBySelector('#sec-slide4 .card-title-en', 'Income / Tenants');
 
-  ['noi','service_charge','gross_income','eur_pln_rate'].forEach(function(id) { setInputRowVisible(id, !isOffice); });
-  setInputRowVisible('add_on_factor', isOffice);
+  setTextBySelector('#sec-slide5 .card-num', (isGroundSale || isHotel) ? '03' : '05');
+  setTextBySelector('#sec-slide5 .card-title', (isGroundSale || isHotel) ? 'Zagospodarowanie przestrzenne' : 'MPZP');
+  setTextBySelector('#sec-slide5 .card-title-en', (isGroundSale || isHotel) ? 'Planning Parameters' : 'Local Spatial Development Plan');
 
-  if (isOffice) {
-    var rentLabel = document.getElementById('label-rent-income');
-    if (rentLabel) rentLabel.textContent = 'Roczny przychód z czynszów [EUR]';
-    var rentCur = document.getElementById('rent_income_currency');
-    if (rentCur) rentCur.value = 'EUR';
-    var priceCur = document.getElementById('price_sale_currency');
-    if (priceCur) priceCur.value = 'EUR';
+  setTextBySelector('#sec-office-slide4 .card-num', '04');
+  setTextBySelector('#sec-office-slide4 .card-title', 'Rzut powierzchni');
+  setTextBySelector('#sec-office-slide4 .card-title-en', 'Floor Plan');
+  setTextBySelector('#sec-office-slide5 .card-num', '05');
+  setTextBySelector('#sec-office-slide5 .card-title', 'Zdjęcia');
+  setTextBySelector('#sec-office-slide5 .card-title-en', 'Photos');
+  setTextBySelector('#sec-office-slide6 .card-num', '06');
+
+  if (isOffice || isHotel) {
     var askingCur = document.getElementById('asking_price_currency');
     if (askingCur) askingCur.value = 'EUR';
-    // Relabel distance fields for office
-    setTextBySelector('.dist-railway-label', 'SKM / PKM [km]');
-    setTextBySelector('.dist-railway-label-en', 'SKM / PKM');
-    setTextBySelector('.dist-expressway-label', 'Droga ekspresowa [km]');
-    setTextBySelector('.dist-expressway-label-en', 'Expressway');
+    var priceCur = document.getElementById('price_sale_currency');
+    if (priceCur) priceCur.value = 'EUR';
+    var rentCur = document.getElementById('rent_income_currency');
+    if (rentCur) rentCur.value = 'EUR';
+    var rentLabel = document.getElementById('label-rent-income');
+    if (rentLabel) rentLabel.textContent = 'Roczny przychód z czynszów [EUR]';
   } else {
+    var askingCur2 = document.getElementById('asking_price_currency');
+    if (askingCur2 && isGroundSale) askingCur2.value = 'PLN';
     var rentLabel2 = document.getElementById('label-rent-income');
     if (rentLabel2) updateCurrencyLabel('rent_income','Przychód z najmu','/m²');
-    // Relabel distance fields for warehouse
-    setTextBySelector('.dist-railway-label', 'Kolej [km]');
-    setTextBySelector('.dist-railway-label-en', 'Railway');
-    setTextBySelector('.dist-expressway-label', 'Autostrada [km]');
-    setTextBySelector('.dist-expressway-label-en', 'Expressway');
   }
-}
 
+  // Relabel distance fields according to office/hotel/ground templates
+  setTextBySelector('.dist-railway-label', (isOffice || isHotel || isGroundSale) ? 'SKM / PKM [km]' : 'Kolej [km]');
+  setTextBySelector('.dist-railway-label-en', (isOffice || isHotel || isGroundSale) ? 'SKM / PKM' : 'Railway');
+  setTextBySelector('.dist-expressway-label', (isOffice || isHotel || isGroundSale) ? 'Droga ekspresowa [km]' : 'Autostrada [km]');
+  setTextBySelector('.dist-expressway-label-en', (isOffice || isHotel || isGroundSale) ? 'Expressway' : 'Expressway');
+}
 
 /* ===== TEMPLATE HANDLING ===== */
 async function loadSelectedTemplate() {
@@ -4838,6 +4903,148 @@ function buildOfficeTextBoxXml(name, textValue, x, y, cx, cy) {
       '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/></p:spPr>' +
       '<p:txBody><a:bodyPr anchor="ctr"/><a:lstStyle/><a:p><a:pPr algn="r"/><a:r><a:rPr lang="pl-PL" sz="1000" b="1"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="Lato"/></a:rPr><a:t>' + escapeXmlText(textValue || '') + '</a:t></a:r></a:p></p:txBody>' +
     '</p:sp>';
+}
+
+
+/* ===== NEW TEMPLATE PROCESSORS: GROUND SALE + HOTEL SALE ===== */
+function getBasicDistanceValues() {
+  // visual order used in Grunt/Hotel templates: city centre, SKM/PKM, highway, expressway, airport, mass transit
+  return [val('dist_city_center'), val('dist_railway'), val('dist_highway'), val('dist_expressway'), val('dist_airport'), val('dist_transit')];
+}
+
+function replaceKmTokens(xml, values) {
+  var di = 0;
+  xml = xml.replace(/>KM</g, function() {
+    var v = values[di++] || '';
+    return '>' + escapeXmlText(v ? v + ' KM' : '') + '<';
+  });
+  xml = xml.replace(/>X KM</g, function() {
+    var v = values[di++] || '';
+    return '>' + escapeXmlText(v ? v + ' KM' : '') + '<';
+  });
+  return xml;
+}
+
+function processLineContactCover(xml) {
+  var name = val('broker_name') || 'Karolina Bomba';
+  var phone = val('broker_phone');
+  var email = val('broker_email');
+  xml = xml.replace(/>Karolina Bomba</g, '>' + escapeXmlText(name) + '<');
+  xml = xml.replace(/>Karolina Bomba, tel\. 509 778 879\s*</g, '>' + escapeXmlText(name + (phone ? ', tel. ' + phone : '')) + '<');
+  xml = xml.replace(/>karolina\.bomba@quercoproperty\.pl</g, '>' + escapeXmlText(email || '') + '<');
+  xml = xml.replace(/>, tel\. 509 778 879 karolina\.bomba@quercoproperty\.pl</g, '>' + escapeXmlText((phone ? ', tel. ' + phone : '') + (email ? ' ' + email : '')) + '<');
+  return xml;
+}
+
+function processGroundSaleSlide2(xml) {
+  var city = valUpper('city');
+  var street = valUpper('street');
+  xml = replaceAll(xml, '>GDAŃSK, OSOWA<', '>' + escapeXmlText(city || '') + '<');
+  xml = replaceAll(xml, '>UL. METEORYTOWA / JANA KAPLERA<', '>' + escapeXmlText(street || '') + '<');
+  xml = replaceAll(xml, '>Miasto<', '>' + escapeXmlText(city || '') + '<');
+  xml = replaceAll(xml, '>Ulica<', '>' + escapeXmlText(street || '') + '<');
+
+  var activeFields = getActiveLandFields();
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    var rows = [];
+    activeFields.forEach(function(field) { rows.push([field.value || '']); });
+    return replaceTableRowsTextCompact(tableXml, rows);
+  });
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    if (!isLandFieldEnabled(LAND_PRICE_FIELD)) return replaceTableRowsText(tableXml, [['']]);
+    tableXml = replaceAll(tableXml, '[CUR]', '[' + (cur('asking_price') || 'PLN') + ']');
+    return replaceTableRowsText(tableXml, [[val('asking_price')]]);
+  });
+  xml = replaceKmTokens(xml, getBasicDistanceValues());
+  xml = replaceAll(xml, '>Opis<', '>' + escapeXmlText(val('description') || '') + '<');
+  return xml;
+}
+
+function processGroundSaleMpzp(xml) {
+  var res = getMpzpResolutionText();
+  var card = valUpper('terrain_card');
+  if (res) {
+    xml = xml.replace(/UCHWAŁA NR y z dnia xx[^<]*/g, escapeXmlText(res));
+    xml = xml.replace(/>UCHWAŁA NR y[^<]*/g, '>' + escapeXmlText(res));
+  }
+  if (card) {
+    xml = xml.replace(/”Karta terenu”\s*/g, escapeXmlText(card));
+    xml = xml.replace(/&#x201D;Karta terenu&#x201D;\s*/g, escapeXmlText(card));
+    xml = xml.replace(/"Karta terenu"\s*/g, escapeXmlText(card));
+  }
+  var fnCount = 0;
+  xml = xml.replace(/>tekst</g, function() {
+    fnCount++;
+    if (fnCount === 1) return '>' + escapeXmlText(valUpper('terrain_function') || '') + '<';
+    if (fnCount === 2) return '>' + escapeXmlText(valUpper('excluded_functions') || '') + '<';
+    return '><';
+  });
+  var vals = [val('building_area_min'), val('building_area_max'), val('intensity_min'), val('intensity_max'), val('height_max'), val('bio_surface_min')];
+  var vi = 0;
+  xml = xml.replace(/>\s*x\s*</gi, function() {
+    var v = vals[vi++] || '-';
+    return '>' + escapeXmlText(v) + '<';
+  });
+  return xml;
+}
+
+function processHotelSlide2(xml) {
+  var city = valUpper('city');
+  var street = valUpper('street');
+  xml = replaceAll(xml, '>Miasto<', '>' + escapeXmlText(city || '') + '<');
+  xml = replaceAll(xml, '>Ulica<', '>' + escapeXmlText(street || '') + '<');
+  xml = replaceAll(xml, '>Opis<', '>' + escapeXmlText(val('description') || '') + '<');
+
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [
+      getOfficeLocationValue('land_area'),
+      getOfficeLocationValue('office_gla'),
+      getOfficeLocationValue('hotel_star_rating'),
+      getOfficeLocationValue('hotel_units'),
+      getOfficeLocationValue('office_parking'),
+      getOfficeLocationValue('year_completion')
+    ]);
+  });
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    return replaceEmptyTableRowsText(tableXml, [isOfficeLocationFieldEnabled('asking_price') ? (val('asking_price') || val('price_sale')) : '']);
+  });
+  xml = replaceKmTokens(xml, getBasicDistanceValues());
+  return xml;
+}
+
+async function insertHotelMediaSlides(zip) {
+  var presFile = zip.file('ppt/presentation.xml');
+  var presXml = presFile ? await presFile.async('string') : '';
+  if (officeSlide4Active && officeMediaState.floorPlan.file) {
+    var floorBox = getOfficeSingleImageBox(presXml);
+    await insertPicturesIntoSlide(zip, 4, [officeMediaState.floorPlan], function(item, relId) {
+      return buildContainPictureXml('hotel_floor_plan.png', relId, item.meta || {}, floorBox);
+    }, 'hotel_slide4_floorplan');
+  }
+  var filledPhotos = getFilledMediaItems(officeMediaState.photos);
+  if (officeSlide5Active && filledPhotos.length) {
+    var layoutGroups = getOfficePhotoLayouts(filledPhotos);
+    var slideNumbers = [5];
+    for (var gi = 1; gi < layoutGroups.length; gi++) {
+      var currentPresXml = await zip.file('ppt/presentation.xml').async('string');
+      var slideCount = (currentPresXml.match(/<p:sldId[^/]*\/>/g) || []).length;
+      var insertIndex = Math.max(0, slideCount - 1); // before contact slide
+      var cloned = await cloneSlideFromBaseAtIndex(zip, 5, insertIndex);
+      if (cloned) slideNumbers.push(cloned);
+    }
+    var singleBox = getOfficeSingleImageBox(presXml);
+    var twoBoxes = getOfficeTwoImageBoxes(presXml);
+    var fourBoxes = getOfficeFourImageBoxes(presXml);
+    for (var li = 0; li < layoutGroups.length; li++) {
+      var group = layoutGroups[li];
+      var targetSlide = slideNumbers[li] || 5;
+      var builder;
+      if (group.length === 1) builder = function(item, relId) { return buildContainPictureXml('hotel_photo_single.png', relId, item.meta || {}, singleBox); };
+      else if (group.length === 2) builder = function(item, relId, idx) { return buildCoverPictureXml('hotel_photo_double_' + idx + '.png', relId, item.meta || {}, twoBoxes[idx]); };
+      else builder = function(item, relId, idx) { return buildCoverPictureXml('hotel_photo_grid_' + idx + '.png', relId, item.meta || {}, fourBoxes[idx]); };
+      await insertPicturesIntoSlide(zip, targetSlide, group, builder, 'hotel_slide' + targetSlide + '_photos');
+    }
+  }
 }
 
 /* ===== PPTX SLIDE PROCESSORS ===== */
@@ -5049,6 +5256,15 @@ async function generatePptx() {
       processors['ppt/slides/slide1.xml'] = processOfficeSlide1;
       if (slide2Active) processors['ppt/slides/slide2.xml'] = processOfficeSlide2;
       if (slide4Active) processors['ppt/slides/slide3.xml'] = processOfficeSlide3;
+    } else if (isGroundSaleTemplate()) {
+      processors['ppt/slides/slide1.xml'] = processLineContactCover;
+      if (slide2Active) processors['ppt/slides/slide2.xml'] = processGroundSaleSlide2;
+      if (slide5Active) processors['ppt/slides/slide3.xml'] = processGroundSaleMpzp;
+    } else if (isHotelTemplate()) {
+      processors['ppt/slides/slide1.xml'] = processLineContactCover;
+      if (slide2Active) processors['ppt/slides/slide2.xml'] = processHotelSlide2;
+      // hotel slide 03 MPZP content is mostly in the layout/master; keep base slide and process shared placeholders if present
+      if (slide5Active) processors['ppt/slides/slide3.xml'] = processGroundSaleMpzp;
     } else {
       processors['ppt/slides/slide1.xml'] = processSlide1;
       if (slide2Active) processors['ppt/slides/slide2.xml'] = processSlide2;
@@ -5066,17 +5282,27 @@ async function generatePptx() {
       }
     }
 
-    if (isOfficeTemplate()) {
+    if (isOfficeTemplate() || isGroundSaleTemplate() || isHotelTemplate()) {
       var presFileOffice = zip.file('ppt/presentation.xml');
       if (presFileOffice) {
         var presXmlOffice = await presFileOffice.async('string');
-        var officeSlidesToRemove = [];
-        if (!slide2Active) officeSlidesToRemove.push(1);
-        if (!slide4Active) officeSlidesToRemove.push(2);
-        if (!officeSlide4Active) officeSlidesToRemove.push(3);
-        if (!officeSlide5Active) officeSlidesToRemove.push(4);
-        if (!officeSlide6Active) officeSlidesToRemove.push(5);
-        officeSlidesToRemove.sort(function(a, b) { return b - a; }).forEach(function(idx) {
+        var specialSlidesToRemove = [];
+        if (!slide2Active) specialSlidesToRemove.push(1);
+        if (isOfficeTemplate()) {
+          if (!slide4Active) specialSlidesToRemove.push(2);
+          if (!officeSlide4Active) specialSlidesToRemove.push(3);
+          if (!officeSlide5Active) specialSlidesToRemove.push(4);
+          if (!officeSlide6Active) specialSlidesToRemove.push(5);
+        }
+        if (isGroundSaleTemplate()) {
+          if (!slide5Active) specialSlidesToRemove.push(2);
+        }
+        if (isHotelTemplate()) {
+          if (!slide5Active) specialSlidesToRemove.push(2);
+          if (!officeSlide4Active) specialSlidesToRemove.push(3);
+          if (!officeSlide5Active) specialSlidesToRemove.push(4);
+        }
+        specialSlidesToRemove.sort(function(a, b) { return b - a; }).forEach(function(idx) {
           presXmlOffice = removeSlideFromPresentation(presXmlOffice, idx);
         });
         zip.file('ppt/presentation.xml', presXmlOffice);
@@ -5086,7 +5312,9 @@ async function generatePptx() {
     await insertAllSlideMainPhotos(zip);
     if (isOfficeTemplate()) {
       await insertOfficeMediaSlides(zip);
-    } else {
+    } else if (isHotelTemplate()) {
+      await insertHotelMediaSlides(zip);
+    } else if (!isGroundSaleTemplate()) {
       await insertSupplementarySlides(zip);
     }
 
@@ -5208,8 +5436,8 @@ async function generatePptx() {
     if (presFile) {
       var presXml = await presFile.async('string');
       var slidesToRemove = [];
-      if (isOfficeTemplate()) {
-        // Base office slides were already removed before media duplication to keep photo slide order stable.
+      if (isOfficeTemplate() || isGroundSaleTemplate() || isHotelTemplate()) {
+        // Special-template slides were already removed before media duplication to keep photo slide order stable.
       } else {
         if (!slide2Active) slidesToRemove.push(1);
         if (!slide3Active) slidesToRemove.push(2);
@@ -5228,7 +5456,7 @@ async function generatePptx() {
     var a = document.createElement('a');
     var city = val('city').replace(/\s/g, '_') || 'Obiekt';
     a.href = url;
-    a.download = (isOfficeTemplate() ? 'Oferta_biurowiec_' : 'Oferta_') + city + '.pptx';
+    a.download = (isOfficeTemplate() ? 'Oferta_biurowiec_' : (isGroundSaleTemplate() ? 'Oferta_grunt_' : (isHotelTemplate() ? 'Oferta_hotel_' : 'Oferta_'))) + city + '.pptx';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
