@@ -638,6 +638,185 @@ select:focus {
 }
 .broker-profile-note { display: none; }
 
+
+/* === ENTRY TEMPLATE CHOOSER === */
+.entry-card {
+  background: rgba(255,255,255,0.96);
+  border: 1px solid var(--q-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  padding: 0 26px 26px;
+  margin-bottom: 16px;
+  min-height: 560px;
+  position: relative;
+}
+
+.entry-card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  margin: 0 -26px 0;
+  background: linear-gradient(90deg, var(--q-navy) 0%, var(--q-steel) 55%, rgba(242,242,242,0) 100%);
+}
+
+.offer-type-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 80px;
+  padding: 30px 0 34px;
+}
+
+.offer-type-btn {
+  min-height: 78px;
+  border: 2px solid var(--q-navy);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--q-navy);
+  cursor: pointer;
+  font-family: 'Lato', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: .095em;
+  text-transform: uppercase;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition), transform var(--transition);
+}
+
+.offer-type-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(16,42,61,0.08);
+}
+
+.offer-type-btn.active {
+  border-color: #0f5ba8;
+  background: linear-gradient(180deg, #f5faff 0%, #ffffff 100%);
+  box-shadow: 0 0 0 3px rgba(15,91,168,0.08), 0 10px 22px rgba(16,42,61,0.08);
+}
+
+.entry-separator {
+  height: 1px;
+  margin: 0 8px;
+  background: var(--q-line);
+}
+
+.property-picker {
+  display: none;
+  padding: 96px 0 24px;
+}
+
+.property-picker.visible { display: block; }
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 34px;
+  align-items: start;
+  justify-items: center;
+}
+
+.property-grid.two-items {
+  grid-template-columns: repeat(2, minmax(0, 280px));
+  justify-content: center;
+  gap: 140px;
+}
+
+.property-tile {
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--q-navy);
+  width: 100%;
+  max-width: 210px;
+  text-align: center;
+  font-family: 'Lato', system-ui, sans-serif;
+  transition: transform var(--transition), opacity var(--transition);
+}
+
+.property-tile:hover { transform: translateY(-2px); }
+
+.property-tile.disabled {
+  cursor: not-allowed;
+  opacity: .46;
+}
+
+.property-tile.disabled:hover { transform: none; }
+
+.property-icon-box {
+  width: 164px;
+  height: 164px;
+  margin: 0 auto 22px;
+  border: 2px solid var(--q-navy);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.property-tile:hover .property-icon-box,
+.property-tile.active .property-icon-box {
+  border-color: #0f5ba8;
+  box-shadow: 0 0 0 3px rgba(15,91,168,0.08), 0 10px 22px rgba(16,42,61,0.08);
+}
+
+.property-icon-box svg {
+  width: 112px;
+  height: 112px;
+  stroke: var(--q-navy);
+  stroke-width: 2.2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.property-name {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.property-note {
+  margin-top: 7px;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--q-soft);
+  text-transform: uppercase;
+}
+
+.tmpl-select-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .offer-type-row { gap: 20px; }
+  .offer-type-btn { font-size: 20px; }
+  .property-grid,
+  .property-grid.two-items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 26px;
+  }
+}
+
+@media (max-width: 560px) {
+  .entry-card { min-height: auto; padding: 0 18px 22px; }
+  .entry-card::before { margin: 0 -18px 0; }
+  .offer-type-row { grid-template-columns: 1fr; padding-top: 22px; }
+  .property-picker { padding-top: 44px; }
+  .property-grid,
+  .property-grid.two-items { grid-template-columns: 1fr; }
+  .property-icon-box { width: 142px; height: 142px; }
+  .property-name { font-size: 22px; }
+}
+
 /* === TEMPLATE SELECTOR === */
 .tmpl-label {
   font-size: 11px;
@@ -1451,21 +1630,75 @@ select:focus {
 <div class="main">
 
 <!-- TEMPLATE SELECTOR -->
-<div class="tmpl-card">
-  <div class="tmpl-label">Szablon oferty</div>
-  <select id="template-select" class="tmpl-select">
+<div class="entry-card" id="entry-card">
+  <div class="offer-type-row">
+    <button type="button" class="offer-type-btn" id="offer-rent-btn" onclick="selectOfferType('rent')">Oferta wynajmu</button>
+    <button type="button" class="offer-type-btn" id="offer-sale-btn" onclick="selectOfferType('sale')">Oferta sprzedaży</button>
+  </div>
+  <div class="entry-separator"></div>
+
+  <div class="property-picker" id="rent-property-picker">
+    <div class="property-grid two-items">
+      <button type="button" class="property-tile disabled" onclick="selectPropertyTemplate('magazyn-wynajem')" title="Template w przygotowaniu">
+        <span class="property-icon-box" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path d="M14 76h72"/><path d="M20 76V28l30-16 30 16v48"/><path d="M34 76V44h32v32"/><path d="M38 50h24M38 58h24M38 66h24"/><path d="M45 76v-14h10v14"/></svg>
+        </span>
+        <span class="property-name">Magazyn</span>
+        <span class="property-note">w przygotowaniu</span>
+      </button>
+      <button type="button" class="property-tile disabled" onclick="selectPropertyTemplate('biuro-wynajem')" title="Template w przygotowaniu">
+        <span class="property-icon-box" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path d="M17 78h66"/><path d="M27 78V28h36v50"/><path d="M63 46h16v32"/><path d="M38 78V66h14v12"/><path d="M38 38h8M54 38h8M38 50h8M54 50h8M38 61h8M54 61h8"/></svg>
+        </span>
+        <span class="property-name">Biuro</span>
+        <span class="property-note">w przygotowaniu</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="property-picker" id="sale-property-picker">
+    <div class="property-grid">
+      <button type="button" class="property-tile" data-template-tile="magazyn-sprzedaz" onclick="selectPropertyTemplate('magazyn-sprzedaz')">
+        <span class="property-icon-box" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path d="M14 76h72"/><path d="M20 76V28l30-16 30 16v48"/><path d="M34 76V44h32v32"/><path d="M38 50h24M38 58h24M38 66h24"/><path d="M45 76v-14h10v14"/></svg>
+        </span>
+        <span class="property-name">Magazyn</span>
+      </button>
+      <button type="button" class="property-tile" data-template-tile="biurowiec-sprzedaz" onclick="selectPropertyTemplate('biurowiec-sprzedaz')">
+        <span class="property-icon-box" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path d="M17 78h66"/><path d="M27 78V28h36v50"/><path d="M63 46h16v32"/><path d="M38 78V66h14v12"/><path d="M38 38h8M54 38h8M38 50h8M54 50h8M38 61h8M54 61h8"/></svg>
+        </span>
+        <span class="property-name">Biurowiec</span>
+      </button>
+      <button type="button" class="property-tile" data-template-tile="hotel-sprzedaz" onclick="selectPropertyTemplate('hotel-sprzedaz')">
+        <span class="property-icon-box" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path d="M16 78h68"/><path d="M28 78V24h44v54"/><path d="M40 78V62h20v16"/><path d="M38 36h7M55 36h7M38 48h7M55 48h7"/><path d="M50 12v12M43 18h14"/></svg>
+        </span>
+        <span class="property-name">Hotel</span>
+      </button>
+      <button type="button" class="property-tile" data-template-tile="grunt-sprzedaz" onclick="selectPropertyTemplate('grunt-sprzedaz')">
+        <span class="property-icon-box" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><path d="M18 70l20-38 20 38 20-26"/><path d="M16 78h68"/><path d="M33 55h10M54 58h10"/><path d="M60 28l8 8 12-16"/></svg>
+        </span>
+        <span class="property-name">Grunt</span>
+      </button>
+    </div>
+  </div>
+
+  <select id="template-select" class="tmpl-select-hidden" aria-hidden="true" tabindex="-1">
     <option value="">— wybierz szablon —</option>
     <option value="magazyn-sprzedaz">Magazyn — sprzedaż</option>
     <option value="biurowiec-sprzedaz">Biurowiec — sprzedaż</option>
     <option value="grunt-sprzedaz">Grunt — sprzedaż</option>
     <option value="hotel-sprzedaz">Hotel — sprzedaż</option>
   </select>
-  <div id="template-status" style="display:none;margin-top:8px;font-size:11px;color:var(--text-tertiary);align-items:center;gap:6px"></div>
+  <div id="template-status" style="display:none;margin-top:18px;font-size:11px;color:var(--text-tertiary);align-items:center;gap:6px"></div>
   <div id="template-loaded" style="display:none" class="tmpl-loaded">
     <span>✓</span> <span id="template-loaded-name"></span>
   </div>
 </div>
 
+<div id="form-area"
 <div id="form-area" style="display:none">
 
 <!-- AI EXTRACTION -->
@@ -4682,6 +4915,39 @@ function applyTemplateMode(key) {
   setTextBySelector('.dist-railway-label-en', (isOffice || isHotel || isGroundSale) ? 'SKM / PKM' : 'Railway');
   setTextBySelector('.dist-expressway-label', (isOffice || isHotel || isGroundSale) ? 'Droga ekspresowa [km]' : 'Autostrada [km]');
   setTextBySelector('.dist-expressway-label-en', (isOffice || isHotel || isGroundSale) ? 'Expressway' : 'Expressway');
+}
+
+
+/* ===== ENTRY PAGE SELECTION ===== */
+function selectOfferType(type) {
+  var rentBtn = document.getElementById('offer-rent-btn');
+  var saleBtn = document.getElementById('offer-sale-btn');
+  var rentPicker = document.getElementById('rent-property-picker');
+  var salePicker = document.getElementById('sale-property-picker');
+
+  if (rentBtn) rentBtn.classList.toggle('active', type === 'rent');
+  if (saleBtn) saleBtn.classList.toggle('active', type === 'sale');
+  if (rentPicker) rentPicker.classList.toggle('visible', type === 'rent');
+  if (salePicker) salePicker.classList.toggle('visible', type === 'sale');
+}
+
+async function selectPropertyTemplate(templateKey) {
+  if (!TEMPLATE_MAP[templateKey]) {
+    setStatus('Ten szablon jest jeszcze w przygotowaniu.');
+    return;
+  }
+
+  var select = document.getElementById('template-select');
+  if (!select) return;
+
+  select.value = templateKey;
+  document.querySelectorAll('[data-template-tile]').forEach(function(tile) {
+    tile.classList.toggle('active', tile.getAttribute('data-template-tile') === templateKey);
+  });
+
+  await loadSelectedTemplate();
+  var form = document.getElementById('form-area');
+  if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ===== TEMPLATE HANDLING ===== */
