@@ -1158,6 +1158,8 @@ select:focus {
 .office-only { display: none !important; }
 .template-office .office-only { display: flex !important; }
 .template-office .office-only.field-row-wide { display: block !important; }
+.warehouse-only { display: flex !important; }
+.template-office .warehouse-only { display: none !important; }
 
 
 /* === SLIDE MAIN PHOTO UPLOAD === */
@@ -1556,15 +1558,13 @@ select:focus {
   <div class="card-body" id="sec2-fields">
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Miasto</div><div class="field-label-en">City</div></div><div class="field-value"><input id="city" placeholder="GDAŃSK"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Ulica</div><div class="field-label-en">Street</div></div><div class="field-value"><input id="street" placeholder="UL. UPHAGENA 27"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="50 000"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Powierzchnia najmu [m²]</div><div class="field-label-en">GLA [m²]</div></div><div class="field-value"><input id="office_gla" placeholder="10 000"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Klasa budynku</div><div class="field-label-en">Building Class</div></div><div class="field-value"><input id="building_class" placeholder="A"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Piętra nadziemne</div><div class="field-label-en">Above-ground Floors</div></div><div class="field-value"><input id="above_ground_floors" placeholder="6"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Piętra podziemne</div><div class="field-label-en">Below-ground Floors</div></div><div class="field-value"><input id="below_ground_floors" placeholder="1"></div></div>
-    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Naziemne miejsca parkingowe</div><div class="field-label-en">Surface Parking Spaces</div></div><div class="field-value"><input id="surface_parking_spaces" placeholder="50"></div></div>
-    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Podziemne miejsca parkingowe</div><div class="field-label-en">Underground Parking Spaces</div></div><div class="field-value"><input id="underground_parking_spaces" placeholder="100"></div></div>
+    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Miejsca parkingowe</div><div class="field-label-en">Parking Spaces</div></div><div class="field-value"><input id="office_parking" placeholder="150"></div></div>
     <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Rok oddania do użytku</div><div class="field-label-en">Year of Completion</div></div><div class="field-value"><input id="year_completion" placeholder="2018"></div></div>
-    <div class="field-row office-only"><div class="field-label"><div class="field-label-pl">Centrum miasta [km]</div><div class="field-label-en">City Centre</div></div><div class="field-value"><input id="dist_city_center" placeholder="2"></div></div>
-    <div class="field-row"><div class="field-label"><div class="field-label-pl">Powierzchnia gruntu [m²]</div><div class="field-label-en">Land Area [m²]</div></div><div class="field-value"><input id="land_area" placeholder="50 000"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Numer działki</div><div class="field-label-en">Plot Number</div></div><div class="field-value"><input id="plot_number" placeholder="100/1, 101/2-5"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Obręb</div><div class="field-label-en">Precinct</div></div><div class="field-value"><input id="precinct" placeholder="0042"></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Gmina / Miasto</div><div class="field-label-en">Commune / City</div></div><div class="field-value"><input id="commune" placeholder="GDAŃSK"></div></div>
@@ -1572,12 +1572,13 @@ select:focus {
     <div class="field-row"><div class="field-label"><div class="field-label-pl">Rodzaj własności</div><div class="field-label-en">Type of Ownership</div></div><div class="field-value"><select id="ownership" class="select-ownership"><option value="">— wybierz —</option><option value="WŁASNOŚĆ">WŁASNOŚĆ</option><option value="UŻYTKOWANIE WIECZYSTE">UŻYTKOWANIE WIECZYSTE</option></select></div></div>
     <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-asking-price">Cena ofertowa [PLN]</div><div class="field-label-en">Asking Price</div></div><div class="field-value"><input id="asking_price" placeholder="10 000 000"><select id="asking_price_currency" onchange="updateCurrencyLabel('asking_price','Cena ofertowa')"><option value="PLN">PLN</option><option value="EUR">EUR</option></select></div></div>
     <div class="dist-grid">
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Lotnisko [km]</div><div class="field-label-en">Airport</div></div><div class="field-value"><input id="dist_airport" placeholder="10"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Autostrada [km]</div><div class="field-label-en">Expressway</div></div><div class="field-value"><input id="dist_expressway" placeholder="10"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Port [km]</div><div class="field-label-en">Port</div></div><div class="field-value"><input id="dist_port" placeholder="10"></div></div>
+      <div class="dist-cell office-only"><div class="field-label"><div class="field-label-pl">Centrum miasta [km]</div><div class="field-label-en">City Centre</div></div><div class="field-value"><input id="dist_city_center" placeholder="2"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl dist-railway-label">SKM / PKM [km]</div><div class="field-label-en dist-railway-label-en">SKM / PKM</div></div><div class="field-value"><input id="dist_railway" placeholder="2"></div></div>
       <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Droga krajowa [km]</div><div class="field-label-en">Highway</div></div><div class="field-value"><input id="dist_highway" placeholder="10"></div></div>
-      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Kolej [km]</div><div class="field-label-en">Railway</div></div><div class="field-value"><input id="dist_railway" placeholder="10"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl dist-expressway-label">Droga ekspresowa [km]</div><div class="field-label-en dist-expressway-label-en">Expressway</div></div><div class="field-value"><input id="dist_expressway" placeholder="10"></div></div>
+      <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Lotnisko [km]</div><div class="field-label-en">Airport</div></div><div class="field-value"><input id="dist_airport" placeholder="10"></div></div>
       <div class="dist-cell"><div class="field-label"><div class="field-label-pl">Komunikacja [m]</div><div class="field-label-en">Mass Transit</div></div><div class="field-value"><input id="dist_transit" placeholder="0,5"></div></div>
+      <div class="dist-cell warehouse-only"><div class="field-label"><div class="field-label-pl">Port [km]</div><div class="field-label-en">Port</div></div><div class="field-value"><input id="dist_port" placeholder="10"></div></div>
     </div>
     <div class="field-row field-row-wide"><div class="field-label"><div class="field-label-pl">Opis nieruchomości</div><div class="field-label-en">Property Description</div></div><div class="field-value"><textarea id="description" placeholder=""></textarea></div></div>
   </div>
@@ -2176,9 +2177,9 @@ var OFFICE_LOCATION_FIELD_CONFIG = [
   { key: 'building_class', upper: true },
   { key: 'above_ground_floors' },
   { key: 'below_ground_floors' },
-  { key: 'surface_parking_spaces' },
-  { key: 'underground_parking_spaces' },
+  { key: 'office_parking' },
   { key: 'year_completion' },
+  { key: 'asking_price' },
   { key: 'dist_city_center', noToggle: true },
   { key: 'dist_railway', noToggle: true },
   { key: 'dist_highway', noToggle: true },
@@ -2601,8 +2602,6 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initLandFieldToggles(); } catch (e) { console.error('initLandFieldToggles failed', e); }
   try { initBuildingFieldToggles(); } catch (e) { console.error('initBuildingFieldToggles failed', e); }
   try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
-  try { initOfficeLocationFieldToggles(); } catch (e) { console.error('initOfficeLocationFieldToggles failed', e); }
-  try { initOfficeIncomeExtraFieldToggles(); } catch (e) { console.error('initOfficeIncomeExtraFieldToggles failed', e); }
   try { initNumberFormatting(); } catch (e) { console.error('initNumberFormatting failed', e); }
   try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
   try { initMpzpResolutionComposer(); } catch (e) { console.error('initMpzpResolutionComposer failed', e); }
@@ -2627,8 +2626,8 @@ function updateCurrencyLabel(fieldId, baseName, suffix) {
 var NUMBER_FORMAT_FIELDS = [
   'land_area',
   'asking_price',
-  'dist_airport', 'dist_expressway', 'dist_port', 'dist_highway', 'dist_railway', 'dist_transit',
-  'building_footprint', 'total_area', 'parking_spots', 'warehouse_area', 'office_area',
+  'dist_city_center', 'dist_airport', 'dist_expressway', 'dist_port', 'dist_highway', 'dist_railway', 'dist_transit',
+  'building_footprint', 'total_area', 'parking_spots', 'warehouse_area', 'office_area', 'office_parking', 'office_gla',
   'asking_price_building',
   'num_tenants', 'noi', 'price_sale', 'rent_income', 'service_charge', 'gross_income'
 ];
@@ -4569,6 +4568,25 @@ function applyTemplateMode(key) {
   var isOffice = isOfficeTemplate();
   document.body.classList.toggle('template-office', isOffice);
 
+  // Remove any existing visibility toggles before re-initializing
+  document.querySelectorAll('.field-visible-switch').forEach(function(btn) { btn.remove(); });
+  document.querySelectorAll('.has-visibility-toggle').forEach(function(el) { el.classList.remove('has-visibility-toggle'); });
+  document.querySelectorAll('[data-land-visibility-toggle-ready]').forEach(function(el) { el.removeAttribute('data-land-visibility-toggle-ready'); });
+  document.querySelectorAll('[data-building-field]').forEach(function(el) { el.removeAttribute('data-visibility-toggle-ready'); });
+  document.querySelectorAll('[data-office-location-toggle-ready]').forEach(function(el) { el.removeAttribute('data-office-location-toggle-ready'); });
+  document.querySelectorAll('[data-income-visibility-toggle-ready]').forEach(function(el) { el.removeAttribute('data-income-visibility-toggle-ready'); });
+  document.querySelectorAll('[data-office-income-extra-toggle-ready]').forEach(function(el) { el.removeAttribute('data-office-income-extra-toggle-ready'); });
+
+  if (isOffice) {
+    try { initOfficeLocationFieldToggles(); } catch(e) { console.error(e); }
+    try { initOfficeIncomeExtraFieldToggles(); } catch(e) { console.error(e); }
+    try { initIncomeFieldToggles(); } catch(e) { console.error(e); }
+  } else {
+    try { initLandFieldToggles(); } catch(e) { console.error(e); }
+    try { initBuildingFieldToggles(); } catch(e) { console.error(e); }
+    try { initIncomeFieldToggles(); } catch(e) { console.error(e); }
+  }
+
   ['plot_number','precinct','commune','county','ownership'].forEach(function(id) {
     setInputRowVisible(id, !isOffice);
   });
@@ -4599,9 +4617,19 @@ function applyTemplateMode(key) {
     if (priceCur) priceCur.value = 'EUR';
     var askingCur = document.getElementById('asking_price_currency');
     if (askingCur) askingCur.value = 'EUR';
+    // Relabel distance fields for office
+    setTextBySelector('.dist-railway-label', 'SKM / PKM [km]');
+    setTextBySelector('.dist-railway-label-en', 'SKM / PKM');
+    setTextBySelector('.dist-expressway-label', 'Droga ekspresowa [km]');
+    setTextBySelector('.dist-expressway-label-en', 'Expressway');
   } else {
     var rentLabel2 = document.getElementById('label-rent-income');
     if (rentLabel2) updateCurrencyLabel('rent_income','Przychód z najmu','/m²');
+    // Relabel distance fields for warehouse
+    setTextBySelector('.dist-railway-label', 'Kolej [km]');
+    setTextBySelector('.dist-railway-label-en', 'Railway');
+    setTextBySelector('.dist-expressway-label', 'Autostrada [km]');
+    setTextBySelector('.dist-expressway-label-en', 'Expressway');
   }
 }
 
@@ -4690,7 +4718,7 @@ function writeValueIntoTableRow(rowXml, value) {
   if (/<a:t>/.test(rowXml)) {
     return rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/, '<a:t>' + safe + '</a:t>');
   }
-  var runXml = '<a:r><a:rPr lang="pl-PL" sz="1000" b="1" dirty="0"><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr><a:t>' + safe + '</a:t></a:r>';
+  var runXml = '<a:r><a:rPr lang="pl-PL" sz="1000" b="1" dirty="0"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr><a:t>' + safe + '</a:t></a:r>';
   if (rowXml.indexOf('<a:endParaRPr') !== -1) {
     return rowXml.replace(/<a:endParaRPr/, runXml + '<a:endParaRPr');
   }
@@ -4749,21 +4777,13 @@ function processOfficeCommonLocation(xml, includeDescription) {
 function processOfficeSlide2(xml) {
   xml = processOfficeCommonLocation(xml, true);
   // Table 1 has 7 rows matching slideMaster4 labels:
-  // Row 0: POWIERZCHNIA GRUNTU [m²] — land_area (usually empty for office)
+  // Row 0: POWIERZCHNIA GRUNTU [m²] — land_area
   // Row 1: POWIERZCHNIA NAJMU [m²] / GLA — office_gla
   // Row 2: KLASA BUDYNKU — building_class
   // Row 3: PIĘTRA NADZIEMNE — above_ground_floors
   // Row 4: PIĘTRA PODZIEMNE — below_ground_floors
-  // Row 5: MIEJSCA PARKINGOWE — combine surface + underground
+  // Row 5: MIEJSCA PARKINGOWE — office_parking
   // Row 6: ROK ODDANIA DO UŻYTKU — year_completion
-  var surfaceParking = getOfficeLocationValue('surface_parking_spaces');
-  var undergroundParking = getOfficeLocationValue('underground_parking_spaces');
-  var parkingCombined = '';
-  if (surfaceParking && undergroundParking) {
-    parkingCombined = surfaceParking + ' / ' + undergroundParking;
-  } else {
-    parkingCombined = surfaceParking || undergroundParking || '';
-  }
   xml = replaceTableByIndex(xml, 1, function(tableXml) {
     return replaceEmptyTableRowsText(tableXml, [
       getOfficeLocationValue('land_area'),
@@ -4771,12 +4791,12 @@ function processOfficeSlide2(xml) {
       getOfficeLocationValue('building_class', true),
       getOfficeLocationValue('above_ground_floors'),
       getOfficeLocationValue('below_ground_floors'),
-      parkingCombined,
+      getOfficeLocationValue('office_parking'),
       getOfficeLocationValue('year_completion')
     ]);
   });
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceEmptyTableRowsText(tableXml, [isLandFieldEnabled('asking_price') ? (val('asking_price') || val('price_sale')) : '']);
+    return replaceEmptyTableRowsText(tableXml, [isOfficeLocationFieldEnabled('asking_price') ? (val('asking_price') || val('price_sale')) : '']);
   });
   return xml;
 }
