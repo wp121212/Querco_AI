@@ -1333,6 +1333,12 @@ select:focus {
   background: #fff;
 }
 
+.gallery-slot.drag-over {
+  border-color: var(--q-navy);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(16,42,61,0.06);
+}
+
 .gallery-slot-index {
   font-family: 'Roboto', system-ui, sans-serif;
   font-size: 10px;
@@ -1695,16 +1701,8 @@ select:focus {
   <div class="card-body">
     <div class="slide6-stack">
       <div class="media-block" style="padding-top:0;border-bottom:none;">
-        <div class="gallery-drop" id="office-slide5-photos-upload" onclick="document.getElementById('office-slide5-photos-input').click()" ondragover="handleOfficePhotosDragOver(event)" ondragleave="handleOfficePhotosDragLeave(event)" ondrop="handleOfficePhotosDrop(event)">
-          <span class="gallery-drop-icon">🖼️</span>
-          <span class="gallery-drop-text">
-            <span class="gallery-drop-title">Dodaj zdjęcia</span>
-            <span class="gallery-drop-name" id="office-slide5-photos-count">0 / 8 dodanych</span>
-          </span>
-        </div>
-        <input type="file" id="office-slide5-photos-input" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficePhotosSelect(this.files)">
         <div class="gallery-slots-grid" id="office-slide5-photos-grid"></div>
-        <div class="media-block-note">Maksymalnie 8 zdjęć. Układ na slajdach 05 zostanie ustawiony automatycznie zgodnie z liczbą zdjęć.</div>
+        <div class="media-block-note" id="office-slide5-photos-count">0 / 8 dodanych. Każde pole przyjmuje jedno zdjęcie — kliknij albo przeciągnij plik na wybrane miejsce.</div>
       </div>
     </div>
   </div>
@@ -1725,16 +1723,8 @@ select:focus {
   <div class="card-body">
     <div class="slide6-stack">
       <div class="media-block" style="padding-top:0;border-bottom:none;">
-        <div class="gallery-drop" id="office-slide6-certs-upload" onclick="document.getElementById('office-slide6-certs-input').click()" ondragover="handleOfficeCertsDragOver(event)" ondragleave="handleOfficeCertsDragLeave(event)" ondrop="handleOfficeCertsDrop(event)">
-          <span class="gallery-drop-icon">🌿</span>
-          <span class="gallery-drop-text">
-            <span class="gallery-drop-title">Dodaj zielone certyfikaty</span>
-            <span class="gallery-drop-name" id="office-slide6-certs-count">0 / 2 dodanych</span>
-          </span>
-        </div>
-        <input type="file" id="office-slide6-certs-input" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficeCertsSelect(this.files)">
         <div class="gallery-slots-grid" id="office-slide6-certs-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));"></div>
-        <div class="media-block-note">Na slajdzie 06 może znaleźć się 1 lub 2 certyfikaty.</div>
+        <div class="media-block-note" id="office-slide6-certs-count">0 / 2 dodanych. Każde pole przyjmuje jeden certyfikat — kliknij albo przeciągnij plik na wybrane miejsce.</div>
       </div>
     </div>
   </div>
@@ -3984,29 +3974,139 @@ function handleOfficeFloorPlanSelect(files) {
 }
 function removeOfficeFloorPlan() { officeMediaState.floorPlan = { file: null, meta: null }; updateSingleUploadUi('office-slide4-plan-upload', 'office-slide4-plan-name', 'office-slide4-plan-remove', null, 'Przeciągnij albo kliknij — JPG, PNG, WEBP'); }
 
-function handleOfficePhotosDragOver(event) { bindDragClass(event, 'office-slide5-photos-upload', true); }
-function handleOfficePhotosDragLeave(event) { bindDragClass(event, 'office-slide5-photos-upload', false); }
-function handleOfficePhotosDrop(event) { bindDragClass(event, 'office-slide5-photos-upload', false); handleOfficePhotosSelect(event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null); }
-function handleOfficePhotosSelect(files) {
-  if (!files || !files.length) return;
-  addFilesToMediaArray(Array.prototype.slice.call(files), officeMediaState.photos, 8);
-  renderOfficePhotosSlots();
-  var input = document.getElementById('office-slide5-photos-input'); if (input) input.value = '';
-}
-function removeOfficePhoto(index) { if (index < 0 || index >= officeMediaState.photos.length) return; officeMediaState.photos.splice(index, 1); renderOfficePhotosSlots(); }
-function renderOfficePhotosSlots() { updateGalleryUploadUi('office-slide5-photos-upload', 'office-slide5-photos-count', officeMediaState.photos, 8); renderMediaSlots('office-slide5-photos-grid', officeMediaState.photos, 8, 'removeOfficePhoto'); }
 
-function handleOfficeCertsDragOver(event) { bindDragClass(event, 'office-slide6-certs-upload', true); }
-function handleOfficeCertsDragLeave(event) { bindDragClass(event, 'office-slide6-certs-upload', false); }
-function handleOfficeCertsDrop(event) { bindDragClass(event, 'office-slide6-certs-upload', false); handleOfficeCertsSelect(event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null); }
-function handleOfficeCertsSelect(files) {
-  if (!files || !files.length) return;
-  addFilesToMediaArray(Array.prototype.slice.call(files), officeMediaState.certificates, 2);
-  renderOfficeCertsSlots();
-  var input = document.getElementById('office-slide6-certs-input'); if (input) input.value = '';
+function setMediaSlot(arr, index, file, maxCount) {
+  if (index < 0 || index >= maxCount) return;
+  var err = validatePhotoFile(file);
+  if (err) { setStatus(err); return; }
+  var item = { file: file, meta: null };
+  arr[index] = item;
+  loadImageFromBlob(file).then(function(img) {
+    item.meta = { width: img.width, height: img.height };
+  }).catch(function(e) {
+    console.warn('[Office media slot meta error]', e);
+  });
 }
-function removeOfficeCert(index) { if (index < 0 || index >= officeMediaState.certificates.length) return; officeMediaState.certificates.splice(index, 1); renderOfficeCertsSlots(); }
-function renderOfficeCertsSlots() { updateGalleryUploadUi('office-slide6-certs-upload', 'office-slide6-certs-count', officeMediaState.certificates, 2); renderMediaSlots('office-slide6-certs-grid', officeMediaState.certificates, 2, 'removeOfficeCert'); }
+
+function getFilledMediaItems(arr) {
+  return (arr || []).filter(function(item) { return item && item.file; });
+}
+
+function countFilledMediaItems(arr) {
+  return getFilledMediaItems(arr).length;
+}
+
+function handleOfficePhotoSlotDragOver(event, index) {
+  event.preventDefault();
+  event.stopPropagation();
+  var slot = document.getElementById('office-photo-slot-' + index);
+  if (slot) slot.classList.add('drag-over');
+}
+
+function handleOfficePhotoSlotDragLeave(event, index) {
+  event.preventDefault();
+  event.stopPropagation();
+  var slot = document.getElementById('office-photo-slot-' + index);
+  if (slot) slot.classList.remove('drag-over');
+}
+
+function handleOfficePhotoSlotDrop(event, index) {
+  event.preventDefault();
+  event.stopPropagation();
+  var slot = document.getElementById('office-photo-slot-' + index);
+  if (slot) slot.classList.remove('drag-over');
+  var files = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
+  handleOfficePhotoSlotSelect(files, index);
+}
+
+function handleOfficePhotoSlotSelect(files, index) {
+  if (!files || !files.length) return;
+  setMediaSlot(officeMediaState.photos, index, files[0], 8);
+  renderOfficePhotosSlots();
+  var input = document.getElementById('office-photo-input-' + index);
+  if (input) input.value = '';
+}
+
+function removeOfficePhoto(index) {
+  if (index < 0 || index >= 8) return;
+  officeMediaState.photos[index] = null;
+  renderOfficePhotosSlots();
+}
+
+function renderOfficePhotosSlots() {
+  var grid = document.getElementById('office-slide5-photos-grid');
+  var countEl = document.getElementById('office-slide5-photos-count');
+  var count = countFilledMediaItems(officeMediaState.photos);
+  if (countEl) countEl.textContent = count + ' / 8 dodanych. Każde pole przyjmuje jedno zdjęcie — kliknij albo przeciągnij plik na wybrane miejsce.';
+  if (!grid) return;
+  var html = '';
+  for (var i = 0; i < 8; i++) {
+    var item = officeMediaState.photos[i];
+    html += '' +
+      '<div class="gallery-slot ' + (item ? 'filled' : '') + '" id="office-photo-slot-' + i + '" onclick="document.getElementById(\'office-photo-input-' + i + '\').click()" ondragover="handleOfficePhotoSlotDragOver(event,' + i + ')" ondragleave="handleOfficePhotoSlotDragLeave(event,' + i + ')" ondrop="handleOfficePhotoSlotDrop(event,' + i + ')">' +
+        '<div class="gallery-slot-index">Zdjęcie ' + (i + 1) + '</div>' +
+        (item ? '<button type="button" class="gallery-slot-remove" onclick="event.stopPropagation();removeOfficePhoto(' + i + ')">×</button><div class="gallery-slot-name">' + escapeXmlText(item.file && item.file.name ? item.file.name : 'Zdjęcie') + '</div>' : '<div class="gallery-slot-empty">Kliknij albo przeciągnij zdjęcie</div>') +
+        '<input type="file" id="office-photo-input-' + i + '" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficePhotoSlotSelect(this.files,' + i + ')">' +
+      '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function handleOfficeCertSlotDragOver(event, index) {
+  event.preventDefault();
+  event.stopPropagation();
+  var slot = document.getElementById('office-cert-slot-' + index);
+  if (slot) slot.classList.add('drag-over');
+}
+
+function handleOfficeCertSlotDragLeave(event, index) {
+  event.preventDefault();
+  event.stopPropagation();
+  var slot = document.getElementById('office-cert-slot-' + index);
+  if (slot) slot.classList.remove('drag-over');
+}
+
+function handleOfficeCertSlotDrop(event, index) {
+  event.preventDefault();
+  event.stopPropagation();
+  var slot = document.getElementById('office-cert-slot-' + index);
+  if (slot) slot.classList.remove('drag-over');
+  var files = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
+  handleOfficeCertSlotSelect(files, index);
+}
+
+function handleOfficeCertSlotSelect(files, index) {
+  if (!files || !files.length) return;
+  setMediaSlot(officeMediaState.certificates, index, files[0], 2);
+  renderOfficeCertsSlots();
+  var input = document.getElementById('office-cert-input-' + index);
+  if (input) input.value = '';
+}
+
+function removeOfficeCert(index) {
+  if (index < 0 || index >= 2) return;
+  officeMediaState.certificates[index] = null;
+  renderOfficeCertsSlots();
+}
+
+function renderOfficeCertsSlots() {
+  var grid = document.getElementById('office-slide6-certs-grid');
+  var countEl = document.getElementById('office-slide6-certs-count');
+  var count = countFilledMediaItems(officeMediaState.certificates);
+  if (countEl) countEl.textContent = count + ' / 2 dodanych. Każde pole przyjmuje jeden certyfikat — kliknij albo przeciągnij plik na wybrane miejsce.';
+  if (!grid) return;
+  var html = '';
+  for (var i = 0; i < 2; i++) {
+    var item = officeMediaState.certificates[i];
+    html += '' +
+      '<div class="gallery-slot ' + (item ? 'filled' : '') + '" id="office-cert-slot-' + i + '" onclick="document.getElementById(\'office-cert-input-' + i + '\').click()" ondragover="handleOfficeCertSlotDragOver(event,' + i + ')" ondragleave="handleOfficeCertSlotDragLeave(event,' + i + ')" ondrop="handleOfficeCertSlotDrop(event,' + i + ')">' +
+        '<div class="gallery-slot-index">Certyfikat ' + (i + 1) + '</div>' +
+        (item ? '<button type="button" class="gallery-slot-remove" onclick="event.stopPropagation();removeOfficeCert(' + i + ')">×</button><div class="gallery-slot-name">' + escapeXmlText(item.file && item.file.name ? item.file.name : 'Certyfikat') + '</div>' : '<div class="gallery-slot-empty">Kliknij albo przeciągnij certyfikat</div>') +
+        '<input type="file" id="office-cert-input-' + i + '" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" style="display:none" onchange="handleOfficeCertSlotSelect(this.files,' + i + ')">' +
+      '</div>';
+  }
+  grid.innerHTML = html;
+}
 
 function getOfficeSingleImageBox(presentationXml) {
   var size = getSlideSizeFromPresentation(presentationXml);
@@ -4100,8 +4200,9 @@ async function insertOfficeMediaSlides(zip) {
     }, 'office_slide4_floorplan');
   }
 
-  if (officeSlide5Active && officeMediaState.photos.length) {
-    var layoutGroups = getOfficePhotoLayouts(officeMediaState.photos);
+  var filledOfficePhotos = getFilledMediaItems(officeMediaState.photos);
+  if (officeSlide5Active && filledOfficePhotos.length) {
+    var layoutGroups = getOfficePhotoLayouts(filledOfficePhotos);
     var slideNumbers = [5];
     for (var gi = 1; gi < layoutGroups.length; gi++) {
       var currentPresXml = await zip.file('ppt/presentation.xml').async('string');
@@ -4130,8 +4231,9 @@ async function insertOfficeMediaSlides(zip) {
     }
   }
 
-  if (officeSlide6Active && officeMediaState.certificates.length) {
-    var certItems = officeMediaState.certificates.slice(0, 2);
+  var filledOfficeCerts = getFilledMediaItems(officeMediaState.certificates).slice(0, 2);
+  if (officeSlide6Active && filledOfficeCerts.length) {
+    var certItems = filledOfficeCerts;
     var singleCertBox = getOfficeSingleImageBox(presXml);
     var twoCertBoxes = getOfficeTwoImageBoxes(presXml);
     var certBuilder = certItems.length === 1
