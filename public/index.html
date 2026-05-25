@@ -2602,6 +2602,8 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initLandFieldToggles(); } catch (e) { console.error('initLandFieldToggles failed', e); }
   try { initBuildingFieldToggles(); } catch (e) { console.error('initBuildingFieldToggles failed', e); }
   try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
+  try { initOfficeLocationFieldToggles(); } catch (e) { console.error('initOfficeLocationFieldToggles failed', e); }
+  try { initOfficeIncomeExtraFieldToggles(); } catch (e) { console.error('initOfficeIncomeExtraFieldToggles failed', e); }
   try { initNumberFormatting(); } catch (e) { console.error('initNumberFormatting failed', e); }
   try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
   try { initMpzpResolutionComposer(); } catch (e) { console.error('initMpzpResolutionComposer failed', e); }
@@ -3072,10 +3074,17 @@ function setSlideActive(section, active) {
   if (section === 'office-slide5') officeSlide5Active = active;
   if (section === 'office-slide6') officeSlide6Active = active;
 
-  var num = section.replace('slide', '');
-  var toggle = document.getElementById('toggle' + num);
-  var fields = document.getElementById('sec' + num + '-fields');
-  var dot = toggle ? toggle.querySelector('.toggle-dot') : null;
+  var toggle, fields, dot;
+  if (section.indexOf('office-') === 0) {
+    var officeNum = section.replace('office-slide', '');
+    toggle = document.getElementById('toggleOffice' + officeNum);
+    fields = document.getElementById('sec-office-slide' + officeNum);
+  } else {
+    var num = section.replace('slide', '');
+    toggle = document.getElementById('toggle' + num);
+    fields = document.getElementById('sec' + num + '-fields');
+  }
+  dot = toggle ? toggle.querySelector('.toggle-dot') : null;
 
   if (toggle) toggle.style.background = active ? '#102A3D' : '#ccc';
   if (dot) dot.style.left = active ? '18px' : '2px';
@@ -3899,6 +3908,9 @@ function addAdditionalGalleryFiles(files) {
 
   renderAdditionalGallerySlots();
 
+  if (warnings.length) setStatus(warnings.join(' '));
+}
+
 /* ===== OFFICE SUPPLEMENTARY MEDIA ===== */
 function updateSingleUploadUi(uploadId, nameId, removeId, file, emptyText) {
   var upload = document.getElementById(uploadId);
@@ -4245,9 +4257,6 @@ async function insertOfficeMediaSlides(zip) {
 
 renderOfficePhotosSlots();
 renderOfficeCertsSlots();
-
-  if (warnings.length) setStatus(warnings.join(' '));
-}
 
 function removeAdditionalGalleryPhoto(index) {
   if (index < 0 || index >= supplementarySlideState.gallery.length) return;
