@@ -1667,6 +1667,30 @@ select:focus {
 .spec-switch span { position: relative; z-index: 1; width: 46px; text-align: center; pointer-events: none; }
 @media (max-width: 760px) { .spec-grid { grid-template-columns: 1fr; } .spec-grid .field-row { border-right: none; } }
 
+
+/* === FIX: WAREHOUSE RENT DISTANCE PICKER FULL WIDTH === */
+.template-warehouse-rent .wr-distance-picker.warehouse-rent-only {
+  display: grid !important;
+  width: 100%;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+.template-warehouse-rent .wr-distance-tile {
+  width: 100%;
+}
+.template-warehouse-rent .wr-distance-icon {
+  width: 58px;
+  height: 58px;
+}
+.template-warehouse-rent .wr-distance-input {
+  width: 64px;
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .template-warehouse-rent .wr-distance-picker.warehouse-rent-only {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 760px) {
   .header { padding: 0 18px; min-height: 58px; }
