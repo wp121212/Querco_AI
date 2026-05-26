@@ -5849,11 +5849,19 @@ function clearWarehouseRentDistancePlaceholderTexts(xml) {
     .replace(/<a:t>\s*KM\s*<\/a:t>/g, '<a:t></a:t>')
     .replace(/<a:t>\s*X\s*KM\s*<\/a:t>/g, '<a:t></a:t>');
 }
-function buildWarehouseRentDistanceValueBoxXml(textValue, x, y, idx) {
+function buildWarehouseRentDistanceValueBoxXml(distanceValue, x, y, idx) {
+  var value = String(distanceValue || '').trim();
+  var safeValue = escapeXmlText(value);
+  // Distance labels in warehouse-rent PPTX must always stay fixed:
+  // Lato, 7 pt, centered. The broker enters only the numeric distance;
+  // KM is rendered as a fixed unit below it.
+  var runPr = '<a:rPr lang="pl-PL" sz="700" b="0" dirty="0"><a:solidFill><a:srgbClr val="102A3D"/></a:solidFill><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr>';
+  var valueRun = value ? ('<a:r>' + runPr + '<a:t>' + safeValue + '</a:t></a:r><a:br/>') : '';
+  var unitRun = '<a:r>' + runPr + '<a:t>KM</a:t></a:r>';
   return '<p:sp>' +
     '<p:nvSpPr><p:cNvPr id="' + (9200 + idx) + '" name="WR distance value ' + (idx + 1) + '"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>' +
     '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + WR_DISTANCE_TEXT_CX + '" cy="' + WR_DISTANCE_TEXT_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>' +
-    '<p:txBody><a:bodyPr anchor="ctr"/><a:lstStyle/><a:p><a:pPr algn="ctr"/><a:r><a:rPr lang="pl-PL" sz="1600" b="1"><a:solidFill><a:srgbClr val="102A3D"/></a:solidFill><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr><a:t>' + escapeXmlText(textValue || '') + '</a:t></a:r></a:p></p:txBody>' +
+    '<p:txBody><a:bodyPr anchor="ctr"/><a:lstStyle/><a:p><a:pPr algn="ctr"/>' + valueRun + unitRun + '</a:p></p:txBody>' +
     '</p:sp>';
 }
 function applyWarehouseRentDistanceLayout(xml) {
@@ -5872,7 +5880,7 @@ function applyWarehouseRentDistanceLayout(xml) {
   var valueBoxes = '';
   positions.forEach(function(p, i) {
     var v = values[i] || '';
-    valueBoxes += buildWarehouseRentDistanceValueBoxXml(v ? (v + ' KM') : '', p.tx, p.ty, i);
+    valueBoxes += buildWarehouseRentDistanceValueBoxXml(v, p.tx, p.ty, i);
   });
   if (valueBoxes) xml = xml.replace('</p:spTree>', valueBoxes + '</p:spTree>');
   return xml;
