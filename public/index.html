@@ -5794,7 +5794,7 @@ function applyWarehouseRentDistanceIconsToZip(zip) {
 /* Dynamic PPTX layout for warehouse-rent distance icons.
    The left distance rail is rebuilt depending on the number of selected icons:
    1 = one centered item, 2 = vertical pair around the map centreline,
-   3 = vertical stack, 4 = 2x2, 5 = 2x2 + centered bottom, 6 = 2x3. */
+   3 = vertical stack, 4 = 2 on top + 2 near map centreline, 5 = 2x2 + centered bottom, 6 = 2x3. */
 var WR_DISTANCE_PIC_PLACEHOLDER_IDXS = ['12','13','14','15','16','17'];
 var WR_DISTANCE_ICON_CX = 455612;
 var WR_DISTANCE_ICON_CY = 427038;
@@ -5832,17 +5832,28 @@ function getWarehouseRentDistanceLayout(count) {
   };
   return layouts[count] || [];
 }
-function buildWarehouseRentPicSpPr(x, y, cx, cy) {
-  return '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>';
+function buildWarehouseRentDistancePicXml(relId, x, y, idx) {
+  var name = 'WR distance icon ' + (idx + 1);
+  return '<p:pic>' +
+    '<p:nvPicPr><p:cNvPr id="' + (9100 + idx) + '" name="' + name + '"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>' +
+    '<p:blipFill><a:blip r:embed="' + relId + '"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></p:blipFill>' +
+    '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + WR_DISTANCE_ICON_CX + '" cy="' + WR_DISTANCE_ICON_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>' +
+    '</p:pic>';
 }
-function replaceWarehouseRentPlaceholderPicPosition(xml, idx, x, y, cx, cy) {
-  var re = new RegExp('<p:pic>(?:(?!</p:pic>)[\\s\\S])*?<p:ph[^>]*idx="' + idx + '"(?:(?!</p:pic>)[\\s\\S])*?</p:pic>');
-  return xml.replace(re, function(shapeXml) {
-    var spPr = buildWarehouseRentPicSpPr(x, y, cx, cy);
-    if (/<p:spPr\s*\/>/.test(shapeXml)) return shapeXml.replace(/<p:spPr\s*\/>/, spPr);
-    if (/<p:spPr>[\s\S]*?<\/p:spPr>/.test(shapeXml)) return shapeXml.replace(/<p:spPr>[\s\S]*?<\/p:spPr>/, spPr);
-    return shapeXml.replace('</p:pic>', spPr + '</p:pic>');
+function getWarehouseRentDistanceRelIds(xml) {
+  return WR_DISTANCE_PIC_PLACEHOLDER_IDXS.map(function(idx, i) {
+    var re = new RegExp('<p:pic>(?:(?!</p:pic>)[\\s\\S])*?<p:ph[^>]*idx="' + idx + '"(?:(?!</p:pic>)[\\s\\S])*?</p:pic>');
+    var match = xml.match(re);
+    var relMatch = match && match[0].match(/r:embed="([^"]+)"/);
+    return relMatch ? relMatch[1] : ('rId' + (3 + i));
   });
+}
+function removeWarehouseRentDistancePlaceholderPics(xml) {
+  WR_DISTANCE_PIC_PLACEHOLDER_IDXS.forEach(function(idx) {
+    var re = new RegExp('<p:pic>(?:(?!</p:pic>)[\\s\\S])*?<p:ph[^>]*idx="' + idx + '"(?:(?!</p:pic>)[\\s\\S])*?</p:pic>', 'g');
+    xml = xml.replace(re, '');
+  });
+  return xml;
 }
 function clearWarehouseRentDistancePlaceholderTexts(xml) {
   return xml
@@ -5868,21 +5879,25 @@ function applyWarehouseRentDistanceLayout(xml) {
   var selected = getSelectedWarehouseRentDistances();
   var values = getWarehouseRentDistanceValues();
   var positions = getWarehouseRentDistanceLayout(selected.length);
+  var relIds = getWarehouseRentDistanceRelIds(xml);
+
+  // Rebuild distance icons as regular pictures instead of PowerPoint picture placeholders.
+  // This prevents empty "insert picture" placeholder frames and fully removes unused icons.
   xml = clearWarehouseRentDistancePlaceholderTexts(xml);
-  WR_DISTANCE_PIC_PLACEHOLDER_IDXS.forEach(function(idx, i) {
-    var p = positions[i];
-    if (p) {
-      xml = replaceWarehouseRentPlaceholderPicPosition(xml, idx, p.x, p.y, WR_DISTANCE_ICON_CX, WR_DISTANCE_ICON_CY);
-    } else {
-      xml = replaceWarehouseRentPlaceholderPicPosition(xml, idx, WR_DISTANCE_HIDDEN_X, WR_DISTANCE_HIDDEN_Y, 1, 1);
-    }
+  xml = removeWarehouseRentDistancePlaceholderPics(xml);
+
+  var iconShapes = '';
+  positions.forEach(function(p, i) {
+    iconShapes += buildWarehouseRentDistancePicXml(relIds[i] || ('rId' + (3 + i)), p.x, p.y, i);
   });
+
   var valueBoxes = '';
   positions.forEach(function(p, i) {
     var v = values[i] || '';
     valueBoxes += buildWarehouseRentDistanceValueBoxXml(v, p.tx, p.ty, i);
   });
-  if (valueBoxes) xml = xml.replace('</p:spTree>', valueBoxes + '</p:spTree>');
+
+  if (iconShapes || valueBoxes) xml = xml.replace('</p:spTree>', iconShapes + valueBoxes + '</p:spTree>');
   return xml;
 }
 updateWarehouseRentDistanceUi();
