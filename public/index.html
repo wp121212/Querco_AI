@@ -5793,7 +5793,7 @@ function applyWarehouseRentDistanceIconsToZip(zip) {
 
 /* Dynamic PPTX layout for warehouse-rent distance icons.
    The left distance rail is rebuilt depending on the number of selected icons:
-   1 = one centered item, 2 = vertical pair around the map centreline,
+   1 = one centered item, 2 = two icons on the top row,
    3 = vertical stack, 4 = 2 on top + 2 near map centreline, 5 = 2x2 + centered bottom, 6 = 2x3. */
 var WR_DISTANCE_PIC_PLACEHOLDER_IDXS = ['12','13','14','15','16','17'];
 var WR_DISTANCE_ICON_CX = 455612;
@@ -5824,7 +5824,7 @@ function getWarehouseRentDistanceLayout(count) {
   var tB = WR_DISTANCE_TEXT_Y_BOTTOM;
   var layouts = {
     1: [{ x:C, y:T, tx:C, ty:tT }],
-    2: [{ x:C, y:T, tx:C, ty:tT }, { x:C, y:B, tx:C, ty:tB }],
+    2: [{ x:L, y:T, tx:L, ty:tT }, { x:R, y:T, tx:R, ty:tT }],
     3: [{ x:C, y:T, tx:C, ty:tT }, { x:C, y:M, tx:C, ty:tM }, { x:C, y:B, tx:C, ty:tB }],
     4: [{ x:L, y:T, tx:L, ty:tT }, { x:R, y:T, tx:R, ty:tT }, { x:L, y:M, tx:L, ty:tM }, { x:R, y:M, tx:R, ty:tM }],
     5: [{ x:L, y:T, tx:L, ty:tT }, { x:R, y:T, tx:R, ty:tT }, { x:L, y:M, tx:L, ty:tM }, { x:R, y:M, tx:R, ty:tM }, { x:C, y:B, tx:C, ty:tB }],
