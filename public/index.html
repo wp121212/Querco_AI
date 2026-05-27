@@ -1992,6 +1992,41 @@ select:focus {
   .logo img { height: 24px; }
 }
 
+
+
+/* === FINAL FIX: visible Polish labels + darker KM === */
+.template-warehouse-rent .wr-distance-tile {
+  min-height: 228px;
+  align-content: start;
+}
+.template-warehouse-rent .wr-distance-label {
+  display: block !important;
+  width: 100%;
+  min-height: 18px;
+  margin: 4px 0 2px;
+  text-align: center;
+  color: #17212b !important;
+  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
+  font-size: 8px;
+  line-height: 1.1;
+  letter-spacing: .08em;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.template-warehouse-rent .wr-distance-input {
+  margin-top: 2px;
+}
+.template-warehouse-rent .wr-distance-unit {
+  display: block !important;
+  width: 100%;
+  text-align: center;
+  color: #111827 !important;
+  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
 </style>
 </head>
 <body>
@@ -6102,6 +6137,8 @@ function applyWarehouseRentDistanceLayout(xml) {
   if (iconShapes || valueBoxes) xml = xml.replace('</p:spTree>', iconShapes + valueBoxes + '</p:spTree>');
   return xml;
 }
+enhanceWarehouseRentDistanceTiles();
+reorderWarehouseRentDistanceTiles();
 updateWarehouseRentDistanceUi();
 
 /* ===== WAREHOUSE RENT TEMPLATE PROCESSORS ===== */
