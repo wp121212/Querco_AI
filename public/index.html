@@ -2075,6 +2075,29 @@ select:focus {
 }
 
 
+
+
+/* === WAREHOUSE RENT: split section 03 into stacked areas/rents + 2-col spec === */
+.template-warehouse-rent .card.warehouse-rent-only {
+  display: block !important;
+}
+.template-warehouse-rent #warehouse-rent-area-rent-fields .field-row {
+  display: flex;
+}
+.template-warehouse-rent #sec-warehouse-rent-spec .spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.template-warehouse-rent #sec-warehouse-rent-spec .field-row {
+  min-height: 62px;
+}
+.template-warehouse-rent #sec-warehouse-rent-spec .field-label {
+  flex: 0 0 48%;
+}
+@media (max-width: 760px) {
+  .template-warehouse-rent #sec-warehouse-rent-spec .spec-grid { grid-template-columns: 1fr; }
+  .template-warehouse-rent #sec-warehouse-rent-spec .spec-grid .field-row { border-right: none; }
+}
 </style>
 </head>
 <body>
@@ -2366,28 +2389,38 @@ select:focus {
 </div>
 
 
-<!-- WAREHOUSE RENT: POWIERZCHNIE / CZYNSZE / SPECYFIKACJA -->
+<!-- WAREHOUSE RENT: POWIERZCHNIE / CZYNSZE -->
 <div class="card warehouse-rent-only" id="sec-warehouse-rent-details">
   <div class="card-header">
     <div class="card-header-left">
       <span class="card-num">03</span>
-      <div class="card-title-block"><div class="card-title">Powierzchnie / czynsze / specyfikacja</div><div class="card-title-en">Areas / Rents / Technical Specification</div></div>
+      <div class="card-title-block"><div class="card-title">Powierzchnie i czynsze</div><div class="card-title-en">Areas / Rents</div></div>
+    </div>
+  </div>
+  <div class="card-body" id="warehouse-rent-area-rent-fields">
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. całkowita budynku</div><div class="field-label-en">Total Building Area</div></div><div class="field-value"><input id="wr_total_building_area" placeholder="20 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Prop. pow. magazynu</div><div class="field-label-en">Offered Warehouse Area</div></div><div class="field-value"><input id="wr_warehouse_area" placeholder="5 000"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Prop. pow. biura</div><div class="field-label-en">Offered Office Area</div></div><div class="field-value"><input id="wr_office_area" placeholder="300"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl">Dostępność powierzchni</div><div class="field-label-en">Availability From</div></div><div class="field-value"><input id="wr_availability" placeholder="Q1 2027"></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-warehouse-base-rent">Czynsz bazowy magazyn [EUR/m²]</div><div class="field-label-en">Warehouse Base Rent</div></div><div class="field-value"><input id="wr_warehouse_base_rent" placeholder="4,50"><select id="wr_warehouse_base_rent_currency"><option value="EUR" selected>EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-warehouse-effective-rent">Czynsz efektywny magazyn [EUR/m²]</div><div class="field-label-en">Warehouse Effective Rent</div></div><div class="field-value"><input id="wr_warehouse_effective_rent" placeholder="4,10"><select id="wr_warehouse_effective_rent_currency"><option value="EUR" selected>EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-office-base-rent">Czynsz bazowy biuro [EUR/m²]</div><div class="field-label-en">Office Base Rent</div></div><div class="field-value"><input id="wr_office_base_rent" placeholder="10,00"><select id="wr_office_base_rent_currency"><option value="EUR" selected>EUR</option><option value="PLN">PLN</option></select></div></div>
+    <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-service-charge">Opłata eksploatacyjna [PLN/m²]</div><div class="field-label-en">Service Charge</div></div><div class="field-value"><input id="wr_service_charge" placeholder="7,50"><select id="wr_service_charge_currency"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option></select></div></div>
+  </div>
+</div>
+
+<!-- WAREHOUSE RENT: SPECYFIKACJA TECHNICZNA -->
+<div class="card warehouse-rent-only" id="sec-warehouse-rent-spec">
+  <div class="card-header">
+    <div class="card-header-left">
+      <span class="card-num">04</span>
+      <div class="card-title-block"><div class="card-title">Specyfikacja techniczna</div><div class="card-title-en">Technical Specification</div></div>
     </div>
   </div>
   <div class="card-body">
-    <div class="param-grid">
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Pow. całkowita budynku</div><div class="field-label-en">Total Building Area</div></div><div class="field-value"><input id="wr_total_building_area" placeholder="20 000"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Prop. pow. magazynu</div><div class="field-label-en">Offered Warehouse Area</div></div><div class="field-value"><input id="wr_warehouse_area" placeholder="5 000"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Prop. pow. biura</div><div class="field-label-en">Offered Office Area</div></div><div class="field-value"><input id="wr_office_area" placeholder="300"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Dostępność powierzchni</div><div class="field-label-en">Availability From</div></div><div class="field-value"><input id="wr_availability" placeholder="Q1 2027"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-warehouse-base-rent">Czynsz bazowy magazyn [EUR/m²]</div><div class="field-label-en">Warehouse Base Rent</div></div><div class="field-value"><input id="wr_warehouse_base_rent" placeholder="4,50"><select id="wr_warehouse_base_rent_currency"><option value="EUR" selected>EUR</option><option value="PLN">PLN</option></select></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-warehouse-effective-rent">Czynsz efektywny magazyn [EUR/m²]</div><div class="field-label-en">Warehouse Effective Rent</div></div><div class="field-value"><input id="wr_warehouse_effective_rent" placeholder="4,10"><select id="wr_warehouse_effective_rent_currency"><option value="EUR" selected>EUR</option><option value="PLN">PLN</option></select></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-office-base-rent">Czynsz bazowy biuro [EUR/m²]</div><div class="field-label-en">Office Base Rent</div></div><div class="field-value"><input id="wr_office_base_rent" placeholder="10,00"><select id="wr_office_base_rent_currency"><option value="EUR" selected>EUR</option><option value="PLN">PLN</option></select></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl" id="label-wr-service-charge">Opłata eksploatacyjna [PLN/m²]</div><div class="field-label-en">Service Charge</div></div><div class="field-value"><input id="wr_service_charge" placeholder="7,50"><select id="wr_service_charge_currency"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option></select></div></div>
+    <div class="spec-grid" id="warehouse-rent-spec-grid">
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Wysokość</div><div class="field-label-en">Clear Height</div></div><div class="field-value"><input id="wr_clear_height" placeholder="10"></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Nośność posadzki</div><div class="field-label-en">Floor Loading</div></div><div class="field-value"><input id="wr_floor_loading" placeholder="5"></div></div>
-    </div>
-    <div class="spec-grid" id="warehouse-rent-spec-grid">
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Ogrzewanie</div><div class="field-label-en">Heating</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="heating" onclick="toggleWarehouseRentSpec('heating')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Tryskacze</div><div class="field-label-en">Sprinklers</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="sprinklers" onclick="toggleWarehouseRentSpec('sprinklers')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Klapy dymowe</div><div class="field-label-en">Smoke Vents</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="smoke_vents" onclick="toggleWarehouseRentSpec('smoke_vents')"><span>✕</span><span>✓</span></button></div></div>
@@ -5430,6 +5463,7 @@ function applyTemplateMode(key) {
   setSectionVisible('sec-slide5', isWarehouse || isGroundSale || isHotel);
   setSectionVisible('sec-slide6', isWarehouse || isWarehouseRent);
   setSectionVisible('sec-warehouse-rent-details', isWarehouseRent);
+  setSectionVisible('sec-warehouse-rent-spec', isWarehouseRent);
   setSectionVisible('sec-office-slide4', isOffice || isHotel);
   setSectionVisible('sec-office-slide5', isOffice || isHotel);
   setSectionVisible('sec-office-slide6', isOffice);
