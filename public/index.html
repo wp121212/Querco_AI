@@ -2041,6 +2041,29 @@ select:focus {
   -webkit-text-fill-color: #c8ced6 !important;
   opacity: 1;
 }
+
+
+/* === WAREHOUSE RENT DISTANCE LIMIT TOOLTIP === */
+.wr-limit-tooltip {
+  position: fixed;
+  z-index: 99999;
+  max-width: 245px;
+  padding: 10px 12px;
+  background: #102A3D;
+  color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 8px 22px rgba(15, 35, 50, .22);
+  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: .01em;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(10px, 10px);
+  transition: opacity .12s ease;
+}
+.wr-limit-tooltip.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -5946,6 +5969,58 @@ function reorderWarehouseRentDistanceTiles() {
   });
 }
 
+
+function getWarehouseRentLimitTooltipEl() {
+  var el = document.getElementById('wr-limit-tooltip');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'wr-limit-tooltip';
+    el.className = 'wr-limit-tooltip';
+    el.textContent = 'Limit: maks. 6 ikon w prezentacji. Odznacz jedną z wybranych, aby dodać inną.';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function showWarehouseRentLimitTooltip(e) {
+  var el = getWarehouseRentLimitTooltipEl();
+  el.classList.add('show');
+  moveWarehouseRentLimitTooltip(e);
+}
+
+function moveWarehouseRentLimitTooltip(e) {
+  var el = getWarehouseRentLimitTooltipEl();
+  var x = (e && e.clientX ? e.clientX : 0) + 14;
+  var y = (e && e.clientY ? e.clientY : 0) + 14;
+  if (x + 260 > window.innerWidth) x = Math.max(12, (e.clientX || 0) - 260);
+  if (y + 80 > window.innerHeight) y = Math.max(12, (e.clientY || 0) - 80);
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+}
+
+function hideWarehouseRentLimitTooltip() {
+  var el = document.getElementById('wr-limit-tooltip');
+  if (el) el.classList.remove('show');
+}
+
+function bindWarehouseRentLimitTooltips() {
+  var picker = document.getElementById('wr-distance-picker');
+  if (!picker || picker.dataset.limitTooltipBound === '1') return;
+  picker.dataset.limitTooltipBound = '1';
+  picker.addEventListener('mousemove', function(e) {
+    var tile = e.target.closest && e.target.closest('[data-wr-dist-tile]');
+    if (!tile) { hideWarehouseRentLimitTooltip(); return; }
+    var key = tile.getAttribute('data-wr-dist-tile');
+    var selected = getSelectedWarehouseRentDistances();
+    if (!warehouseRentDistanceState[key] && selected.length >= 6) {
+      showWarehouseRentLimitTooltip(e);
+    } else {
+      hideWarehouseRentLimitTooltip();
+    }
+  });
+  picker.addEventListener('mouseleave', hideWarehouseRentLimitTooltip);
+}
+
 function updateWarehouseRentDistanceUi() {
   var selected = getSelectedWarehouseRentDistances();
   WAREHOUSE_RENT_DISTANCE_ORDER.forEach(function(key){
@@ -5967,6 +6042,7 @@ function toggleWarehouseRentDistance(key) {
   if (!warehouseRentDistanceState[key] && selected.length >= 6) {
     enhanceWarehouseRentDistanceTiles();
 reorderWarehouseRentDistanceTiles();
+bindWarehouseRentLimitTooltips();
 updateWarehouseRentDistanceUi();
     return;
   }
