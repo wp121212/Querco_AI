@@ -2638,6 +2638,160 @@ var officeMediaState = {
   certificates: []
 };
 
+
+/* ===== WAREHOUSE RENT SECTION 03 FIELD VISIBILITY ===== */
+var WAREHOUSE_RENT_AREA_FIELD_CONFIG = [
+  { key: 'wr_total_building_area', plFallback: 'POWIERZCHNIA CAŁKOWITA BUDYNKU', enFallback: 'TOTAL BUILDING AREA [M²]' },
+  { key: 'wr_warehouse_area', plFallback: 'PROPONOWANA POWIERZCHNIA MAGAZYNU', enFallback: 'OFFERED WAREHOUSE AREA [M²]' },
+  { key: 'wr_office_area', plFallback: 'PROPONOWANA POWIERZCHNIA BIURA', enFallback: 'OFFERED OFFICE AREA [M²]' },
+  { key: 'wr_availability', plFallback: 'DOSTĘPNOŚĆ POWIERZCHNI', enFallback: 'SPACE AVAILABILITY FROM' }
+];
+var WAREHOUSE_RENT_RENT_FIELD_CONFIG = [
+  { key: 'wr_warehouse_base_rent', plFallback: 'CZYNSZ BAZOWY MAGAZYN', enFallback: 'WAREHOUSE BASE RENT [M²]' },
+  { key: 'wr_warehouse_effective_rent', plFallback: 'CZYNSZ EFEKTYWNY MAGAZYN', enFallback: 'WAREHOUSE EFFECTIVE RENT [M²]' },
+  { key: 'wr_office_base_rent', plFallback: 'CZYNSZ BAZOWY BIURO', enFallback: 'OFFICE BASE RENT [M²]' },
+  { key: 'wr_service_charge', plFallback: 'OPŁATA EKSPLOATACYJNA', enFallback: 'SERVICE CHARGE [M²]' }
+];
+var WAREHOUSE_RENT_DETAIL_FIELD_CONFIG = WAREHOUSE_RENT_AREA_FIELD_CONFIG.concat(WAREHOUSE_RENT_RENT_FIELD_CONFIG);
+var warehouseRentDetailFieldState = {};
+
+function initWarehouseRentDetailFieldToggles() {
+  WAREHOUSE_RENT_DETAIL_FIELD_CONFIG.forEach(function(cfg) {
+    var input = document.getElementById(cfg.key);
+    if (!input) return;
+    var row = input.closest('.field-row') || input.closest('.field-row-wide') || input.closest('.dist-cell');
+    if (!row || row.getAttribute('data-wr-detail-toggle-ready') === '1') return;
+
+    row.setAttribute('data-wr-detail-toggle-ready', '1');
+    row.setAttribute('data-wr-detail-field', cfg.key);
+    row.classList.add('has-visibility-toggle');
+    if (typeof warehouseRentDetailFieldState[cfg.key] === 'undefined') warehouseRentDetailFieldState[cfg.key] = true;
+
+    var toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'field-visible-switch';
+    toggle.setAttribute('aria-label', 'Pokaż / ukryj wartość w prezentacji');
+    toggle.title = 'Pokaż / ukryj wartość w prezentacji';
+    toggle.setAttribute('data-wr-detail-toggle', cfg.key);
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleWarehouseRentDetailField(cfg.key);
+    });
+    row.appendChild(toggle);
+
+    row.classList.toggle('field-disabled', !isWarehouseRentDetailFieldEnabled(cfg.key));
+    toggle.classList.toggle('off', !isWarehouseRentDetailFieldEnabled(cfg.key));
+  });
+}
+
+function toggleWarehouseRentDetailField(key) {
+  warehouseRentDetailFieldState[key] = !isWarehouseRentDetailFieldEnabled(key);
+  var row = document.querySelector('[data-wr-detail-field="' + key + '"]');
+  var toggle = document.querySelector('[data-wr-detail-toggle="' + key + '"]');
+  if (row) row.classList.toggle('field-disabled', !warehouseRentDetailFieldState[key]);
+  if (toggle) toggle.classList.toggle('off', !warehouseRentDetailFieldState[key]);
+}
+
+function isWarehouseRentDetailFieldEnabled(key) {
+  return warehouseRentDetailFieldState[key] !== false;
+}
+
+function getWarehouseRentDetailLabel(key, lang, fallback) {
+  var custom = getLabel(key, lang);
+  return (custom || fallback || '').toUpperCase();
+}
+
+function getActiveWarehouseRentAreaFields() {
+  var active = [];
+  WAREHOUSE_RENT_AREA_FIELD_CONFIG.forEach(function(cfg) {
+    if (!isWarehouseRentDetailFieldEnabled(cfg.key)) return;
+    active.push({
+      key: cfg.key,
+      label_pl: getWarehouseRentDetailLabel(cfg.key, 'pl', cfg.plFallback),
+      label_en: getWarehouseRentDetailLabel(cfg.key, 'en', cfg.enFallback),
+      value: val(cfg.key)
+    });
+  });
+  return active;
+}
+
+function getActiveWarehouseRentRentFields() {
+  var active = [];
+  WAREHOUSE_RENT_RENT_FIELD_CONFIG.forEach(function(cfg) {
+    if (!isWarehouseRentDetailFieldEnabled(cfg.key)) return;
+    active.push({
+      key: cfg.key,
+      label_pl: getWarehouseRentDetailLabel(cfg.key, 'pl', cfg.plFallback),
+      label_en: getWarehouseRentDetailLabel(cfg.key, 'en', cfg.enFallback),
+      value: val(cfg.key),
+      currency: wrCur(cfg.key)
+    });
+  });
+  return active;
+}
+
+function replaceRowTextEnsure(rowXml, values) {
+  values = values || [];
+  var textCount = (rowXml.match(/<a:t>[\s\S]*?<\/a:t>/g) || []).length;
+  if (textCount > 0) {
+    var textIndex = 0;
+    return rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function() {
+      var replacement = textIndex < values.length ? values[textIndex] : '';
+      textIndex++;
+      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
+    });
+  }
+
+  var cellIndex = 0;
+  return rowXml.replace(/<a:tc>[\s\S]*?<\/a:tc>/g, function(cellXml) {
+    var replacement = cellIndex < values.length ? values[cellIndex] : '';
+    cellIndex++;
+    if (!replacement) return cellXml;
+    var safe = escapeXmlText(replacement);
+    if (/<a:endParaRPr([^>]*)\/>/.test(cellXml)) {
+      return cellXml.replace(/<a:endParaRPr([^>]*)\/>/, '<a:r><a:rPr$1/><a:t>' + safe + '</a:t></a:r><a:endParaRPr$1/>');
+    }
+    return cellXml.replace('</a:p>', '<a:r><a:rPr lang="pl-PL" sz="1100"/><a:t>' + safe + '</a:t></a:r></a:p>');
+  });
+}
+
+function replaceTableRowsTextCompactEnsure(tableXml, rowsValues) {
+  var rowIndex = 0;
+  var rowsToRender = rowsValues.length ? rowsValues : [['']];
+  var renderCount = rowsToRender.length;
+  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+    if (rowIndex >= renderCount) {
+      rowIndex++;
+      return '';
+    }
+    var values = rowsToRender[rowIndex] || [];
+    rowXml = setTableRowHeight(rowXml, BUILDING_TABLE_ROW_HEIGHT);
+    rowXml = replaceRowTextEnsure(rowXml, values);
+    rowIndex++;
+    return rowXml;
+  });
+}
+
+function processWarehouseRentMasterLabels(xml) {
+  var areaRows = [];
+  getActiveWarehouseRentAreaFields().forEach(function(field) {
+    areaRows.push([field.label_pl, field.label_en]);
+  });
+  var rentRows = [];
+  getActiveWarehouseRentRentFields().forEach(function(field) {
+    rentRows.push([field.label_pl, field.label_en]);
+  });
+
+  xml = replaceTableByIndex(xml, 2, function(tableXml) {
+    return replaceBuildingMasterRows(tableXml, areaRows, areaRows.length);
+  });
+  xml = replaceTableByIndex(xml, 3, function(tableXml) {
+    return replaceBuildingMasterRows(tableXml, rentRows, rentRows.length);
+  });
+  return xml;
+}
+
 /* ===== SECTION 03 FIELD VISIBILITY ===== */
 var BUILDING_FIELD_CONFIG = [
   { key: 'building_footprint', plFallback: 'POWIERZCHNIA ZABUDOWY [m²]', enFallback: 'BUILDING FOOTPRINT' },
@@ -3387,6 +3541,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initLandFieldToggles(); } catch (e) { console.error('initLandFieldToggles failed', e); }
   try { initBuildingFieldToggles(); } catch (e) { console.error('initBuildingFieldToggles failed', e); }
   try { initIncomeFieldToggles(); } catch (e) { console.error('initIncomeFieldToggles failed', e); }
+  try { initWarehouseRentDetailFieldToggles(); } catch (e) { console.error('initWarehouseRentDetailFieldToggles failed', e); }
   try { initNumberFormatting(); } catch (e) { console.error('initNumberFormatting failed', e); }
   try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
   try { initMpzpResolutionComposer(); } catch (e) { console.error('initMpzpResolutionComposer failed', e); }
@@ -5437,6 +5592,7 @@ function applyTemplateMode(key) {
   document.querySelectorAll('[data-office-location-toggle-ready]').forEach(function(el) { el.removeAttribute('data-office-location-toggle-ready'); });
   document.querySelectorAll('[data-income-visibility-toggle-ready]').forEach(function(el) { el.removeAttribute('data-income-visibility-toggle-ready'); });
   document.querySelectorAll('[data-office-income-extra-toggle-ready]').forEach(function(el) { el.removeAttribute('data-office-income-extra-toggle-ready'); });
+  document.querySelectorAll('[data-wr-detail-toggle-ready]').forEach(function(el) { el.removeAttribute('data-wr-detail-toggle-ready'); });
 
   // Reset commonly hidden rows first
   ['plot_number','precinct','commune','county','ownership','office_gla','hotel_star_rating','hotel_units','building_class','above_ground_floors','below_ground_floors','office_parking','year_completion','noi','service_charge','gross_income','eur_pln_rate','add_on_factor','client_name','warehouse_name','wr_total_building_area','wr_warehouse_area','wr_office_area','wr_availability','wr_warehouse_base_rent','wr_warehouse_effective_rent','wr_office_base_rent','wr_service_charge','wr_clear_height','wr_floor_loading'].forEach(function(id) {
@@ -5454,6 +5610,9 @@ function applyTemplateMode(key) {
     if (isWarehouse) {
       try { initBuildingFieldToggles(); } catch(e) { console.error(e); }
       try { initIncomeFieldToggles(); } catch(e) { console.error(e); }
+    }
+    if (isWarehouseRent) {
+      try { initWarehouseRentDetailFieldToggles(); } catch(e) { console.error(e); }
     }
   }
 
@@ -6304,8 +6463,12 @@ function processWarehouseRentSlide2(xml) {
 
   xml = replaceTableByIndex(xml, 0, function(tableXml) { return replaceTableRowsText(tableXml, [[wrIcon('heating')], [val('wr_clear_height') || ''], [wrIcon('sprinklers')], [wrIcon('smoke_vents')], [wrIcon('docks')], [wrIcon('gate0')], [wrIcon('dust_free_floor')]]); });
   xml = replaceTableByIndex(xml, 1, function(tableXml) { return replaceTableRowsText(tableXml, [[val('wr_floor_loading') || ''], [wrIcon('crane')], [wrIcon('cctv')], [wrIcon('security')], [wrIcon('production')], [wrIcon('ev_charging')], [wrIcon('solar')]]); });
-  xml = replaceTableByIndex(xml, 2, function(tableXml) { return replaceTableRowsText(tableXml, [[val('wr_total_building_area')], [val('wr_warehouse_area')], [val('wr_office_area')], [val('wr_availability')]]); });
-  xml = replaceTableByIndex(xml, 3, function(tableXml) { return replaceTableRowsText(tableXml, [[val('wr_warehouse_base_rent'), wrCur('wr_warehouse_base_rent')], [val('wr_warehouse_effective_rent'), wrCur('wr_warehouse_effective_rent')], [val('wr_office_base_rent'), wrCur('wr_office_base_rent')], [val('wr_service_charge'), wrCur('wr_service_charge')]]); });
+  var areaRows = [];
+  getActiveWarehouseRentAreaFields().forEach(function(field) { areaRows.push([field.value || '']); });
+  var rentRows = [];
+  getActiveWarehouseRentRentFields().forEach(function(field) { rentRows.push([field.value || '', field.currency || '']); });
+  xml = replaceTableByIndex(xml, 2, function(tableXml) { return replaceTableRowsTextCompactEnsure(tableXml, areaRows); });
+  xml = replaceTableByIndex(xml, 3, function(tableXml) { return replaceTableRowsTextCompactEnsure(tableXml, rentRows); });
   return xml;
 }
 function getWarehouseRentFloorPlanBox(presentationXml) {
@@ -6644,8 +6807,12 @@ async function generatePptx() {
       // Replace custom labels in slideMasters (always, regardless of CUR)
       if (xmlPath.indexOf('slideMaster') !== -1) {
         var before = xmlStr;
-        if (!isOfficeTemplate() && !isWarehouseRentTemplate()) {
-          // Warehouse-specific master label processing — only for magazyn-sprzedaz
+        if (isWarehouseRentTemplate()) {
+          if (xmlPath.indexOf('slideMaster1') !== -1) {
+            xmlStr = processWarehouseRentMasterLabels(xmlStr);
+          }
+        } else if (!isOfficeTemplate()) {
+          // Warehouse-specific master label processing — only for sale templates
           if (xmlPath.indexOf('slideMaster4') !== -1) {
             xmlStr = processLandMasterLabels(xmlStr);
           }
