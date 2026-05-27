@@ -2027,6 +2027,20 @@ select:focus {
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+
+
+/* === FINAL FIX: dark typed distance value + default first six selected === */
+.template-warehouse-rent .wr-distance-input {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827 !important;
+  font-weight: 500;
+}
+.template-warehouse-rent .wr-distance-input::placeholder {
+  color: #c8ced6 !important;
+  -webkit-text-fill-color: #c8ced6 !important;
+  opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -5853,7 +5867,7 @@ var WAREHOUSE_RENT_DISTANCE_ICONS = {
 var WAREHOUSE_RENT_DISTANCE_ORDER = ['expressway','highway','airport','port','railway','mass_transit','border','city_center','skm_pkm','custom_icon'];
 var WAREHOUSE_RENT_DISTANCE_PLACEHOLDER_MEDIA = ['ppt/media/image6.png','ppt/media/image7.png','ppt/media/image8.png','ppt/media/image9.png','ppt/media/image10.png','ppt/media/image11.png'];
 var warehouseRentDistanceState = {};
-WAREHOUSE_RENT_DISTANCE_ORDER.forEach(function(k){ warehouseRentDistanceState[k] = false; });
+WAREHOUSE_RENT_DISTANCE_ORDER.forEach(function(k, i){ warehouseRentDistanceState[k] = i < 6; });
 var WR_TRANSPARENT_PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';
 WAREHOUSE_RENT_DISTANCE_ICONS.custom_icon = { label: 'CUSTOM', media: '', data: WR_TRANSPARENT_PNG };
 
