@@ -2075,59 +2075,6 @@ select:focus {
 }
 
 
-/* === HARD FIX: visible limit message even when JS hover fails === */
-.template-warehouse-rent .wr-distance-tile.limit-blocked {
-  position: relative;
-  cursor: help !important;
-}
-.template-warehouse-rent .wr-distance-tile.limit-blocked .wr-distance-switch {
-  cursor: help !important;
-}
-.template-warehouse-rent .wr-distance-tile.limit-blocked:hover::after {
-  content: 'Limit: maks. 6 ikon w prezentacji. Odznacz jedną z wybranych, aby dodać inną.';
-  position: absolute;
-  left: calc(100% + 10px);
-  top: 8px;
-  z-index: 9999999;
-  width: 245px;
-  padding: 10px 12px;
-  border: 1px solid #d9dee5;
-  border-radius: 6px;
-  background: #fff;
-  color: #102A3D;
-  box-shadow: 0 8px 24px rgba(16,42,61,.18);
-  font-family: 'Lato','Roboto',system-ui,sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.35;
-  letter-spacing: .02em;
-  text-align: left;
-  pointer-events: none;
-  text-transform: none;
-}
-.template-warehouse-rent .wr-distance-tile.limit-blocked:hover::before {
-  content: '';
-  position: absolute;
-  left: calc(100% + 3px);
-  top: 20px;
-  z-index: 10000000;
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border-left: 1px solid #d9dee5;
-  border-bottom: 1px solid #d9dee5;
-  transform: rotate(45deg);
-  pointer-events: none;
-}
-.template-warehouse-rent .wr-distance-tile.limit-blocked:nth-child(n+8):hover::after {
-  left: auto;
-  right: calc(100% + 10px);
-}
-.template-warehouse-rent .wr-distance-tile.limit-blocked:nth-child(n+8):hover::before {
-  left: auto;
-  right: calc(100% + 3px);
-  transform: rotate(225deg);
-}
 </style>
 </head>
 <body>
@@ -6095,7 +6042,7 @@ function updateWarehouseRentDistanceUi() {
       btn.classList.toggle('on', on);
       btn.classList.toggle('limit-blocked', blocked);
       btn.disabled = false;
-      btn.title = blocked ? 'Limit: maks. 6 ikon w prezentacji. Odznacz jedną z wybranych, aby dodać inną.' : 'Pokaż / ukryj w PPTX';
+      btn.title = blocked ? '' : 'Pokaż / ukryj w PPTX';
     }
   });
   var count = document.getElementById('wr-distance-count');
