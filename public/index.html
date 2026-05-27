@@ -2042,28 +2042,37 @@ select:focus {
   opacity: 1;
 }
 
-
-/* === WAREHOUSE RENT DISTANCE LIMIT TOOLTIP === */
+/* === FINAL FIX: visible limit tooltip for distance icons === */
 .wr-limit-tooltip {
   position: fixed;
-  z-index: 99999;
-  max-width: 245px;
+  z-index: 999999;
+  max-width: 285px;
   padding: 10px 12px;
-  background: #102A3D;
-  color: #fff;
-  border-radius: 3px;
-  box-shadow: 0 8px 22px rgba(15, 35, 50, .22);
-  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
+  border: 1px solid #d9dee5;
+  border-radius: 6px;
+  background: #fff;
+  color: #102A3D;
+  box-shadow: 0 8px 24px rgba(16,42,61,.16);
+  font-family: 'Lato','Roboto',system-ui,sans-serif;
   font-size: 11px;
+  font-weight: 800;
   line-height: 1.35;
-  font-weight: 700;
-  letter-spacing: .01em;
+  letter-spacing: .02em;
   pointer-events: none;
   opacity: 0;
-  transform: translate(10px, 10px);
-  transition: opacity .12s ease;
+  transform: translateY(4px);
+  transition: opacity .12s ease, transform .12s ease;
 }
-.wr-limit-tooltip.show { opacity: 1; }
+.wr-limit-tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.template-warehouse-rent .wr-distance-switch.limit-blocked {
+  cursor: not-allowed;
+}
+.template-warehouse-rent .wr-distance-tile.limit-blocked {
+  cursor: not-allowed;
+}
 </style>
 </head>
 <body>
@@ -5984,18 +5993,13 @@ function getWarehouseRentLimitTooltipEl() {
 
 function showWarehouseRentLimitTooltip(e) {
   var el = getWarehouseRentLimitTooltipEl();
-  el.classList.add('show');
-  moveWarehouseRentLimitTooltip(e);
-}
-
-function moveWarehouseRentLimitTooltip(e) {
-  var el = getWarehouseRentLimitTooltipEl();
   var x = (e && e.clientX ? e.clientX : 0) + 14;
   var y = (e && e.clientY ? e.clientY : 0) + 14;
-  if (x + 260 > window.innerWidth) x = Math.max(12, (e.clientX || 0) - 260);
-  if (y + 80 > window.innerHeight) y = Math.max(12, (e.clientY || 0) - 80);
+  if (x + 300 > window.innerWidth) x = Math.max(12, (e.clientX || 0) - 300);
+  if (y + 70 > window.innerHeight) y = Math.max(12, (e.clientY || 0) - 70);
   el.style.left = x + 'px';
   el.style.top = y + 'px';
+  el.classList.add('show');
 }
 
 function hideWarehouseRentLimitTooltip() {
@@ -6003,10 +6007,11 @@ function hideWarehouseRentLimitTooltip() {
   if (el) el.classList.remove('show');
 }
 
-function bindWarehouseRentLimitTooltips() {
+function bindWarehouseRentLimitTooltip() {
   var picker = document.getElementById('wr-distance-picker');
   if (!picker || picker.dataset.limitTooltipBound === '1') return;
   picker.dataset.limitTooltipBound = '1';
+
   picker.addEventListener('mousemove', function(e) {
     var tile = e.target.closest && e.target.closest('[data-wr-dist-tile]');
     if (!tile) { hideWarehouseRentLimitTooltip(); return; }
@@ -6018,6 +6023,7 @@ function bindWarehouseRentLimitTooltips() {
       hideWarehouseRentLimitTooltip();
     }
   });
+
   picker.addEventListener('mouseleave', hideWarehouseRentLimitTooltip);
 }
 
@@ -6028,10 +6034,13 @@ function updateWarehouseRentDistanceUi() {
     var tile = document.querySelector('[data-wr-dist-tile="' + key + '"]');
     var btn = document.querySelector('[data-wr-dist="' + key + '"]');
     if (tile) tile.classList.toggle('on', on);
+    var blocked = !on && selected.length >= 6;
+    if (tile) tile.classList.toggle('limit-blocked', blocked);
     if (btn) {
       btn.classList.toggle('on', on);
-      btn.disabled = !on && selected.length >= 6;
-      btn.title = (!on && selected.length >= 6) ? 'Maksymalnie 6 ikon w prezentacji' : 'Pokaż / ukryj w PPTX';
+      btn.classList.toggle('limit-blocked', blocked);
+      btn.disabled = false;
+      btn.title = blocked ? 'Limit: maks. 6 ikon w prezentacji. Odznacz jedną z wybranych, aby dodać inną.' : 'Pokaż / ukryj w PPTX';
     }
   });
   var count = document.getElementById('wr-distance-count');
@@ -6041,9 +6050,10 @@ function toggleWarehouseRentDistance(key) {
   var selected = getSelectedWarehouseRentDistances();
   if (!warehouseRentDistanceState[key] && selected.length >= 6) {
     enhanceWarehouseRentDistanceTiles();
-reorderWarehouseRentDistanceTiles();
-bindWarehouseRentLimitTooltips();
-updateWarehouseRentDistanceUi();
+    reorderWarehouseRentDistanceTiles();
+    bindWarehouseRentLimitTooltip();
+    updateWarehouseRentDistanceUi();
+    if (window.event) showWarehouseRentLimitTooltip(window.event);
     return;
   }
   warehouseRentDistanceState[key] = !warehouseRentDistanceState[key];
@@ -6229,6 +6239,7 @@ function applyWarehouseRentDistanceLayout(xml) {
 }
 enhanceWarehouseRentDistanceTiles();
 reorderWarehouseRentDistanceTiles();
+bindWarehouseRentLimitTooltip();
 updateWarehouseRentDistanceUi();
 
 /* ===== WAREHOUSE RENT TEMPLATE PROCESSORS ===== */
