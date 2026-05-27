@@ -961,6 +961,81 @@ select:focus {
   line-height: 1;
 }
 
+
+/* === FIX: warehouse rent distance tile style (match mockup) === */
+.template-warehouse-rent .wr-distance-picker {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+.template-warehouse-rent .wr-distance-tile {
+  min-height: 218px;
+  gap: 10px;
+  padding: 12px 8px 14px;
+  justify-items: center;
+}
+.template-warehouse-rent .wr-distance-switch {
+  margin-bottom: 2px;
+}
+.template-warehouse-rent .wr-distance-icon,
+.template-warehouse-rent .wr-custom-icon-drop {
+  width: 54px;
+  height: 54px;
+}
+.wr-distance-label {
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 86px;
+  margin-top: 2px;
+  text-align: center;
+  color: #17212b;
+  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
+  font-size: 8px;
+  line-height: 1.05;
+  letter-spacing: .08em;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.template-warehouse-rent .wr-distance-input {
+  width: 100%;
+  max-width: 74px;
+  border: 0;
+  border-bottom: 1px solid #d8dde3;
+  border-radius: 0;
+  background: transparent;
+  color: #b8c0ca;
+  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+  text-align: center;
+  padding: 2px 0 10px;
+  margin-top: auto;
+  box-shadow: none;
+}
+.template-warehouse-rent .wr-distance-input::placeholder {
+  color: #c8ced6;
+  opacity: 1;
+  text-align: center;
+}
+.template-warehouse-rent .wr-distance-input:focus {
+  outline: none;
+  border-bottom-color: #c7cfd8;
+}
+.wr-distance-unit {
+  margin-top: 0;
+  color: #17212b;
+  font-family: 'Lato', 'Roboto', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.wr-distance-value-row {
+  display: contents;
+}
+
 /* === TEMPLATE SELECTOR === */
 .tmpl-label {
   font-size: 11px;
@@ -5769,7 +5844,7 @@ var WAREHOUSE_RENT_DISTANCE_PL_LABELS = {
   border: 'Granica',
   city_center: 'Centrum miasta',
   skm_pkm: 'SKM / PKM',
-  custom_icon: 'Własna ikona'
+  custom_icon: 'Własna ikonka'
 };
 
 function enhanceWarehouseRentDistanceTiles() {
@@ -5778,30 +5853,34 @@ function enhanceWarehouseRentDistanceTiles() {
   Array.prototype.forEach.call(picker.querySelectorAll('[data-wr-dist-tile]'), function(tile) {
     var key = tile.getAttribute('data-wr-dist-tile');
     var labelText = WAREHOUSE_RENT_DISTANCE_PL_LABELS[key] || '';
-    if (labelText) {
-      var label = tile.querySelector('.wr-distance-label');
-      if (!label) {
-        label = document.createElement('div');
-        label.className = 'wr-distance-label';
-        var anchor = tile.querySelector('.wr-custom-icon-drop') || tile.querySelector('.wr-distance-icon');
-        if (anchor && anchor.parentNode) {
-          anchor.insertAdjacentElement('afterend', label);
-        }
+
+    var label = tile.querySelector('.wr-distance-label');
+    if (!label) {
+      label = document.createElement('div');
+      label.className = 'wr-distance-label';
+      var anchor = tile.querySelector('.wr-custom-icon-drop') || tile.querySelector('.wr-distance-icon');
+      if (anchor) {
+        anchor.insertAdjacentElement('afterend', label);
       }
-      label.textContent = labelText;
+    }
+    label.textContent = labelText;
+
+    var row = tile.querySelector('.wr-distance-value-row');
+    if (row) {
+      var inputInRow = row.querySelector('.wr-distance-input');
+      var unitInRow = row.querySelector('.wr-distance-unit');
+      if (inputInRow) tile.insertBefore(inputInRow, row);
+      if (unitInRow) tile.insertBefore(unitInRow, row);
+      row.remove();
     }
 
     var input = tile.querySelector('.wr-distance-input');
     var unit = tile.querySelector('.wr-distance-unit');
-    if (input && unit) {
-      var row = tile.querySelector('.wr-distance-value-row');
-      if (!row) {
-        row = document.createElement('div');
-        row.className = 'wr-distance-value-row';
-        input.parentNode.insertBefore(row, input);
-        row.appendChild(input);
-        row.appendChild(unit);
-      }
+    if (label && input && label.nextElementSibling !== input) {
+      label.insertAdjacentElement('afterend', input);
+    }
+    if (input && unit && input.nextElementSibling !== unit) {
+      input.insertAdjacentElement('afterend', unit);
     }
   });
 }
