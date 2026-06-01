@@ -2803,6 +2803,10 @@ function replaceTableRowsTextCompactEnsure(tableXml, rowsValues) {
   });
 }
 
+function setTableCellAnchor(tableXml, anchorValue) {
+  return tableXml.replace(/<a:tcPr([^>]*)\sanchor="[^"]*"([^>]*)>/g, '<a:tcPr$1 anchor="' + anchorValue + '"$2>');
+}
+
 function processWarehouseRentMasterLabels(xml) {
   var areaRows = [];
   getActiveWarehouseRentAreaFields().forEach(function(field) {
@@ -3599,8 +3603,20 @@ var NUMBER_FORMAT_FIELDS = [
   'dist_city_center', 'dist_airport', 'dist_expressway', 'dist_port', 'dist_highway', 'dist_railway', 'dist_transit',
   'building_footprint', 'total_area', 'parking_spots', 'warehouse_area', 'office_area', 'office_parking', 'office_gla',
   'asking_price_building',
-  'num_tenants', 'noi', 'price_sale', 'rent_income', 'service_charge', 'gross_income'
+  'num_tenants', 'noi', 'price_sale', 'rent_income', 'service_charge', 'gross_income',
+  'wr_total_building_area', 'wr_warehouse_area', 'wr_office_area'
 ];
+
+var TWO_DECIMAL_FORMAT_FIELDS = [
+  'wr_warehouse_base_rent',
+  'wr_warehouse_effective_rent',
+  'wr_office_base_rent',
+  'wr_service_charge'
+];
+
+function isTwoDecimalFormatField(id) {
+  return TWO_DECIMAL_FORMAT_FIELDS.indexOf(id) !== -1;
+}
 
 function isNumberFormatField(id) {
   return NUMBER_FORMAT_FIELDS.indexOf(id) !== -1;
@@ -3617,7 +3633,7 @@ function formatIntegerGroups(intPart) {
   return sign + intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
-function formatReadableNumber(raw) {
+function formatReadableNumber(raw, forceTwoDecimals) {
   var value = String(raw || '').trim();
   if (!value) return '';
 
@@ -3629,6 +3645,13 @@ function formatReadableNumber(raw) {
   var compact = value.replace(/\s+/g, '').replace(/,/g, '.');
   if (!/^-?\d+(\.\d+)?$/.test(compact)) return value;
 
+  if (forceTwoDecimals) {
+    var num = Number(compact);
+    if (!isFinite(num)) return value;
+    var fixed = num.toFixed(2).split('.');
+    return formatIntegerGroups(fixed[0]) + ',' + fixed[1];
+  }
+
   var parts = compact.split('.');
   var intPart = formatIntegerGroups(parts[0]);
   if (parts.length > 1) {
@@ -3638,17 +3661,21 @@ function formatReadableNumber(raw) {
 }
 
 function formatNumericFieldById(id) {
-  if (!isNumberFormatField(id)) return;
+  if (!isNumberFormatField(id) && !isTwoDecimalFormatField(id)) return;
   var el = document.getElementById(id);
   if (!el || typeof el.value === 'undefined') return;
-  var formatted = formatReadableNumber(el.value);
+  var formatted = formatReadableNumber(el.value, isTwoDecimalFormatField(id));
   if (formatted !== el.value) {
     el.value = formatted;
   }
 }
 
 function initNumberFormatting() {
-  NUMBER_FORMAT_FIELDS.forEach(function(id) {
+  var allNumberFields = NUMBER_FORMAT_FIELDS.concat(TWO_DECIMAL_FORMAT_FIELDS.filter(function(id) {
+    return NUMBER_FORMAT_FIELDS.indexOf(id) === -1;
+  }));
+
+  allNumberFields.forEach(function(id) {
     var el = document.getElementById(id);
     if (!el || el.getAttribute('data-number-format-ready') === '1') return;
     el.setAttribute('data-number-format-ready', '1');
@@ -6497,8 +6524,14 @@ function processWarehouseRentSlide2(xml) {
   getActiveWarehouseRentAreaFields().forEach(function(field) { areaRows.push([field.value || '']); });
   var rentRows = [];
   getActiveWarehouseRentRentFields().forEach(function(field) { rentRows.push([field.value || '', field.currency || '']); });
-  xml = replaceTableByIndex(xml, 2, function(tableXml) { return replaceTableRowsTextCompactEnsure(tableXml, areaRows); });
-  xml = replaceTableByIndex(xml, 3, function(tableXml) { return replaceTableRowsTextCompactEnsure(tableXml, rentRows); });
+  xml = replaceTableByIndex(xml, 2, function(tableXml) {
+    tableXml = replaceTableRowsTextCompactEnsure(tableXml, areaRows);
+    return setTableCellAnchor(tableXml, 'ctr');
+  });
+  xml = replaceTableByIndex(xml, 3, function(tableXml) {
+    tableXml = replaceTableRowsTextCompactEnsure(tableXml, rentRows);
+    return setTableCellAnchor(tableXml, 'ctr');
+  });
   return xml;
 }
 function getWarehouseRentFloorPlanBox(presentationXml) {
