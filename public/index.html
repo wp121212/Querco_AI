@@ -2421,18 +2421,18 @@ select:focus {
     <div class="spec-grid" id="warehouse-rent-spec-grid">
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Wysokość</div><div class="field-label-en">Clear Height</div></div><div class="field-value"><input id="wr_clear_height" placeholder="10"></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Nośność posadzki</div><div class="field-label-en">Floor Loading</div></div><div class="field-value"><input id="wr_floor_loading" placeholder="5"></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Ogrzewanie</div><div class="field-label-en">Heating</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="heating"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Tryskacze</div><div class="field-label-en">Sprinklers</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="sprinklers"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Klapy dymowe</div><div class="field-label-en">Smoke Vents</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="smoke_vents"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Doki</div><div class="field-label-en">Docks</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="docks"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Bramy 0</div><div class="field-label-en">Gate 0</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="gate0"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Posadzka bezpyłowa</div><div class="field-label-en">Floor Dust-free</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="dust_free_floor"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Suwnica</div><div class="field-label-en">Crane</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="crane"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Monitoring</div><div class="field-label-en">CCTV</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="cctv"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Ochrona</div><div class="field-label-en">Security</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="security"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Produkcja</div><div class="field-label-en">Production</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="production"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Stacja ładowania</div><div class="field-label-en">EV Charging Station</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="ev_charging"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Fotowoltaika</div><div class="field-label-en">Solar Panel</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="solar"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Ogrzewanie</div><div class="field-label-en">Heating</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="heating" onclick="toggleWarehouseRentSpec('heating')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Tryskacze</div><div class="field-label-en">Sprinklers</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="sprinklers" onclick="toggleWarehouseRentSpec('sprinklers')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Klapy dymowe</div><div class="field-label-en">Smoke Vents</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="smoke_vents" onclick="toggleWarehouseRentSpec('smoke_vents')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Doki</div><div class="field-label-en">Docks</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="docks" onclick="toggleWarehouseRentSpec('docks')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Bramy 0</div><div class="field-label-en">Gate 0</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="gate0" onclick="toggleWarehouseRentSpec('gate0')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Posadzka bezpyłowa</div><div class="field-label-en">Floor Dust-free</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="dust_free_floor" onclick="toggleWarehouseRentSpec('dust_free_floor')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Suwnica</div><div class="field-label-en">Crane</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="crane" onclick="toggleWarehouseRentSpec('crane')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Monitoring</div><div class="field-label-en">CCTV</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="cctv" onclick="toggleWarehouseRentSpec('cctv')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Ochrona</div><div class="field-label-en">Security</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="security" onclick="toggleWarehouseRentSpec('security')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Produkcja</div><div class="field-label-en">Production</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="production" onclick="toggleWarehouseRentSpec('production')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Stacja ładowania</div><div class="field-label-en">EV Charging Station</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="ev_charging" onclick="toggleWarehouseRentSpec('ev_charging')"><span>✕</span><span>✓</span></button></div></div>
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Fotowoltaika</div><div class="field-label-en">Solar Panel</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="solar" onclick="toggleWarehouseRentSpec('solar')"><span>✕</span><span>✓</span></button></div></div>
     </div>
   </div>
 </div>
@@ -2811,56 +2811,112 @@ function clearTableTexts(tableXml) {
   return tableXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, '<a:t></a:t>');
 }
 
-var WR_SPEC_VALUE_CX = 576376;
-var WR_SPEC_VALUE_CY = 329871;
+var WR_SPEC_X_ICON_B64 = 'iVBORw0KGgoAAAANSUhEUgAAABwAAAAeCAYAAAA/xX6fAAAAAXNSR0IArs4c6QAAAIRlWElmTU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAACQAAAAAQAAAJAAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABygAwAEAAAAAQAAAB4AAAAADEVGVwAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAAM5JREFUSA3tlt0NwjAMhAvvnYQFeGMOtgKWYEEG4Axq5VSW67u2b4lk5ce+7yJLUTsMffQO7NCBEYzTDpwrGMZqxrnZ/TcXTA/EFtMb9HfEB1EaJngiFFNZqwgVTdMBBsDUNibLTQVUqVly030GzHIpdC0ZgaOzNQ6V9wZ+TUHYYjN6I6RnEz386gWUN1plz3W+jbZ+IQ4z9mbTDaKzKbdpzsBZTjKtACs1JXMGxNSG5gpA0fzMZSHUtNa+1NKjdn2iTA/9xXCX6svegVoHvgSjHORFXWYfAAAAAElFTkSuQmCC';
+var WR_SPEC_CHECK_ICON_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAIRlWElmTU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAACQAAAAAQAAAJAAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAAB6gAwAEAAAAAQAAAB4AAAAA2HnWkAAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAARJJREFUSA1jYBgFoyEwDEKACegHVpg/QBx6AGagJdOAWIselsHsAPlyDhBbwgToQXMALVkIxEb0sAxmBxeQsQSIdWAC9KD5gJYsB2I1elgGs0MQyFgBxIowAUI0KD5AqY8SIArUvBKIZUgxRA+oeAYQk5vFJIF6VwGxOBCTDOyAOiYDMSOJOuWA6kE+FSZRH4pyFyCvF0UEP0cZKA2KU378yoiT9QYqaydCqSZQzVIg5iFCLdFKgoAqG/Co1gfKLQJiTjxqyJaKAuqsxKLbFCg2D4jZsMhRTSgRaFIhkmk2QPYsIGZBEiOZSWzqzYSafAtIBwJxHhD/g4rRnCoA2tAPxMQ6luYOGrVgNARGQ2BgQwAAdRMVoLACdTEAAAAASUVORK5CYII=';
 var WR_SPEC_ROW_H = 317677;
-var WR_SPEC_LEFT_X = 2023353;
-var WR_SPEC_LEFT_Y0 = 4321911;
-var WR_SPEC_RIGHT_X = 4377875;
-var WR_SPEC_RIGHT_Y0 = 4295450;
+var WR_SPEC_LEFT_TABLE_X = 2023353;
+var WR_SPEC_RIGHT_TABLE_X = 4377875;
+var WR_SPEC_LEFT_TABLE_Y = 4292600;
+var WR_SPEC_RIGHT_TABLE_Y = 4292600;
+var WR_SPEC_VALUE_CX = 576376;
+var WR_SPEC_ICON_CX = 230000;
+var WR_SPEC_ICON_CY = 230000;
+var WR_SPEC_TEXT_CX = 576376;
+var WR_SPEC_TEXT_CY = 329871;
 
-function buildWarehouseRentSpecValueBoxXml(textValue, x, y, idx) {
+function getWarehouseRentSpecValueX(side) {
+  var tableX = side === 'right' ? WR_SPEC_RIGHT_TABLE_X : WR_SPEC_LEFT_TABLE_X;
+  return Math.round(tableX + (WR_SPEC_VALUE_CX - WR_SPEC_ICON_CX) / 2);
+}
+
+function getWarehouseRentSpecValueY(side, rowIndex, itemCy) {
+  var tableY = side === 'right' ? WR_SPEC_RIGHT_TABLE_Y : WR_SPEC_LEFT_TABLE_Y;
+  return Math.round(tableY + rowIndex * WR_SPEC_ROW_H + (WR_SPEC_ROW_H - itemCy) / 2);
+}
+
+function getWarehouseRentSpecIconItems() {
+  return [
+    { side: 'left', row: 0, on: !!warehouseRentSpecState.heating },
+    { side: 'left', row: 2, on: !!warehouseRentSpecState.sprinklers },
+    { side: 'left', row: 3, on: !!warehouseRentSpecState.smoke_vents },
+    { side: 'left', row: 4, on: !!warehouseRentSpecState.docks },
+    { side: 'left', row: 5, on: !!warehouseRentSpecState.gate0 },
+    { side: 'left', row: 6, on: !!warehouseRentSpecState.dust_free_floor },
+    { side: 'right', row: 1, on: !!warehouseRentSpecState.crane },
+    { side: 'right', row: 2, on: !!warehouseRentSpecState.cctv },
+    { side: 'right', row: 3, on: !!warehouseRentSpecState.security },
+    { side: 'right', row: 4, on: !!warehouseRentSpecState.production },
+    { side: 'right', row: 5, on: !!warehouseRentSpecState.ev_charging },
+    { side: 'right', row: 6, on: !!warehouseRentSpecState.solar }
+  ];
+}
+
+function buildWarehouseRentSpecIconPicXml(relId, x, y, idx) {
+  return '' +
+    '<p:pic>' +
+      '<p:nvPicPr>' +
+        '<p:cNvPr id="' + (9800 + idx) + '" name="WR spec icon ' + (idx + 1) + '"/>' +
+        '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>' +
+        '<p:nvPr/>' +
+      '</p:nvPicPr>' +
+      '<p:blipFill><a:blip r:embed="' + relId + '"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>' +
+      '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + WR_SPEC_ICON_CX + '" cy="' + WR_SPEC_ICON_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>' +
+    '</p:pic>';
+}
+
+function buildWarehouseRentSpecTextBoxXml(textValue, side, rowIndex, idx) {
   var safe = escapeXmlText(textValue || '');
-  var font = textValue === '✓' ? 'Segoe UI Symbol' : 'Lato';
+  if (!safe) return '';
+  var tableX = side === 'right' ? WR_SPEC_RIGHT_TABLE_X : WR_SPEC_LEFT_TABLE_X;
+  var y = getWarehouseRentSpecValueY(side, rowIndex, WR_SPEC_TEXT_CY);
   return '<p:sp>' +
-    '<p:nvSpPr><p:cNvPr id="' + (9700 + idx) + '" name="WR spec value ' + (idx + 1) + '"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>' +
-    '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + WR_SPEC_VALUE_CX + '" cy="' + WR_SPEC_VALUE_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>' +
+    '<p:nvSpPr><p:cNvPr id="' + (9900 + idx) + '" name="WR spec text ' + (idx + 1) + '"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>' +
+    '<p:spPr><a:xfrm><a:off x="' + tableX + '" y="' + y + '"/><a:ext cx="' + WR_SPEC_TEXT_CX + '" cy="' + WR_SPEC_TEXT_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>' +
     '<p:txBody><a:bodyPr anchor="ctr" rtlCol="0"/><a:lstStyle/><a:p><a:pPr algn="ctr"/>' +
-    '<a:r><a:rPr lang="pl-PL" sz="1100" b="1" dirty="0"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:latin typeface="' + font + '"/><a:ea typeface="' + font + '"/><a:cs typeface="' + font + '"/></a:rPr><a:t>' + safe + '</a:t></a:r>' +
+    '<a:r><a:rPr lang="pl-PL" sz="1100" b="1" dirty="0"><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr><a:t>' + safe + '</a:t></a:r>' +
     '</a:p></p:txBody>' +
     '</p:sp>';
 }
 
-function applyWarehouseRentSpecValuesOverlay(xml) {
-  var leftValues = [
-    wrIcon('heating'),
-    val('wr_clear_height') || '',
-    wrIcon('sprinklers'),
-    wrIcon('smoke_vents'),
-    wrIcon('docks'),
-    wrIcon('gate0'),
-    wrIcon('dust_free_floor')
-  ];
-  var rightValues = [
-    val('wr_floor_loading') || '',
-    wrIcon('crane'),
-    wrIcon('cctv'),
-    wrIcon('security'),
-    wrIcon('production'),
-    wrIcon('ev_charging'),
-    wrIcon('solar')
-  ];
-
+function applyWarehouseRentSpecTextOverlay(xml) {
   var shapes = '';
-  leftValues.forEach(function(v, i) {
-    shapes += buildWarehouseRentSpecValueBoxXml(v, WR_SPEC_LEFT_X, WR_SPEC_LEFT_Y0 + i * WR_SPEC_ROW_H, i);
-  });
-  rightValues.forEach(function(v, i) {
-    shapes += buildWarehouseRentSpecValueBoxXml(v, WR_SPEC_RIGHT_X, WR_SPEC_RIGHT_Y0 + i * WR_SPEC_ROW_H, 20 + i);
-  });
-
+  shapes += buildWarehouseRentSpecTextBoxXml(val('wr_clear_height') || '', 'left', 1, 1);
+  shapes += buildWarehouseRentSpecTextBoxXml(val('wr_floor_loading') || '', 'right', 0, 2);
   if (shapes) xml = xml.replace('</p:spTree>', shapes + '</p:spTree>');
   return xml;
+}
+
+async function insertWarehouseRentSpecIconImages(zip) {
+  if (!isWarehouseRentTemplate() || !slide2Active) return;
+  await ensurePngContentType(zip);
+
+  var slidePath = 'ppt/slides/slide2.xml';
+  var relsPath = 'ppt/slides/_rels/slide2.xml.rels';
+  var slideFile = zip.file(slidePath);
+  if (!slideFile) return;
+
+  zip.file('ppt/media/wr_spec_x.png', base64ToUint8Array(WR_SPEC_X_ICON_B64));
+  zip.file('ppt/media/wr_spec_check.png', base64ToUint8Array(WR_SPEC_CHECK_ICON_B64));
+
+  var slideXml = await slideFile.async('string');
+  var relsFile = zip.file(relsPath);
+  var relsXml = relsFile ? await relsFile.async('string') : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+
+  var xRelId = getNextRelId(relsXml);
+  relsXml = relsXml.replace('</Relationships>', '<Relationship Id="' + xRelId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/wr_spec_x.png"/></Relationships>');
+  var checkRelId = getNextRelId(relsXml);
+  relsXml = relsXml.replace('</Relationships>', '<Relationship Id="' + checkRelId + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/wr_spec_check.png"/></Relationships>');
+
+  var shapes = '';
+  getWarehouseRentSpecIconItems().forEach(function(item, idx) {
+    var x = getWarehouseRentSpecValueX(item.side);
+    var y = getWarehouseRentSpecValueY(item.side, item.row, WR_SPEC_ICON_CY);
+    shapes += buildWarehouseRentSpecIconPicXml(item.on ? checkRelId : xRelId, x, y, idx);
+  });
+
+  if (shapes) slideXml = slideXml.replace('</p:spTree>', shapes + '</p:spTree>');
+  zip.file(slidePath, slideXml);
+  zip.file(relsPath, relsXml);
 }
 
 function processWarehouseRentMasterLabels(xml) {
@@ -5730,7 +5786,6 @@ function applyTemplateMode(key) {
     }
     if (isWarehouseRent) {
       try { initWarehouseRentDetailFieldToggles(); } catch(e) { console.error(e); }
-      try { bindWarehouseRentSpecSwitches(); syncWarehouseRentSpecSwitches(); } catch(e) { console.error(e); }
     }
   }
 
@@ -6560,38 +6615,11 @@ var warehouseRentSpecState = {
   heating:false, sprinklers:false, smoke_vents:false, docks:false, gate0:false, dust_free_floor:false,
   crane:false, cctv:false, security:false, production:false, ev_charging:false, solar:false
 };
-var warehouseRentSpecSwitchesBound = false;
-
-function syncWarehouseRentSpecSwitches() {
-  if (!warehouseRentSpecState) return;
-  Object.keys(warehouseRentSpecState).forEach(function(key) {
-    var btn = document.querySelector('[data-spec="' + key + '"]');
-    if (btn) {
-      btn.classList.toggle('on', !!warehouseRentSpecState[key]);
-      btn.setAttribute('aria-pressed', warehouseRentSpecState[key] ? 'true' : 'false');
-    }
-  });
-}
-
 function toggleWarehouseRentSpec(key) {
-  if (!Object.prototype.hasOwnProperty.call(warehouseRentSpecState, key)) return;
   warehouseRentSpecState[key] = !warehouseRentSpecState[key];
-  syncWarehouseRentSpecSwitches();
+  var btn = document.querySelector('[data-spec="' + key + '"]');
+  if (btn) btn.classList.toggle('on', !!warehouseRentSpecState[key]);
 }
-
-function bindWarehouseRentSpecSwitches() {
-  if (warehouseRentSpecSwitchesBound) return;
-  warehouseRentSpecSwitchesBound = true;
-  document.addEventListener('click', function(e) {
-    var btn = e.target && e.target.closest ? e.target.closest('.spec-switch[data-spec]') : null;
-    if (!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWarehouseRentSpec(btn.getAttribute('data-spec'));
-  }, true);
-  syncWarehouseRentSpecSwitches();
-}
-
 function wrIcon(key) { return warehouseRentSpecState[key] ? '✓' : 'X'; }
 function wrCur(id) { return val(id + '_currency') || (id === 'wr_service_charge' ? 'PLN' : 'EUR'); }
 function processWarehouseRentCover(xml) {
@@ -6606,16 +6634,11 @@ function processWarehouseRentSlide2(xml) {
   xml = replaceAll(xml, '>MIASTO, UL. ULICA<', '>' + escapeXmlText(cityStreet || 'MIASTO, UL. ULICA') + '<');
   xml = applyWarehouseRentDistanceLayout(xml);
 
-  // Template spec value placeholders may be fully empty or removed.
-  // Keep the original tables in place for layout stability, clear any old placeholders,
-  // and render the values as overlay text boxes at fixed template coordinates.
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return clearTableTexts(tableXml);
-  });
-  xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    return clearTableTexts(tableXml);
-  });
-  xml = applyWarehouseRentSpecValuesOverlay(xml);
+  // Spec value cells in the PowerPoint template may be empty, so we do not rely on text placeholders.
+  // Clear any old placeholders and render technical values/icons as overlays.
+  xml = replaceTableByIndex(xml, 0, function(tableXml) { return clearTableTexts(tableXml); });
+  xml = replaceTableByIndex(xml, 1, function(tableXml) { return clearTableTexts(tableXml); });
+  xml = applyWarehouseRentSpecTextOverlay(xml);
   var areaRows = [];
   getActiveWarehouseRentAreaFields().forEach(function(field) { areaRows.push([field.value || '']); });
   var rentRows = [];
@@ -6925,6 +6948,7 @@ async function generatePptx() {
     await insertAllSlideMainPhotos(zip);
     if (isWarehouseRentTemplate()) {
       applyWarehouseRentDistanceIconsToZip(zip);
+      await insertWarehouseRentSpecIconImages(zip);
       await insertWarehouseRentFloorPlanSlides(zip);
     } else if (isOfficeTemplate()) {
       await insertOfficeMediaSlides(zip);
