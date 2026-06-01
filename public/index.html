@@ -2807,6 +2807,62 @@ function setTableCellAnchor(tableXml, anchorValue) {
   return tableXml.replace(/<a:tcPr([^>]*)\sanchor="[^"]*"([^>]*)>/g, '<a:tcPr$1 anchor="' + anchorValue + '"$2>');
 }
 
+function clearTableTexts(tableXml) {
+  return tableXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, '<a:t></a:t>');
+}
+
+var WR_SPEC_VALUE_CX = 576376;
+var WR_SPEC_VALUE_CY = 329871;
+var WR_SPEC_ROW_H = 317677;
+var WR_SPEC_LEFT_X = 2023353;
+var WR_SPEC_LEFT_Y0 = 4321911;
+var WR_SPEC_RIGHT_X = 4377875;
+var WR_SPEC_RIGHT_Y0 = 4295450;
+
+function buildWarehouseRentSpecValueBoxXml(textValue, x, y, idx) {
+  var safe = escapeXmlText(textValue || '');
+  var font = textValue === '✓' ? 'Segoe UI Symbol' : 'Lato';
+  return '<p:sp>' +
+    '<p:nvSpPr><p:cNvPr id="' + (9700 + idx) + '" name="WR spec value ' + (idx + 1) + '"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>' +
+    '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + WR_SPEC_VALUE_CX + '" cy="' + WR_SPEC_VALUE_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>' +
+    '<p:txBody><a:bodyPr anchor="ctr" rtlCol="0"/><a:lstStyle/><a:p><a:pPr algn="ctr"/>' +
+    '<a:r><a:rPr lang="pl-PL" sz="1100" b="1" dirty="0"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:latin typeface="' + font + '"/><a:ea typeface="' + font + '"/><a:cs typeface="' + font + '"/></a:rPr><a:t>' + safe + '</a:t></a:r>' +
+    '</a:p></p:txBody>' +
+    '</p:sp>';
+}
+
+function applyWarehouseRentSpecValuesOverlay(xml) {
+  var leftValues = [
+    wrIcon('heating'),
+    val('wr_clear_height') || '',
+    wrIcon('sprinklers'),
+    wrIcon('smoke_vents'),
+    wrIcon('docks'),
+    wrIcon('gate0'),
+    wrIcon('dust_free_floor')
+  ];
+  var rightValues = [
+    val('wr_floor_loading') || '',
+    wrIcon('crane'),
+    wrIcon('cctv'),
+    wrIcon('security'),
+    wrIcon('production'),
+    wrIcon('ev_charging'),
+    wrIcon('solar')
+  ];
+
+  var shapes = '';
+  leftValues.forEach(function(v, i) {
+    shapes += buildWarehouseRentSpecValueBoxXml(v, WR_SPEC_LEFT_X, WR_SPEC_LEFT_Y0 + i * WR_SPEC_ROW_H, i);
+  });
+  rightValues.forEach(function(v, i) {
+    shapes += buildWarehouseRentSpecValueBoxXml(v, WR_SPEC_RIGHT_X, WR_SPEC_RIGHT_Y0 + i * WR_SPEC_ROW_H, 20 + i);
+  });
+
+  if (shapes) xml = xml.replace('</p:spTree>', shapes + '</p:spTree>');
+  return xml;
+}
+
 function processWarehouseRentMasterLabels(xml) {
   var areaRows = [];
   getActiveWarehouseRentAreaFields().forEach(function(field) {
@@ -6550,12 +6606,16 @@ function processWarehouseRentSlide2(xml) {
   xml = replaceAll(xml, '>MIASTO, UL. ULICA<', '>' + escapeXmlText(cityStreet || 'MIASTO, UL. ULICA') + '<');
   xml = applyWarehouseRentDistanceLayout(xml);
 
+  // Template spec value placeholders may be fully empty or removed.
+  // Keep the original tables in place for layout stability, clear any old placeholders,
+  // and render the values as overlay text boxes at fixed template coordinates.
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return setTableCellAnchor(replaceTableRowsTextCompactEnsure(tableXml, [[wrIcon('heating')], [val('wr_clear_height') || ''], [wrIcon('sprinklers')], [wrIcon('smoke_vents')], [wrIcon('docks')], [wrIcon('gate0')], [wrIcon('dust_free_floor')]]), 'ctr');
+    return clearTableTexts(tableXml);
   });
   xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    return setTableCellAnchor(replaceTableRowsTextCompactEnsure(tableXml, [[val('wr_floor_loading') || ''], [wrIcon('crane')], [wrIcon('cctv')], [wrIcon('security')], [wrIcon('production')], [wrIcon('ev_charging')], [wrIcon('solar')]]), 'ctr');
+    return clearTableTexts(tableXml);
   });
+  xml = applyWarehouseRentSpecValuesOverlay(xml);
   var areaRows = [];
   getActiveWarehouseRentAreaFields().forEach(function(field) { areaRows.push([field.value || '']); });
   var rentRows = [];
