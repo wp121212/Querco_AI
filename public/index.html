@@ -6507,6 +6507,7 @@ var warehouseRentSpecState = {
 var warehouseRentSpecSwitchesBound = false;
 
 function syncWarehouseRentSpecSwitches() {
+  if (!warehouseRentSpecState) return;
   Object.keys(warehouseRentSpecState).forEach(function(key) {
     var btn = document.querySelector('[data-spec="' + key + '"]');
     if (btn) {
@@ -6535,9 +6536,8 @@ function bindWarehouseRentSpecSwitches() {
   syncWarehouseRentSpecSwitches();
 }
 
-function wrIcon(key) { return warehouseRentSpecState[key] ? '✓' : '✕'; }
+function wrIcon(key) { return warehouseRentSpecState[key] ? '✓' : 'X'; }
 function wrCur(id) { return val(id + '_currency') || (id === 'wr_service_charge' ? 'PLN' : 'EUR'); }
-bindWarehouseRentSpecSwitches();
 function processWarehouseRentCover(xml) {
   xml = replaceAll(xml, '>NAZWA KLIENTA<', '>' + escapeXmlText(valUpper('client_name') || 'NAZWA KLIENTA') + '<');
   xml = replaceAll(xml, '>IMIĘ I NAZWISKO, tel. TELEFON<', '>' + escapeXmlText((val('broker_name') || 'IMIĘ I NAZWISKO') + (val('broker_phone') ? ', tel. ' + val('broker_phone') : '')) + '<');
