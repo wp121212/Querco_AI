@@ -2733,26 +2733,56 @@ function getActiveWarehouseRentRentFields() {
 
 function replaceRowTextEnsure(rowXml, values) {
   values = values || [];
-  var textCount = (rowXml.match(/<a:t>[\s\S]*?<\/a:t>/g) || []).length;
-  if (textCount > 0) {
-    var textIndex = 0;
-    return rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function() {
-      var replacement = textIndex < values.length ? values[textIndex] : '';
-      textIndex++;
-      return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
+
+  function replaceCellText(cellXml, replacement) {
+    replacement = replacement || '';
+    var safe = escapeXmlText(replacement);
+
+    // Normal cells with existing text runs.
+    if (/<a:t>[\s\S]*?<\/a:t>/.test(cellXml)) {
+      var done = false;
+      cellXml = cellXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function(txt) {
+        if (done) return '<a:t></a:t>';
+        done = true;
+        return '<a:t>' + safe + '</a:t>';
+      });
+      return cellXml;
+    }
+
+    // Empty PPT table cells often contain only <a:endParaRPr>...</a:endParaRPr>.
+    // Insert a real run BEFORE endParaRPr; inserting after it is ignored by PowerPoint.
+    if (/<a:endParaRPr\b([^>]*)>([\s\S]*?)<\/a:endParaRPr>/.test(cellXml)) {
+      return cellXml.replace(/<a:endParaRPr\b([^>]*)>([\s\S]*?)<\/a:endParaRPr>/, function(match, attrs, inner) {
+        return '<a:r><a:rPr' + attrs + '>' + inner + '</a:rPr><a:t>' + safe + '</a:t></a:r>' + match;
+      });
+    }
+
+    // Fallback for self-closing endParaRPr.
+    if (/<a:endParaRPr\b([^\/]*)\/>/.test(cellXml)) {
+      return cellXml.replace(/<a:endParaRPr\b([^\/]*)\/>/, function(match, attrs) {
+        return '<a:r><a:rPr' + attrs + '/><a:t>' + safe + '</a:t></a:r>' + match;
+      });
+    }
+
+    // Last fallback: insert before paragraph close.
+    return cellXml.replace('</a:p>', '<a:r><a:rPr lang="pl-PL" sz="1100"/><a:t>' + safe + '</a:t></a:r></a:p>');
+  }
+
+  var cells = rowXml.match(/<a:tc>[\s\S]*?<\/a:tc>/g) || [];
+  if (cells.length) {
+    var cellIndex = 0;
+    return rowXml.replace(/<a:tc>[\s\S]*?<\/a:tc>/g, function(cellXml) {
+      var replacement = cellIndex < values.length ? values[cellIndex] : '';
+      cellIndex++;
+      return replaceCellText(cellXml, replacement);
     });
   }
 
-  var cellIndex = 0;
-  return rowXml.replace(/<a:tc>[\s\S]*?<\/a:tc>/g, function(cellXml) {
-    var replacement = cellIndex < values.length ? values[cellIndex] : '';
-    cellIndex++;
-    if (!replacement) return cellXml;
-    var safe = escapeXmlText(replacement);
-    if (/<a:endParaRPr([^>]*)\/>/.test(cellXml)) {
-      return cellXml.replace(/<a:endParaRPr([^>]*)\/>/, '<a:r><a:rPr$1/><a:t>' + safe + '</a:t></a:r><a:endParaRPr$1/>');
-    }
-    return cellXml.replace('</a:p>', '<a:r><a:rPr lang="pl-PL" sz="1100"/><a:t>' + safe + '</a:t></a:r></a:p>');
+  var textIndex = 0;
+  return rowXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function() {
+    var replacement = textIndex < values.length ? values[textIndex] : '';
+    textIndex++;
+    return '<a:t>' + escapeXmlText(replacement) + '</a:t>';
   });
 }
 
