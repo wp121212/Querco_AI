@@ -2724,7 +2724,7 @@ function getActiveWarehouseRentRentFields() {
       key: cfg.key,
       label_pl: getWarehouseRentDetailLabel(cfg.key, 'pl', cfg.plFallback),
       label_en: getWarehouseRentDetailLabel(cfg.key, 'en', cfg.enFallback),
-      value: val(cfg.key),
+      value: formatTwoDecimalsForPptx(val(cfg.key)),
       currency: wrCur(cfg.key)
     });
   });
@@ -3618,6 +3618,10 @@ function isTwoDecimalFormatField(id) {
   return TWO_DECIMAL_FORMAT_FIELDS.indexOf(id) !== -1;
 }
 
+function formatTwoDecimalsForPptx(raw) {
+  return formatReadableNumber(raw, true);
+}
+
 function isNumberFormatField(id) {
   return NUMBER_FORMAT_FIELDS.indexOf(id) !== -1;
 }
@@ -3664,7 +3668,7 @@ function formatNumericFieldById(id) {
   if (!isNumberFormatField(id) && !isTwoDecimalFormatField(id)) return;
   var el = document.getElementById(id);
   if (!el || typeof el.value === 'undefined') return;
-  var formatted = formatReadableNumber(el.value, isTwoDecimalFormatField(id));
+  var formatted = formatReadableNumber(el.value, false);
   if (formatted !== el.value) {
     el.value = formatted;
   }
