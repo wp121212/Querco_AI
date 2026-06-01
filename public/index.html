@@ -2823,6 +2823,7 @@ var WR_SPEC_ICON_CX = 230000;
 var WR_SPEC_ICON_CY = 230000;
 var WR_SPEC_TEXT_CX = 576376;
 var WR_SPEC_TEXT_CY = 329871;
+var WR_SPEC_ICON_Y_OFFSET = 65000; // lowers spec PNG icons to sit visually centered between row lines
 
 function getWarehouseRentSpecValueX(side) {
   var tableX = side === 'right' ? WR_SPEC_RIGHT_TABLE_X : WR_SPEC_LEFT_TABLE_X;
@@ -2831,7 +2832,7 @@ function getWarehouseRentSpecValueX(side) {
 
 function getWarehouseRentSpecValueY(side, rowIndex, itemCy) {
   var tableY = side === 'right' ? WR_SPEC_RIGHT_TABLE_Y : WR_SPEC_LEFT_TABLE_Y;
-  return Math.round(tableY + rowIndex * WR_SPEC_ROW_H + (WR_SPEC_ROW_H - itemCy) / 2);
+  return Math.round(tableY + rowIndex * WR_SPEC_ROW_H + (WR_SPEC_ROW_H - itemCy) / 2 + WR_SPEC_ICON_Y_OFFSET);
 }
 
 function getWarehouseRentSpecIconItems() {
