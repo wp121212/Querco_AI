@@ -2823,11 +2823,13 @@ var WR_SPEC_ICON_CX = 230000;
 var WR_SPEC_ICON_CY = 230000;
 var WR_SPEC_TEXT_CX = 576376;
 var WR_SPEC_TEXT_CY = 329871;
-var WR_SPEC_ICON_Y_OFFSET = 65000; // lowers spec PNG icons to sit visually centered between row lines
+var WR_SPEC_ICON_X_OFFSET = 85000; // moves spec PNG icons slightly right inside the value area
+var WR_SPEC_ICON_Y_OFFSET = 35000; // centers spec PNG icons between row divider lines
+var WR_SPEC_X_ICON_Y_EXTRA = 12000; // balances the X icon visual center against the check icon
 
 function getWarehouseRentSpecValueX(side) {
   var tableX = side === 'right' ? WR_SPEC_RIGHT_TABLE_X : WR_SPEC_LEFT_TABLE_X;
-  return Math.round(tableX + (WR_SPEC_VALUE_CX - WR_SPEC_ICON_CX) / 2);
+  return Math.round(tableX + (WR_SPEC_VALUE_CX - WR_SPEC_ICON_CX) / 2 + WR_SPEC_ICON_X_OFFSET);
 }
 
 function getWarehouseRentSpecValueY(side, rowIndex, itemCy) {
@@ -2911,7 +2913,7 @@ async function insertWarehouseRentSpecIconImages(zip) {
   var shapes = '';
   getWarehouseRentSpecIconItems().forEach(function(item, idx) {
     var x = getWarehouseRentSpecValueX(item.side);
-    var y = getWarehouseRentSpecValueY(item.side, item.row, WR_SPEC_ICON_CY);
+    var y = getWarehouseRentSpecValueY(item.side, item.row, WR_SPEC_ICON_CY) + (item.on ? 0 : WR_SPEC_X_ICON_Y_EXTRA);
     shapes += buildWarehouseRentSpecIconPicXml(item.on ? checkRelId : xRelId, x, y, idx);
   });
 
