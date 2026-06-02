@@ -3040,19 +3040,61 @@ function processWarehouseRentMasterLabels(xml) {
     rentRows.push([field.label_pl, field.label_en]);
   });
 
+  // Spec tables use paragraph-aware replacement because superscript chars
+  // (e.g. T/M²) split labels into multiple <a:t> runs within one paragraph.
   xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, leftSpecRows, leftSpecRows.length);
+    return replaceSpecMasterRows(tableXml, leftSpecRows, leftSpecRows.length);
   });
   xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, rightSpecRows, rightSpecRows.length);
+    return replaceSpecMasterRows(tableXml, rightSpecRows, rightSpecRows.length);
   });
   xml = replaceTableByIndex(xml, 2, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, areaRows, areaRows.length);
+    return replaceSpecMasterRows(tableXml, areaRows, areaRows.length);
   });
   xml = replaceTableByIndex(xml, 3, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, rentRows, rentRows.length);
+    return replaceSpecMasterRows(tableXml, rentRows, rentRows.length);
   });
   return xml;
+}
+
+// Like replaceBuildingMasterRows but replaces text per-paragraph instead of
+// sequentially across the whole row. This correctly handles rows where
+// superscript characters (T/M², m²) split a single label into multiple
+// <a:t> runs: the label goes into the first run and the rest are cleared.
+function replaceSpecMasterRows(tableXml, rowsValues, activeCount) {
+  var rowIndex = 0;
+  var rowsToRender = rowsValues.length ? rowsValues : [['', '']];
+  var renderCount = rowsToRender.length;
+
+  return tableXml.replace(/<a:tr[\s\S]*?<\/a:tr>/g, function(rowXml) {
+    if (rowIndex >= renderCount) {
+      rowIndex++;
+      return '';
+    }
+    var values = rowsToRender[rowIndex] || [];
+    var visibleRows = activeCount || 0;
+    rowXml = setTableRowHeight(rowXml, BUILDING_TABLE_ROW_HEIGHT);
+    rowXml = setBuildingMasterRowBorders(rowXml, rowIndex, visibleRows);
+
+    // Replace text per-paragraph: each <a:p> that has runs gets one value.
+    var paraIndex = 0;
+    rowXml = rowXml.replace(/<a:p[\s\S]*?<\/a:p>/g, function(paraXml) {
+      if (!/<a:r>/.test(paraXml)) return paraXml; // skip paragraphs without runs
+      var val = paraIndex < values.length ? values[paraIndex] : '';
+      paraIndex++;
+      var firstRun = true;
+      return paraXml.replace(/<a:t>[\s\S]*?<\/a:t>/g, function() {
+        if (firstRun) {
+          firstRun = false;
+          return '<a:t>' + escapeXmlText(val) + '</a:t>';
+        }
+        return '<a:t></a:t>';
+      });
+    });
+
+    rowIndex++;
+    return rowXml;
+  });
 }
 
 /* ===== SECTION 03 FIELD VISIBILITY ===== */
@@ -6891,17 +6933,9 @@ function processWarehouseRentSlide2(xml) {
   xml = replaceAll(xml, '>MIASTO, UL. ULICA<', '>' + escapeXmlText(cityStreet || 'MIASTO, UL. ULICA') + '<');
   xml = applyWarehouseRentDistanceLayout(xml);
 
-  // Spec value cells: compact tables to match balanced column counts, clear texts, set borders.
-  var balanced = getBalancedWarehouseRentSpecColumns();
-  var leftEmptyRows = balanced.left.map(function() { return ['']; });
-  var rightEmptyRows = balanced.right.map(function() { return ['']; });
-
-  xml = replaceTableByIndex(xml, 0, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, leftEmptyRows, balanced.left.length);
-  });
-  xml = replaceTableByIndex(xml, 1, function(tableXml) {
-    return replaceBuildingMasterRows(tableXml, rightEmptyRows, balanced.right.length);
-  });
+  // Spec value cells: just clear existing text — icons/values are added as overlays.
+  xml = replaceTableByIndex(xml, 0, function(tableXml) { return clearTableTexts(tableXml); });
+  xml = replaceTableByIndex(xml, 1, function(tableXml) { return clearTableTexts(tableXml); });
   xml = applyWarehouseRentSpecTextOverlay(xml);
   var areaRows = [];
   getActiveWarehouseRentAreaFields().forEach(function(field) { areaRows.push([field.value || '']); });
