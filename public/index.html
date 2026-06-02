@@ -2466,19 +2466,26 @@ select:focus {
   </div>
   <div class="card-body">
     <div class="spec-grid" id="warehouse-rent-spec-grid">
+      <!-- Row 1 -->
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Wysokość</div><div class="field-label-en">Clear Height</div></div><div class="field-value"><input id="wr_clear_height" placeholder="10"></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Nośność posadzki</div><div class="field-label-en">Floor Loading</div></div><div class="field-value"><input id="wr_floor_loading" placeholder="5"></div></div>
+      <!-- Row 2 -->
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Ogrzewanie</div><div class="field-label-en">Heating</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="heating" onclick="toggleWarehouseRentSpec('heating')"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Tryskacze</div><div class="field-label-en">Sprinklers</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="sprinklers" onclick="toggleWarehouseRentSpec('sprinklers')"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Klapy dymowe</div><div class="field-label-en">Smoke Vents</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="smoke_vents" onclick="toggleWarehouseRentSpec('smoke_vents')"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Doki</div><div class="field-label-en">Docks</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="docks" onclick="toggleWarehouseRentSpec('docks')"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Bramy 0</div><div class="field-label-en">Gate 0</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="gate0" onclick="toggleWarehouseRentSpec('gate0')"><span>✕</span><span>✓</span></button></div></div>
-      <div class="field-row"><div class="field-label"><div class="field-label-pl">Posadzka bezpyłowa</div><div class="field-label-en">Floor Dust-free</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="dust_free_floor" onclick="toggleWarehouseRentSpec('dust_free_floor')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Suwnica</div><div class="field-label-en">Crane</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="crane" onclick="toggleWarehouseRentSpec('crane')"><span>✕</span><span>✓</span></button></div></div>
+      <!-- Row 3 -->
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Tryskacze</div><div class="field-label-en">Sprinklers</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="sprinklers" onclick="toggleWarehouseRentSpec('sprinklers')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Monitoring</div><div class="field-label-en">CCTV</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="cctv" onclick="toggleWarehouseRentSpec('cctv')"><span>✕</span><span>✓</span></button></div></div>
+      <!-- Row 4 -->
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Klapy dymowe</div><div class="field-label-en">Smoke Vents</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="smoke_vents" onclick="toggleWarehouseRentSpec('smoke_vents')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Ochrona</div><div class="field-label-en">Security</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="security" onclick="toggleWarehouseRentSpec('security')"><span>✕</span><span>✓</span></button></div></div>
+      <!-- Row 5 -->
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Doki</div><div class="field-label-en">Docks</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="docks" onclick="toggleWarehouseRentSpec('docks')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Produkcja</div><div class="field-label-en">Production</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="production" onclick="toggleWarehouseRentSpec('production')"><span>✕</span><span>✓</span></button></div></div>
+      <!-- Row 6 -->
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Bramy 0</div><div class="field-label-en">Gate 0</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="gate0" onclick="toggleWarehouseRentSpec('gate0')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Stacja ładowania</div><div class="field-label-en">EV Charging Station</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="ev_charging" onclick="toggleWarehouseRentSpec('ev_charging')"><span>✕</span><span>✓</span></button></div></div>
+      <!-- Row 7 -->
+      <div class="field-row"><div class="field-label"><div class="field-label-pl">Posadzka bezpyłowa</div><div class="field-label-en">Floor Dust-free</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="dust_free_floor" onclick="toggleWarehouseRentSpec('dust_free_floor')"><span>✕</span><span>✓</span></button></div></div>
       <div class="field-row"><div class="field-label"><div class="field-label-pl">Fotowoltaika</div><div class="field-label-en">Solar Panel</div></div><div class="field-value"><button type="button" class="spec-switch" data-spec="solar" onclick="toggleWarehouseRentSpec('solar')"><span>✕</span><span>✓</span></button></div></div>
     </div>
   </div>
@@ -2886,9 +2893,10 @@ function getWarehouseRentSpecValueY(side, rowIndex, itemCy) {
 
 function getWarehouseRentSpecConfig() {
   // Canonical order — no hardcoded side. Columns are balanced dynamically.
+  // With 14 items and ceil(14/2)=7, items 1-7 → left, 8-14 → right.
   return [
-    { key: 'heating', type: 'icon', pl: 'OGRZEWANIE', en: 'HEATING' },
     { key: 'wr_clear_height', type: 'text', valueId: 'wr_clear_height', pl: 'WYSOKOŚĆ [M]', en: 'CLEAR HEIGHT [M]' },
+    { key: 'heating', type: 'icon', pl: 'OGRZEWANIE', en: 'HEATING' },
     { key: 'sprinklers', type: 'icon', pl: 'TRYSKACZE', en: 'SPRINKLERS' },
     { key: 'smoke_vents', type: 'icon', pl: 'KLAPY DYMOWE', en: 'SMOKE VENTS' },
     { key: 'docks', type: 'icon', pl: 'DOKI', en: 'DOCKS' },
