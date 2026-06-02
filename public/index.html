@@ -2291,6 +2291,17 @@ select:focus {
   .wr-map-preview img { min-height: 150px; }
 }
 
+
+
+/* === FIX: smaller map marker, override generic map preview image sizing === */
+.wr-map-preview img.wr-map-marker {
+  width: 24px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  object-fit: contain !important;
+  transform: translate(-50%, -100%);
+}
 </style>
 </head>
 <body>
@@ -7274,7 +7285,7 @@ function warehouseRentDataUrlToBlob(dataUrl) {
 function getWarehouseRentMapMarkerBox() {
   if (!warehouseRentMapMarker) return null;
   var mapBox = getWarehouseRentMapBox();
-  var markerCx = 280000;
+  var markerCx = 130000;
   var markerCy = Math.round(markerCx * 88 / 74);
   var tipX = mapBox.x + Math.round(mapBox.cx * warehouseRentMapMarker.x);
   var tipY = mapBox.y + Math.round(mapBox.cy * warehouseRentMapMarker.y);
