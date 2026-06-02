@@ -3196,7 +3196,7 @@ function setTableRowHeights(tableXml, height) {
 }
 
 function setCellBorder(rowXml, borderTag, visible) {
-  var re = new RegExp('<a:' + borderTag + '([^>]*)>[\s\S]*?<\/a:' + borderTag + '>', 'g');
+  var re = new RegExp('<a:' + borderTag + '([^>]*)>[\\s\\S]*?<\\/a:' + borderTag + '>', 'g');
   return rowXml.replace(re, function(match, attrs) {
     if (visible) {
       return '<a:' + borderTag + attrs + '><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:prstDash val="solid"/><a:round/><a:headEnd type="none" w="med" len="med"/><a:tailEnd type="none" w="med" len="med"/></a:' + borderTag + '>';
