@@ -2402,7 +2402,7 @@ select:focus {
             <select id="wr_map_select" class="wr-map-select" onchange="setWarehouseRentMap(this.value)">
               <option value="">— wybierz mapę —</option>
             </select>
-            <div class="wr-map-note">Pliki są pobierane z folderu <strong>public/maps</strong> i wstawiane w miejsce mapy na slajdzie 2.</div>
+            <div class="wr-map-note">Możesz wybrać mapę ręcznie albo wpisać miasto — pasująca mapka zaznaczy się automatycznie.</div>
           </div>
           <div class="wr-map-preview" id="wr-map-preview">
             <span class="wr-map-empty" id="wr-map-empty">Brak wybranej mapy</span>
@@ -7054,14 +7054,28 @@ function getWarehouseRentMapUrl(fileName) {
   return 'maps/' + String(fileName).split('/').map(function(part) { return encodeURIComponent(part); }).join('/');
 }
 
+
+function escapeWarehouseRentMapHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function populateWarehouseRentMapSelect() {
   var select = document.getElementById('wr_map_select');
   if (!select) return;
+  if (!Array.isArray(warehouseRentMapOptions) || !warehouseRentMapOptions.length) {
+    warehouseRentMapOptions = WAREHOUSE_RENT_MAP_OPTIONS_FALLBACK.slice();
+  }
   var previous = warehouseRentSelectedMap || select.value || '';
   var html = '<option value="">— wybierz mapę —</option>';
   warehouseRentMapOptions.forEach(function(item) {
+    if (!item || !item.file) return;
     var displayName = getWarehouseRentMapDisplayName(item.name || item.file);
-    html += '<option value="' + escapeHtmlAttr(item.file) + '">' + escapeHtmlText(displayName) + '</option>';
+    html += '<option value="' + escapeWarehouseRentMapHtml(item.file) + '">' + escapeWarehouseRentMapHtml(displayName) + '</option>';
   });
   select.innerHTML = html;
   if (previous && warehouseRentMapOptions.some(function(item) { return item.file === previous; })) {
