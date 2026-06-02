@@ -2970,13 +2970,13 @@ function buildWarehouseRentSpecIconPicXml(relId, x, y, idx) {
 function buildWarehouseRentSpecTextBoxXml(textValue, side, rowIndex, idx) {
   var safe = escapeXmlText(textValue || '');
   if (!safe) return '';
-  var tableX = side === 'right' ? WR_SPEC_RIGHT_TABLE_X : WR_SPEC_LEFT_TABLE_X;
+  var x = getWarehouseRentSpecValueX(side);
   var y = getWarehouseRentSpecValueY(side, rowIndex, WR_SPEC_TEXT_CY);
   return '<p:sp>' +
     '<p:nvSpPr><p:cNvPr id="' + (9900 + idx) + '" name="WR spec text ' + (idx + 1) + '"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>' +
-    '<p:spPr><a:xfrm><a:off x="' + tableX + '" y="' + y + '"/><a:ext cx="' + WR_SPEC_TEXT_CX + '" cy="' + WR_SPEC_TEXT_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>' +
+    '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + y + '"/><a:ext cx="' + WR_SPEC_ICON_CX + '" cy="' + WR_SPEC_TEXT_CY + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln><a:noFill/></a:ln></p:spPr>' +
     '<p:txBody><a:bodyPr anchor="ctr" rtlCol="0"/><a:lstStyle/><a:p><a:pPr algn="ctr"/>' +
-    '<a:r><a:rPr lang="pl-PL" sz="1100" b="1" dirty="0"><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr><a:t>' + safe + '</a:t></a:r>' +
+    '<a:r><a:rPr lang="pl-PL" sz="1100" dirty="0"><a:solidFill><a:srgbClr val="000000"/></a:solidFill><a:latin typeface="Lato"/><a:ea typeface="Lato"/><a:cs typeface="Lato"/></a:rPr><a:t>' + safe + '</a:t></a:r>' +
     '</a:p></p:txBody>' +
     '</p:sp>';
 }
