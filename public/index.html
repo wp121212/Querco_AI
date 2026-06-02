@@ -2885,21 +2885,22 @@ function getWarehouseRentSpecValueY(side, rowIndex, itemCy) {
 }
 
 function getWarehouseRentSpecConfig() {
+  // Canonical order — no hardcoded side. Columns are balanced dynamically.
   return [
-    { key: 'heating', type: 'icon', side: 'left', pl: 'OGRZEWANIE', en: 'HEATING' },
-    { key: 'wr_clear_height', type: 'text', side: 'left', valueId: 'wr_clear_height', pl: 'WYSOKOŚĆ [M]', en: 'CLEAR HIGHTS [M]' },
-    { key: 'sprinklers', type: 'icon', side: 'left', pl: 'TRYSKACZE', en: 'SPRINKLERS' },
-    { key: 'smoke_vents', type: 'icon', side: 'left', pl: 'KLAPY DYMOWE', en: 'SMOKE VENTS' },
-    { key: 'docks', type: 'icon', side: 'left', pl: 'DOKI', en: 'DOCKS' },
-    { key: 'gate0', type: 'icon', side: 'left', pl: 'BRAMY 0', en: 'GATE 0' },
-    { key: 'dust_free_floor', type: 'icon', side: 'left', pl: 'POSADZKA BEZPYŁOWA', en: 'FLOOR DUST-FREE' },
-    { key: 'wr_floor_loading', type: 'text', side: 'right', valueId: 'wr_floor_loading', pl: 'NOŚNOŚĆ POSADZKI [T/M²]', en: 'FLOOR LOADING [T/M²]' },
-    { key: 'crane', type: 'icon', side: 'right', pl: 'SUWNICA', en: 'CRANE' },
-    { key: 'cctv', type: 'icon', side: 'right', pl: 'MONITORING', en: 'CCTV' },
-    { key: 'security', type: 'icon', side: 'right', pl: 'OCHRONA', en: 'SECURITY' },
-    { key: 'production', type: 'icon', side: 'right', pl: 'PRODUKCJA', en: 'PRODUCTION' },
-    { key: 'ev_charging', type: 'icon', side: 'right', pl: 'STACJA ŁADOW. SAM. ELEKTR.', en: 'EV CHARGING STATION' },
-    { key: 'solar', type: 'icon', side: 'right', pl: 'FOTOWOLTAIKA', en: 'SOLAR PANEL' }
+    { key: 'heating', type: 'icon', pl: 'OGRZEWANIE', en: 'HEATING' },
+    { key: 'wr_clear_height', type: 'text', valueId: 'wr_clear_height', pl: 'WYSOKOŚĆ [M]', en: 'CLEAR HEIGHT [M]' },
+    { key: 'sprinklers', type: 'icon', pl: 'TRYSKACZE', en: 'SPRINKLERS' },
+    { key: 'smoke_vents', type: 'icon', pl: 'KLAPY DYMOWE', en: 'SMOKE VENTS' },
+    { key: 'docks', type: 'icon', pl: 'DOKI', en: 'DOCKS' },
+    { key: 'gate0', type: 'icon', pl: 'BRAMY 0', en: 'GATE 0' },
+    { key: 'dust_free_floor', type: 'icon', pl: 'POSADZKA BEZPYŁOWA', en: 'FLOOR DUST-FREE' },
+    { key: 'wr_floor_loading', type: 'text', valueId: 'wr_floor_loading', pl: 'NOŚNOŚĆ POSADZKI [T/M²]', en: 'FLOOR LOADING [T/M²]' },
+    { key: 'crane', type: 'icon', pl: 'SUWNICA', en: 'CRANE' },
+    { key: 'cctv', type: 'icon', pl: 'MONITORING', en: 'CCTV' },
+    { key: 'security', type: 'icon', pl: 'OCHRONA', en: 'SECURITY' },
+    { key: 'production', type: 'icon', pl: 'PRODUKCJA', en: 'PRODUCTION' },
+    { key: 'ev_charging', type: 'icon', pl: 'STACJA ŁADOW. SAM. ELEKTR.', en: 'EV CHARGING STATION' },
+    { key: 'solar', type: 'icon', pl: 'FOTOWOLTAIKA', en: 'SOLAR PANEL' }
   ];
 }
 
@@ -2907,19 +2908,30 @@ function isWarehouseRentSpecItemVisible(key) {
   return !window.warehouseRentSpecVisibilityState || window.warehouseRentSpecVisibilityState[key] !== false;
 }
 
-function getActiveWarehouseRentSpecRows(side) {
-  return getWarehouseRentSpecConfig()
-    .filter(function(item) { return item.side === side && isWarehouseRentSpecItemVisible(item.key); })
-    .map(function(item, index) {
-      var copy = Object.assign({}, item);
-      copy.row = index;
-      return copy;
-    });
+function getBalancedWarehouseRentSpecColumns() {
+  // 1. Filter only active (visible) items from the canonical list
+  var active = getWarehouseRentSpecConfig().filter(function(item) {
+    return isWarehouseRentSpecItemVisible(item.key);
+  });
+  // 2. Split into two balanced columns
+  var leftCount = Math.ceil(active.length / 2);
+  var left = active.slice(0, leftCount).map(function(item, i) {
+    var copy = Object.assign({}, item);
+    copy.side = 'left';
+    copy.row = i;
+    return copy;
+  });
+  var right = active.slice(leftCount).map(function(item, i) {
+    var copy = Object.assign({}, item);
+    copy.side = 'right';
+    copy.row = i;
+    return copy;
+  });
+  return { left: left, right: right, all: left.concat(right) };
 }
 
 function getWarehouseRentSpecIconItems() {
-  return getActiveWarehouseRentSpecRows('left')
-    .concat(getActiveWarehouseRentSpecRows('right'))
+  return getBalancedWarehouseRentSpecColumns().all
     .filter(function(item) { return item.type === 'icon'; })
     .map(function(item) {
       return { side: item.side, row: item.row, on: !!warehouseRentSpecState[item.key], key: item.key };
@@ -2927,8 +2939,7 @@ function getWarehouseRentSpecIconItems() {
 }
 
 function getWarehouseRentSpecTextItems() {
-  return getActiveWarehouseRentSpecRows('left')
-    .concat(getActiveWarehouseRentSpecRows('right'))
+  return getBalancedWarehouseRentSpecColumns().all
     .filter(function(item) { return item.type === 'text'; })
     .map(function(item) {
       return { side: item.side, row: item.row, value: val(item.valueId || item.key), key: item.key };
@@ -3005,10 +3016,11 @@ async function insertWarehouseRentSpecIconImages(zip) {
 }
 
 function processWarehouseRentMasterLabels(xml) {
-  var leftSpecRows = getActiveWarehouseRentSpecRows('left').map(function(field) {
+  var balanced = getBalancedWarehouseRentSpecColumns();
+  var leftSpecRows = balanced.left.map(function(field) {
     return [field.pl || '', field.en || ''];
   });
-  var rightSpecRows = getActiveWarehouseRentSpecRows('right').map(function(field) {
+  var rightSpecRows = balanced.right.map(function(field) {
     return [field.pl || '', field.en || ''];
   });
   var areaRows = [];
@@ -6871,10 +6883,17 @@ function processWarehouseRentSlide2(xml) {
   xml = replaceAll(xml, '>MIASTO, UL. ULICA<', '>' + escapeXmlText(cityStreet || 'MIASTO, UL. ULICA') + '<');
   xml = applyWarehouseRentDistanceLayout(xml);
 
-  // Spec value cells in the PowerPoint template may be empty, so we do not rely on text placeholders.
-  // Clear any old placeholders and render technical values/icons as overlays.
-  xml = replaceTableByIndex(xml, 0, function(tableXml) { return clearTableTexts(tableXml); });
-  xml = replaceTableByIndex(xml, 1, function(tableXml) { return clearTableTexts(tableXml); });
+  // Spec value cells: compact tables to match balanced column counts, clear texts, set borders.
+  var balanced = getBalancedWarehouseRentSpecColumns();
+  var leftEmptyRows = balanced.left.map(function() { return ['']; });
+  var rightEmptyRows = balanced.right.map(function() { return ['']; });
+
+  xml = replaceTableByIndex(xml, 0, function(tableXml) {
+    return replaceBuildingMasterRows(tableXml, leftEmptyRows, balanced.left.length);
+  });
+  xml = replaceTableByIndex(xml, 1, function(tableXml) {
+    return replaceBuildingMasterRows(tableXml, rightEmptyRows, balanced.right.length);
+  });
   xml = applyWarehouseRentSpecTextOverlay(xml);
   var areaRows = [];
   getActiveWarehouseRentAreaFields().forEach(function(field) { areaRows.push([field.value || '']); });
