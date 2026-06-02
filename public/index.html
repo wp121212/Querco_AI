@@ -3946,6 +3946,7 @@ document.addEventListener('DOMContentLoaded', function() {
   try { initWarehouseRentDetailFieldToggles(); } catch (e) { console.error('initWarehouseRentDetailFieldToggles failed', e); }
   try { initWarehouseRentSpecVisibilityToggles(); } catch (e) { console.error('initWarehouseRentSpecVisibilityToggles failed', e); }
   try { initWarehouseRentMapSelector(); } catch (e) { console.error('initWarehouseRentMapSelector failed', e); }
+  try { initWarehouseRentMapCityAutoSelect(); } catch (e) { console.error('initWarehouseRentMapCityAutoSelect failed', e); }
   try { initNumberFormatting(); } catch (e) { console.error('initNumberFormatting failed', e); }
   try { initAskingPriceSync(); } catch (e) { console.error('initAskingPriceSync failed', e); }
   try { initMpzpResolutionComposer(); } catch (e) { console.error('initMpzpResolutionComposer failed', e); }
@@ -6135,6 +6136,8 @@ function applyTemplateMode(key) {
 
   if (isWarehouseRent) {
     try { initWarehouseRentMapSelector(); } catch(e) { console.error(e); }
+    try { initWarehouseRentMapCityAutoSelect(); } catch(e) { console.error(e); }
+    try { autoSelectWarehouseRentMapByCity(); } catch(e) { console.error(e); }
   }
 
   setWarehouseRentPlanInputMode();
@@ -6961,21 +6964,78 @@ updateWarehouseRentDistanceUi();
 
 /* ===== WAREHOUSE RENT MAP SELECTOR ===== */
 var WAREHOUSE_RENT_MAP_OPTIONS_FALLBACK = [
-  { name: 'Gdańsk_Południe.jpg', file: 'Gdańsk_Południe.jpg' },
-  { name: 'Gdańsk.jpg', file: 'Gdańsk.jpg' },
-  { name: 'Gdynia.jpg', file: 'Gdynia.jpg' },
-  { name: 'Słupsk.jpg', file: 'Słupsk.jpg' }
+  { name: 'Gdańsk_Południe', file: 'Gdańsk_Południe.jpg' },
+  { name: 'Gdańsk', file: 'Gdańsk.jpg' },
+  { name: 'Gdynia', file: 'Gdynia.jpg' },
+  { name: 'Słupsk', file: 'Słupsk.jpg' }
 ];
 var warehouseRentMapOptions = WAREHOUSE_RENT_MAP_OPTIONS_FALLBACK.slice();
 var warehouseRentSelectedMap = '';
 var warehouseRentMapSelectorReady = false;
 
-function escapeHtmlText(value) {
-  return escapeXmlText(value || '');
+
+function getWarehouseRentMapDisplayName(fileOrName) {
+  return String(fileOrName || '')
+    .replace(/^.*[\\/]/, '')
+    .replace(/\.(jpg|jpeg|png|webp)$/i, '');
 }
 
-function escapeHtmlAttr(value) {
-  return escapeXmlText(value || '').replace(/"/g, '&quot;');
+function normalizeWarehouseRentMapName(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/ł/g, 'l')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/^gdassk$/, 'gdansk');
+}
+
+function normalizeWarehouseRentMapKey(value) {
+  return normalizeWarehouseRentMapName(value).replace(/\s+/g, '');
+}
+
+function findWarehouseRentMapForCity(cityValue) {
+  var cityName = normalizeWarehouseRentMapName(cityValue);
+  var cityKey = normalizeWarehouseRentMapKey(cityValue);
+  if (!cityKey) return null;
+
+  var exact = null;
+  var startsWith = null;
+  var contains = null;
+  warehouseRentMapOptions.some(function(item) {
+    var label = getWarehouseRentMapDisplayName(item.name || item.file);
+    var mapName = normalizeWarehouseRentMapName(label);
+    var mapKey = normalizeWarehouseRentMapKey(label);
+
+    if (mapKey === cityKey) {
+      exact = item;
+      return true;
+    }
+    if (!startsWith && mapName.indexOf(cityName + ' ') === 0) startsWith = item;
+    if (!contains && (mapKey.indexOf(cityKey) !== -1 || cityKey.indexOf(mapKey) !== -1)) contains = item;
+    return false;
+  });
+  return exact || startsWith || contains;
+}
+
+function autoSelectWarehouseRentMapByCity() {
+  var cityEl = document.getElementById('city');
+  var select = document.getElementById('wr_map_select');
+  if (!cityEl || !select || !warehouseRentMapOptions.length) return;
+  var matched = findWarehouseRentMapForCity(cityEl.value);
+  if (!matched || !matched.file) return;
+  select.value = matched.file;
+  setWarehouseRentMap(matched.file);
+}
+
+function initWarehouseRentMapCityAutoSelect() {
+  var cityEl = document.getElementById('city');
+  if (!cityEl || cityEl.getAttribute('data-wr-map-city-ready') === '1') return;
+  cityEl.setAttribute('data-wr-map-city-ready', '1');
+  cityEl.addEventListener('input', autoSelectWarehouseRentMapByCity);
+  cityEl.addEventListener('change', autoSelectWarehouseRentMapByCity);
 }
 
 function normalizeWarehouseRentMapOptions(list) {
@@ -6983,8 +7043,8 @@ function normalizeWarehouseRentMapOptions(list) {
   var normalized = [];
   list.forEach(function(item) {
     if (!item) return;
-    if (typeof item === 'string') normalized.push({ name: item, file: item });
-    else if (item.file) normalized.push({ name: item.name || item.file, file: item.file });
+    if (typeof item === 'string') normalized.push({ name: getWarehouseRentMapDisplayName(item), file: item });
+    else if (item.file) normalized.push({ name: getWarehouseRentMapDisplayName(item.name || item.file), file: item.file });
   });
   return normalized.length ? normalized : WAREHOUSE_RENT_MAP_OPTIONS_FALLBACK.slice();
 }
@@ -7000,7 +7060,8 @@ function populateWarehouseRentMapSelect() {
   var previous = warehouseRentSelectedMap || select.value || '';
   var html = '<option value="">— wybierz mapę —</option>';
   warehouseRentMapOptions.forEach(function(item) {
-    html += '<option value="' + escapeHtmlAttr(item.file) + '">' + escapeHtmlText(item.name || item.file) + '</option>';
+    var displayName = getWarehouseRentMapDisplayName(item.name || item.file);
+    html += '<option value="' + escapeHtmlAttr(item.file) + '">' + escapeHtmlText(displayName) + '</option>';
   });
   select.innerHTML = html;
   if (previous && warehouseRentMapOptions.some(function(item) { return item.file === previous; })) {
@@ -7011,6 +7072,7 @@ function populateWarehouseRentMapSelect() {
     warehouseRentSelectedMap = '';
   }
   updateWarehouseRentMapPreview();
+  autoSelectWarehouseRentMapByCity();
 }
 
 function setWarehouseRentMap(fileName) {
