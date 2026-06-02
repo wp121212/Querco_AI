@@ -2302,6 +2302,405 @@ select:focus {
   object-fit: contain !important;
   transform: translate(-50%, -100%);
 }
+
+
+/* === COSMETIC REDESIGN: SIDEBAR TABS / WIZARD LAYOUT === */
+body.wizard-ui {
+  background: #f4f5f6;
+}
+body.wizard-ui .header {
+  min-height: 82px;
+  padding: 0 32px;
+  background: linear-gradient(180deg, #071d31 0%, #06182a 100%);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  box-shadow: 0 14px 40px rgba(6,24,42,.22);
+}
+body.wizard-ui .badge {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 3px;
+  background: #00478f;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: none;
+}
+body.wizard-ui .main {
+  width: 100%;
+  max-width: none;
+  min-height: calc(100vh - 82px);
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 430px;
+  gap: 0;
+  align-items: start;
+  background: #f5f6f7;
+}
+body.wizard-ui .wizard-sidebar {
+  grid-column: 1;
+  grid-row: 1 / span 999;
+  align-self: stretch;
+  position: sticky;
+  top: 82px;
+  height: calc(100vh - 82px);
+  overflow-y: auto;
+  background: linear-gradient(180deg, #071f35 0%, #06182a 100%);
+  border-right: 1px solid rgba(255,255,255,.08);
+  color: #fff;
+  z-index: 10;
+}
+.wizard-sidebar-inner {
+  padding: 30px 0;
+}
+.wizard-nav-btn {
+  width: 100%;
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  border: 0;
+  border-left: 5px solid transparent;
+  background: transparent;
+  color: rgba(255,255,255,.86);
+  text-align: left;
+  cursor: pointer;
+  padding: 0 22px;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.wizard-nav-btn:hover {
+  background: rgba(255,255,255,.045);
+  color: #fff;
+}
+.wizard-nav-btn.active {
+  border-left-color: #0a62b8;
+  background: rgba(0,74,143,.34);
+  color: #fff;
+}
+.wizard-nav-num {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+.wizard-nav-btn.active .wizard-nav-num {
+  background: #0a4d91;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,.12);
+}
+.wizard-nav-title {
+  display: block;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .015em;
+  line-height: 1.2;
+}
+.wizard-nav-subtitle {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.72);
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.2;
+}
+body.wizard-ui .wizard-preview {
+  grid-column: 3;
+  grid-row: 1 / span 999;
+  position: sticky;
+  top: 82px;
+  min-height: calc(100vh - 82px);
+  padding: 38px 28px;
+  background: #f7f8f9;
+  border-left: 1px solid #d8dde3;
+  z-index: 5;
+}
+.wizard-preview-title {
+  color: var(--q-text);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.wizard-preview-subtitle {
+  margin-top: 6px;
+  color: #5f6b76;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 12px;
+}
+.wizard-slide-preview-box {
+  margin-top: 28px;
+  aspect-ratio: 16 / 9;
+  background: #fff;
+  border: 1px solid #d9dee5;
+  box-shadow: 0 12px 28px rgba(16,42,61,.08);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 48% 52%;
+}
+.wizard-slide-preview-left {
+  padding: 30px 22px;
+  color: #fff;
+  background: linear-gradient(145deg, #071d31 0%, #0b2b49 100%);
+  display: flex;
+  flex-direction: column;
+}
+.wizard-preview-logo {
+  font-weight: 900;
+  letter-spacing: .16em;
+  font-size: 13px;
+  line-height: 1.1;
+}
+.wizard-preview-offer {
+  margin-top: auto;
+  font-size: 26px;
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.wizard-preview-line {
+  width: 48px;
+  height: 1px;
+  margin: 18px 0;
+  background: rgba(255,255,255,.75);
+}
+.wizard-preview-type {
+  color: rgba(255,255,255,.88);
+  font-size: 14px;
+  line-height: 1.35;
+}
+.wizard-slide-preview-right {
+  background:
+    linear-gradient(135deg, rgba(16,42,61,.16), rgba(16,42,61,.04)),
+    linear-gradient(45deg, #d6dce2 25%, #eef1f3 25%, #eef1f3 50%, #d6dce2 50%, #d6dce2 75%, #eef1f3 75%);
+  background-size: auto, 28px 28px;
+}
+.wizard-preview-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  color: #333;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 12px;
+}
+.wizard-preview-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+.wizard-arrow-btn {
+  width: 52px;
+  height: 52px;
+  border: 1px solid #d6dce2;
+  background: #fff;
+  color: #06182a;
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+.wizard-dots {
+  display: inline-flex;
+  gap: 13px;
+  align-items: center;
+}
+.wizard-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #9aa5b1;
+}
+.wizard-dot.active { background: #003b79; }
+.wizard-preview-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 34px;
+}
+.wizard-action-secondary,
+.wizard-action-primary {
+  min-height: 64px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: 'Lato', system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: .035em;
+  text-align: left;
+  padding: 0 22px;
+}
+.wizard-action-secondary {
+  border: 1px solid #d6dce2;
+  background: #fff;
+  color: var(--q-text);
+}
+.wizard-action-primary {
+  border: 1px solid #08294b;
+  background: #061d35;
+  color: #fff;
+}
+.wizard-action-secondary span,
+.wizard-action-primary span {
+  display: block;
+  margin-top: 4px;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  opacity: .82;
+}
+body.wizard-ui .main > :not(.wizard-sidebar):not(.wizard-preview) {
+  grid-column: 2;
+  width: min(100%, 980px);
+  justify-self: center;
+}
+body.wizard-ui .entry-card,
+body.wizard-ui .ai-card,
+body.wizard-ui .tmpl-card,
+body.wizard-ui .card,
+body.wizard-ui .wizard-reset-wrap,
+body.wizard-ui .gen-btn,
+body.wizard-ui .status {
+  width: min(100%, 980px);
+  margin-left: 0;
+  margin-right: 0;
+}
+body.wizard-ui .entry-card,
+body.wizard-ui .ai-card,
+body.wizard-ui .tmpl-card,
+body.wizard-ui .card {
+  margin-top: 28px;
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border-color: #d9dee5;
+  background: rgba(255,255,255,.98);
+}
+body.wizard-ui .entry-card::before,
+body.wizard-ui .ai-card::before,
+body.wizard-ui .tmpl-card::before,
+body.wizard-ui .card::before {
+  display: none;
+}
+body.wizard-ui .entry-card {
+  min-height: 0;
+  padding: 0 26px 26px;
+}
+body.wizard-ui .offer-type-row {
+  gap: 18px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+body.wizard-ui .offer-type-btn {
+  min-height: 76px;
+  border-radius: 2px;
+  font-size: 16px;
+  letter-spacing: .03em;
+}
+body.wizard-ui .property-picker {
+  padding: 26px 0 8px;
+}
+body.wizard-ui .property-grid,
+body.wizard-ui .property-grid.two-items {
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 14px;
+  justify-content: stretch;
+}
+body.wizard-ui .property-icon-box {
+  width: 110px;
+  height: 92px;
+  margin-bottom: 14px;
+  border-width: 1px;
+}
+body.wizard-ui .property-name {
+  font-size: 15px;
+  letter-spacing: .02em;
+}
+body.wizard-ui .card-header {
+  min-height: 76px;
+  padding: 22px 28px;
+  background: #fff;
+}
+body.wizard-ui .card-num {
+  width: auto;
+  height: auto;
+  background: transparent;
+  color: #111827;
+  box-shadow: none;
+  font-size: 28px;
+  letter-spacing: .04em;
+}
+body.wizard-ui .card-title {
+  font-size: 24px;
+  letter-spacing: .04em;
+}
+body.wizard-ui .card-title-en {
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+body.wizard-ui .wizard-reset-wrap {
+  margin-top: 18px !important;
+  margin-bottom: 0 !important;
+}
+body.wizard-ui .gen-btn {
+  margin-top: 28px;
+  max-width: 520px;
+  justify-self: center;
+}
+body.wizard-ui .status {
+  justify-self: center;
+}
+body.wizard-ui .wizard-hidden {
+  display: none !important;
+}
+.wizard-tab-heading {
+  grid-column: 2;
+  width: min(100%, 980px);
+  justify-self: center;
+  margin-top: 34px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #d6dce2;
+}
+.wizard-tab-heading h1 {
+  color: #111827;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.wizard-tab-heading p {
+  margin-top: 9px;
+  color: #6E7579;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: .03em;
+}
+@media (max-width: 1180px) {
+  body.wizard-ui .main { grid-template-columns: 260px minmax(0, 1fr); }
+  body.wizard-ui .wizard-preview { display: none; }
+}
+@media (max-width: 820px) {
+  body.wizard-ui .header { position: static; }
+  body.wizard-ui .main { display: block; }
+  body.wizard-ui .wizard-sidebar { position: static; height: auto; display: flex; overflow-x: auto; padding: 0; }
+  .wizard-sidebar-inner { display: flex; padding: 0; }
+  .wizard-nav-btn { width: 220px; min-height: 70px; border-left: none; border-bottom: 4px solid transparent; }
+  .wizard-nav-btn.active { border-bottom-color: #0a62b8; }
+  body.wizard-ui .main > :not(.wizard-sidebar):not(.wizard-preview),
+  .wizard-tab-heading { width: calc(100% - 28px); margin-left: auto; margin-right: auto; }
+}
+
 </style>
 </head>
 <body>
@@ -2314,6 +2713,44 @@ select:focus {
 </div>
 
 <div class="main">
+  <aside class="wizard-sidebar" aria-label="Nawigacja generatora">
+    <div class="wizard-sidebar-inner">
+      <button type="button" class="wizard-nav-btn active" data-wizard-nav="01"><span class="wizard-nav-num">01</span><span><span class="wizard-nav-title">Typ oferty</span><span class="wizard-nav-subtitle">Offer type</span></span></button>
+      <button type="button" class="wizard-nav-btn" data-wizard-nav="02"><span class="wizard-nav-num">02</span><span><span class="wizard-nav-title">Dane podstawowe</span><span class="wizard-nav-subtitle">Basic information</span></span></button>
+      <button type="button" class="wizard-nav-btn" data-wizard-nav="03"><span class="wizard-nav-num">03</span><span><span class="wizard-nav-title">Powierzchnie i czynsze</span><span class="wizard-nav-subtitle">Areas / Rents</span></span></button>
+      <button type="button" class="wizard-nav-btn" data-wizard-nav="04"><span class="wizard-nav-num">04</span><span><span class="wizard-nav-title">Specyfikacja techniczna</span><span class="wizard-nav-subtitle">Technical specification</span></span></button>
+      <button type="button" class="wizard-nav-btn" data-wizard-nav="05"><span class="wizard-nav-num">05</span><span><span class="wizard-nav-title">Lokalizacja i mapa</span><span class="wizard-nav-subtitle">Location & map</span></span></button>
+      <button type="button" class="wizard-nav-btn" data-wizard-nav="06"><span class="wizard-nav-num">06</span><span><span class="wizard-nav-title">Zdjęcia i rzuty</span><span class="wizard-nav-subtitle">Photos & plans</span></span></button>
+      <button type="button" class="wizard-nav-btn" data-wizard-nav="07"><span class="wizard-nav-num">07</span><span><span class="wizard-nav-title">Podgląd i eksport</span><span class="wizard-nav-subtitle">Preview & export</span></span></button>
+    </div>
+  </aside>
+
+  <aside class="wizard-preview" aria-label="Podgląd slajdu">
+    <div class="wizard-preview-title">Podgląd slajdu</div>
+    <div class="wizard-preview-subtitle">Slide preview</div>
+    <div class="wizard-slide-preview-box">
+      <div class="wizard-slide-preview-left">
+        <div class="wizard-preview-logo">QUERCO<br><span style="font-size:9px;font-weight:400;letter-spacing:.14em;opacity:.82">PROPERTY</span></div>
+        <div class="wizard-preview-offer">Oferta<br>wynajmu</div>
+        <div class="wizard-preview-line"></div>
+        <div class="wizard-preview-type">Magazyn<br><span style="font-size:12px;opacity:.8">Warehouse</span></div>
+      </div>
+      <div class="wizard-slide-preview-right"></div>
+    </div>
+    <div class="wizard-preview-meta"><span>Nowa oferta</span><span>1 / 12</span></div>
+    <div class="wizard-preview-controls">
+      <button type="button" class="wizard-arrow-btn" onclick="changeWizardTabByOffset(-1)">‹</button>
+      <div class="wizard-dots"><span class="wizard-dot active"></span><span class="wizard-dot"></span><span class="wizard-dot"></span><span class="wizard-dot"></span></div>
+      <button type="button" class="wizard-arrow-btn" onclick="changeWizardTabByOffset(1)">›</button>
+    </div>
+    <div class="wizard-preview-actions">
+      <button type="button" class="wizard-action-secondary" onclick="setActiveWizardTab('07')">Pełny podgląd<span>Full preview</span></button>
+      <button type="button" class="wizard-action-primary" onclick="generatePptx()">Generuj PPTX<span>Generate PPTX</span></button>
+    </div>
+  </aside>
+
+  <div class="wizard-tab-heading" id="wizard-tab-heading"><h1>01. Typ oferty</h1><p>Offer type</p></div>
+
 
 <!-- TEMPLATE SELECTOR -->
 <div class="entry-card" id="entry-card">
@@ -2418,7 +2855,7 @@ select:focus {
   <div class="ai-hint">AI przeanalizuje tekst i załączone pliki, następnie wypełni formularz.</div>
 </div>
 
-<div style="margin-bottom:12px"><button class="reset-labels-btn" onclick="resetAllLabels()">↺ Przywróć domyślne nazwy pól</button></div>
+<div class="wizard-reset-wrap" style="margin-bottom:12px"><button class="reset-labels-btn" onclick="resetAllLabels()">↺ Przywróć domyślne nazwy pól</button></div>
 
 <!-- SECTION 1: OKŁADKA -->
 <div class="card">
@@ -7911,6 +8348,107 @@ async function generatePptx() {
   btn.disabled = false;
   btn.innerHTML = '⬇ Generuj PPTX';
 }
+
+
+/* === COSMETIC REDESIGN: TAB NAVIGATION === */
+var WIZARD_TAB_ORDER = ['01','02','03','04','05','06','07'];
+var WIZARD_TAB_LABELS = {
+  '01': { title: '01. Typ oferty', sub: 'Offer type' },
+  '02': { title: '02. Dane podstawowe', sub: 'Basic information' },
+  '03': { title: '03. Powierzchnie i czynsze', sub: 'Areas / Rents' },
+  '04': { title: '04. Specyfikacja techniczna', sub: 'Technical specification' },
+  '05': { title: '05. Lokalizacja i mapa', sub: 'Location & map' },
+  '06': { title: '06. Zdjęcia i rzuty', sub: 'Photos & plans' },
+  '07': { title: '07. Podgląd i eksport', sub: 'Preview & export' }
+};
+var activeWizardTab = '01';
+
+function markWizardTabElement(el, tab) {
+  if (el) el.setAttribute('data-wizard-tab', tab);
+}
+
+function initWizardLayout() {
+  document.body.classList.add('wizard-ui');
+
+  markWizardTabElement(document.getElementById('entry-card'), '01');
+  markWizardTabElement(document.querySelector('.ai-card'), '01');
+
+  var resetWrap = document.querySelector('.reset-labels-btn') ? document.querySelector('.reset-labels-btn').closest('div') : null;
+  if (resetWrap) {
+    resetWrap.classList.add('wizard-reset-wrap');
+    markWizardTabElement(resetWrap, '02');
+  }
+
+  var allCards = Array.prototype.slice.call(document.querySelectorAll('.main > .card'));
+  var coverCard = allCards.find(function(card) { return !card.id && !card.classList.contains('office-only-card'); });
+  markWizardTabElement(coverCard, '02');
+
+  markWizardTabElement(document.getElementById('sec-warehouse-rent-details'), '03');
+  markWizardTabElement(document.getElementById('sec-slide3'), '03');
+  markWizardTabElement(document.getElementById('sec-slide4'), '03');
+
+  markWizardTabElement(document.getElementById('sec-warehouse-rent-spec'), '04');
+
+  markWizardTabElement(document.getElementById('sec-slide2'), '05');
+
+  markWizardTabElement(document.getElementById('sec-slide6'), '06');
+  markWizardTabElement(document.getElementById('sec-office-slide4'), '06');
+  markWizardTabElement(document.getElementById('sec-office-slide5'), '06');
+  markWizardTabElement(document.getElementById('sec-office-slide6'), '06');
+
+  markWizardTabElement(document.getElementById('sec-slide5'), '07');
+  markWizardTabElement(document.getElementById('gen-btn'), '07');
+  markWizardTabElement(document.getElementById('status'), '07');
+
+  document.querySelectorAll('[data-wizard-nav]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      setActiveWizardTab(btn.getAttribute('data-wizard-nav'));
+    });
+  });
+
+  setActiveWizardTab(activeWizardTab || '01', true);
+}
+
+function setActiveWizardTab(tab, skipScroll) {
+  if (WIZARD_TAB_ORDER.indexOf(tab) === -1) tab = '01';
+  activeWizardTab = tab;
+
+  document.querySelectorAll('[data-wizard-tab]').forEach(function(el) {
+    el.classList.toggle('wizard-hidden', el.getAttribute('data-wizard-tab') !== tab);
+  });
+  document.querySelectorAll('[data-wizard-nav]').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-wizard-nav') === tab);
+  });
+
+  var label = WIZARD_TAB_LABELS[tab] || WIZARD_TAB_LABELS['01'];
+  var heading = document.getElementById('wizard-tab-heading');
+  if (heading) {
+    var h1 = heading.querySelector('h1');
+    var p = heading.querySelector('p');
+    if (h1) h1.textContent = label.title;
+    if (p) p.textContent = label.sub;
+  }
+
+  var dots = document.querySelectorAll('.wizard-dot');
+  dots.forEach(function(dot, idx) { dot.classList.toggle('active', idx === Math.min(3, WIZARD_TAB_ORDER.indexOf(tab))); });
+
+  if (!skipScroll) {
+    var main = document.querySelector('.main');
+    if (main) main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function changeWizardTabByOffset(offset) {
+  var idx = WIZARD_TAB_ORDER.indexOf(activeWizardTab);
+  if (idx === -1) idx = 0;
+  idx = Math.max(0, Math.min(WIZARD_TAB_ORDER.length - 1, idx + offset));
+  setActiveWizardTab(WIZARD_TAB_ORDER[idx]);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  try { initWizardLayout(); } catch (e) { console.error('initWizardLayout failed', e); }
+});
+
 </script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
