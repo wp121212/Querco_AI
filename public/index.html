@@ -4500,6 +4500,7 @@ async function analyzeMpzpActFile() {
 
     var formData = new FormData();
     formData.append('text', analysisPrompt);
+    formData.append('templateId', 'mpzp');
 
     var resp = await fetch('/api/extract', { method: 'POST', body: formData });
     if (!resp.ok) {
@@ -4992,11 +4993,45 @@ async function aiExtract() {
     }
 
     var data = await resp.json();
+    var rawAiResponseForDebug = data;
 
-    // Kompatybilność: jeśli backend zwróci wrapper { data: {...} }, też obsłużymy.
-    if (data && data.data && typeof data.data === 'object') data = data.data;
+    function parseJsonLike(value) {
+      if (!value || typeof value !== 'string') return null;
+      var cleaned = value.trim()
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+      try { return JSON.parse(cleaned); } catch (e) { return null; }
+    }
 
-    console.log('[AI extraction response]', data);
+    function unwrapAiExtractionResponse(payload) {
+      if (!payload) return {};
+
+      // Backend może zwrócić bezpośrednio JSON pól albo wrapper { data: {...} }.
+      if (payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data)) {
+        payload = payload.data;
+      } else if (payload.data && typeof payload.data === 'string') {
+        var parsedDataString = parseJsonLike(payload.data);
+        if (parsedDataString) payload = parsedDataString;
+      }
+
+      // Starszy backend zwracał czasem raw jako string z JSON-em modelu.
+      if (payload.raw && typeof payload.raw === 'string') {
+        var parsedRaw = parseJsonLike(payload.raw);
+        if (parsedRaw && typeof parsedRaw === 'object') {
+          payload = Object.assign({}, parsedRaw, payload);
+          delete payload.raw;
+        }
+      }
+
+      return payload && typeof payload === 'object' ? payload : {};
+    }
+
+    data = unwrapAiExtractionResponse(data);
+
+    console.log('[AI extraction raw response]', rawAiResponseForDebug);
+    console.log('[AI extraction parsed payload]', data);
 
     var fieldStatus = data._field_status || {};
     var fieldNotes = data._field_notes || {};
@@ -5075,6 +5110,88 @@ async function aiExtract() {
       el.value = value;
       applyAiFieldStatus(id, getAiStatusForField(id, true));
       filledCount++;
+    }
+
+    function setAiAlias(target, keys) {
+      if (normalizeAiValue(data[target])) return;
+      for (var i = 0; i < keys.length; i++) {
+        var value = normalizeAiValue(data[keys[i]]);
+        if (value) {
+          data[target] = value;
+          if (!fieldStatus[target] && fieldStatus[keys[i]]) fieldStatus[target] = fieldStatus[keys[i]];
+          return;
+        }
+      }
+    }
+
+    function applyLocalWarehouseRentFallback(source) {
+      source = String(source || '');
+      if (!source) return;
+
+      function pick(regex) {
+        var m = source.match(regex);
+        return m && m[1] ? m[1].trim().replace(/[.;,]+$/g, '') : '';
+      }
+
+      if (!normalizeAiValue(data.warehouse_name)) {
+        var wh = pick(/(?:nazwa\s+(?:parku|magazynu|obiektu)|park\s+magazynowy|magazyn)\s*[:\-–]\s*([^\n\r]+)/i);
+        if (wh) {
+          data.warehouse_name = wh.toUpperCase();
+          fieldStatus.warehouse_name = fieldStatus.warehouse_name || 'yellow';
+          fieldNotes.warehouse_name = fieldNotes.warehouse_name || 'Wartość wyciągnięta lokalnie z tekstu, sprawdź ręcznie.';
+        }
+      }
+
+      if (!normalizeAiValue(data.city)) {
+        var city = pick(/(?:miasto|lokalizacja|miejscowość|miejscowosc)\s*[:\-–]\s*([^\n\r,]+)/i);
+        if (city) {
+          data.city = city.toUpperCase();
+          fieldStatus.city = fieldStatus.city || 'yellow';
+        }
+      }
+
+      if (!normalizeAiValue(data.street)) {
+        var street = pick(/(?:ulica|adres)\s*[:\-–]\s*([^\n\r]+)/i);
+        if (street) {
+          data.street = street.toUpperCase();
+          fieldStatus.street = fieldStatus.street || 'yellow';
+        }
+      }
+
+      if (!normalizeAiValue(data.wr_warehouse_area)) {
+        var area = pick(/(?:pow(?:ierzchnia)?\s+(?:magazynu|hali)|proponowana\s+pow(?:ierzchnia)?\s+magazynu|warehouse\s+area)\s*[:\-–]\s*([^\n\r]+)/i);
+        if (area) {
+          data.wr_warehouse_area = area.replace(/m2|m²|sqm/ig, '').trim().toUpperCase();
+          fieldStatus.wr_warehouse_area = fieldStatus.wr_warehouse_area || 'yellow';
+        }
+      }
+
+      if (!normalizeAiValue(data.wr_service_charge)) {
+        var sch = pick(/(?:service\s*charge|SCH|opłata\s+eksploatacyjna|oplata\s+eksploatacyjna)\s*[:\-–]\s*([0-9]+[,.]?[0-9]*)/i);
+        if (sch) {
+          data.wr_service_charge = sch;
+          fieldStatus.wr_service_charge = fieldStatus.wr_service_charge || 'yellow';
+        }
+      }
+    }
+
+    // Alias mapping: backend/prompt może zwrócić różne nazwy pól, więc normalizujemy do ID z HTML.
+    setAiAlias('warehouse_name', ['park_name','property_name','building_name','name','warehouse']);
+    setAiAlias('client_name', ['client','tenant','tenant_name','customer_name']);
+    setAiAlias('wr_total_building_area', ['total_building_area','building_total_area','total_area','gla']);
+    setAiAlias('wr_warehouse_area', ['warehouse_area','offered_warehouse_area','offered_area','module_area']);
+    setAiAlias('wr_office_area', ['office_area','offered_office_area','office_module_area']);
+    setAiAlias('wr_availability', ['availability','availability_from','available_from','space_availability']);
+    setAiAlias('wr_warehouse_base_rent', ['warehouse_base_rent','base_rent_warehouse','base_rent','headline_rent','warehouse_rent']);
+    setAiAlias('wr_warehouse_effective_rent', ['warehouse_effective_rent','effective_rent_warehouse','effective_rent','ner']);
+    setAiAlias('wr_office_base_rent', ['office_base_rent','base_rent_office','office_rent']);
+    setAiAlias('wr_service_charge', ['service_charge','operating_cost','operating_costs','opex','sch']);
+    setAiAlias('wr_clear_height', ['clear_height','clear_height_m','height']);
+    setAiAlias('wr_floor_loading', ['floor_loading','floor_load','floor_capacity','floor_load_capacity']);
+
+    // Awaryjny fallback dla testów ręcznie wpisanego tekstu, np. "nazwa parku - Panattoni East V".
+    if (currentTemplateKey === 'magazyn-wynajem') {
+      applyLocalWarehouseRentFallback(combinedText || text);
     }
 
     // Simple fields: stare pola + nowe pola dla magazyn-wynajem.
