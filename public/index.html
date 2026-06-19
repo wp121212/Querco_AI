@@ -599,6 +599,35 @@ select:focus {
 }
 
 
+/* === AI EXTRACTION FIELD STATUS COLORS === */
+.ai-status-green {
+  background: var(--q-success-bg) !important;
+  border-bottom-color: var(--q-success) !important;
+}
+.ai-status-yellow {
+  background: #fff8e6 !important;
+  border-bottom-color: var(--q-warning) !important;
+  box-shadow: inset 0 -1px 0 var(--q-warning) !important;
+}
+.field-row.ai-status-yellow,
+.field-row-wide.ai-status-yellow,
+.dist-cell.ai-status-yellow {
+  background: #fffaf0 !important;
+}
+.field-row.ai-status-green,
+.field-row-wide.ai-status-green,
+.dist-cell.ai-status-green {
+  background: var(--q-success-bg) !important;
+}
+.spec-switch.ai-status-yellow {
+  border-color: var(--q-warning) !important;
+  box-shadow: 0 0 0 2px rgba(185,121,22,.12);
+}
+.spec-switch.ai-status-green {
+  border-color: var(--q-success) !important;
+}
+
+
 /* === BROKER PROFILE SELECTOR === */
 .card-header-right {
   margin-left: auto;
@@ -4936,14 +4965,16 @@ async function aiExtract() {
       return;
     }
 
+    var selectedTemplateId = currentTemplateKey || (document.getElementById('template-select') ? document.getElementById('template-select').value : '') || 'magazyn-wynajem';
+
     var formData = new FormData();
     formData.append('text', combinedText || text);
+    formData.append('templateId', selectedTemplateId);
 
     // WAŻNE:
     // Nie wysyłamy już surowych PDF/JPG/PNG/WEBP do backendu.
-    // Backend dostał stabilną wersję tekstową, więc tutaj robimy:
-    // PDF/TXT/obrazy/OCR stron PDF → tekst w przeglądarce → /api/extract dostaje tylko mały tekst.
-    // Dzięki temu nie przekraczamy limitów Vercela i nie psujemy działającego AI z tekstu.
+    // Backend dostaje stabilną wersję tekstową oraz templateId.
+    // Dzięki temu /api/extract wie, po który prompt sięgnąć, np. magazyn-wynajem.
 
     if (extractedFiles.warnings && extractedFiles.warnings.length) {
       console.warn('[PDF/TXT/OCR extraction warnings]', extractedFiles.warnings);
@@ -4959,9 +4990,94 @@ async function aiExtract() {
       var errData = await resp.json().catch(function() { return {}; });
       throw new Error(errData.error || 'Błąd serwera (' + resp.status + ')');
     }
+
     var data = await resp.json();
 
-    // Simple fields
+    // Kompatybilność: jeśli backend zwróci wrapper { data: {...} }, też obsłużymy.
+    if (data && data.data && typeof data.data === 'object') data = data.data;
+
+    console.log('[AI extraction response]', data);
+
+    var fieldStatus = data._field_status || {};
+    var fieldNotes = data._field_notes || {};
+    var filledCount = 0;
+
+    function normalizeAiValue(value) {
+      if (value === null || typeof value === 'undefined') return '';
+      if (Array.isArray(value)) value = value.join(', ');
+      value = String(value).trim();
+      if (!value) return '';
+      var low = value.toLowerCase();
+      if (low === 'null' || low === 'undefined' || low === 'brak danych' || low === 'n/a') return '';
+      return value;
+    }
+
+    function clearAiStatusClasses(target) {
+      if (!target) return;
+      target.classList.remove('ai-filled', 'ai-status-green', 'ai-status-yellow');
+    }
+
+    function getAiStatusForField(id, valueWasFilled) {
+      var st = fieldStatus[id];
+      if (st === 'green' || st === 'yellow' || st === 'empty') return st;
+      return valueWasFilled ? 'green' : '';
+    }
+
+    function applyAiFieldStatus(id, status) {
+      if (!status || status === 'empty') return;
+
+      var target = document.getElementById(id) || document.querySelector('[data-spec="' + id + '"]');
+      if (!target) return;
+
+      var row = target.closest('.field-row') || target.closest('.field-row-wide') || target.closest('.dist-cell');
+
+      clearAiStatusClasses(target);
+      if (row) clearAiStatusClasses(row);
+
+      if (status === 'yellow') {
+        target.classList.add('ai-status-yellow');
+        if (row) row.classList.add('ai-status-yellow');
+      } else if (status === 'green') {
+        target.classList.add('ai-status-green');
+        target.classList.add('ai-filled');
+        if (row) row.classList.add('ai-status-green');
+      }
+
+      if (fieldNotes[id]) {
+        target.title = fieldNotes[id];
+        if (row) row.title = fieldNotes[id];
+      }
+    }
+
+    function fillField(id, value) {
+      value = normalizeAiValue(value);
+      if (!value) return;
+
+      var el = document.getElementById(id);
+      if (!el) return;
+
+      el.value = value;
+      formatNumericFieldById(id);
+
+      var status = getAiStatusForField(id, true);
+      applyAiFieldStatus(id, status);
+
+      filledCount++;
+    }
+
+    function fillSelect(id, value) {
+      value = normalizeAiValue(value);
+      if (!value) return;
+
+      var el = document.getElementById(id);
+      if (!el) return;
+
+      el.value = value;
+      applyAiFieldStatus(id, getAiStatusForField(id, true));
+      filledCount++;
+    }
+
+    // Simple fields: stare pola + nowe pola dla magazyn-wynajem.
     var simpleFields = [
       'broker_name','broker_email','broker_phone',
       'city','street','land_area','plot_number','precinct','commune','county',
@@ -4969,27 +5085,45 @@ async function aiExtract() {
       'building_footprint','total_area','parking_spots','warehouse_area','office_area','year_modernization',
       'num_tenants','occupancy','yield_pct','eur_pln_rate',
       'mpzp_resolution','mpzp_resolution_date','terrain_card','terrain_function','excluded_functions',
-      'building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'
+      'building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min',
+
+      // WAREHOUSE RENT
+      'client_name',
+      'warehouse_name',
+      'wr_total_building_area',
+      'wr_warehouse_area',
+      'wr_office_area',
+      'wr_availability',
+      'wr_warehouse_base_rent',
+      'wr_warehouse_effective_rent',
+      'wr_office_base_rent',
+      'wr_service_charge',
+      'wr_clear_height',
+      'wr_floor_loading',
+      'wr_dist_expressway',
+      'wr_dist_highway',
+      'wr_dist_airport',
+      'wr_dist_port',
+      'wr_dist_railway',
+      'wr_dist_mass_transit',
+      'wr_dist_border',
+      'wr_dist_city_center',
+      'wr_dist_skm_pkm',
+      'wr_dist_custom_icon'
     ];
 
-    var filledCount = 0;
-    function fillField(id, value) {
-      if (!value || value === 'null' || value === 'brak danych' || !value.trim()) return;
-      var el = document.getElementById(id);
-      if (el) { el.value = value; formatNumericFieldById(id); el.classList.add('ai-filled'); filledCount++; }
-    }
-    function fillSelect(id, value) {
-      if (!value || !value.trim()) return;
-      var el = document.getElementById(id);
-      if (el) { el.value = value; filledCount++; }
+    simpleFields.forEach(function(id) { fillField(id, data[id]); });
+
+    // Jeśli AI zwróci tylko wr_map_city, potraktuj to jako pomoc do automatycznego wyboru mapy.
+    if (!normalizeAiValue(data.city) && normalizeAiValue(data.wr_map_city)) {
+      fillField('city', data.wr_map_city);
     }
 
-    simpleFields.forEach(function(id) { fillField(id, data[id]); });
     normalizeMpzpResolutionComposite();
 
     // Ownership select
     if (data.ownership) {
-      var ow = data.ownership.toUpperCase();
+      var ow = String(data.ownership).toUpperCase();
       if (ow.indexOf('WIECZYSTE') !== -1) fillSelect('ownership', 'UŻYTKOWANIE WIECZYSTE');
       else if (ow.indexOf('WŁASNOŚĆ') !== -1 || ow.indexOf('WLASNOSC') !== -1) fillSelect('ownership', 'WŁASNOŚĆ');
     }
@@ -5003,7 +5137,14 @@ async function aiExtract() {
       { val: 'rent_income', cur: 'rent_income_currency', label: 'rent_income', baseName: 'Przychód z najmu', suffix: '/m²' },
       { val: 'service_charge', cur: 'service_charge_currency', label: 'service_charge', baseName: 'Opłaty serwisowe', suffix: '/m²' },
       { val: 'gross_income', cur: 'gross_income_currency', label: 'gross_income', baseName: 'Łączny przychód op.', suffix: '/m²' },
+
+      // WAREHOUSE RENT
+      { val: 'wr_warehouse_base_rent', cur: 'wr_warehouse_base_rent_currency', label: 'wr_warehouse_base_rent', baseName: 'Czynsz bazowy magazyn', suffix: '/m²' },
+      { val: 'wr_warehouse_effective_rent', cur: 'wr_warehouse_effective_rent_currency', label: 'wr_warehouse_effective_rent', baseName: 'Czynsz efektywny magazyn', suffix: '/m²' },
+      { val: 'wr_office_base_rent', cur: 'wr_office_base_rent_currency', label: 'wr_office_base_rent', baseName: 'Czynsz bazowy biuro', suffix: '/m²' },
+      { val: 'wr_service_charge', cur: 'wr_service_charge_currency', label: 'wr_service_charge', baseName: 'Opłata eksploatacyjna', suffix: '/m²' }
     ];
+
     currencyFields.forEach(function(cf) {
       fillField(cf.val, data[cf.val]);
       if (data[cf.cur]) {
@@ -5012,17 +5153,74 @@ async function aiExtract() {
       }
     });
 
+    // Warehouse rent: aktywne ikony odległości z AI.
+    if (data._distance_enabled && typeof warehouseRentDistanceState !== 'undefined' && typeof WAREHOUSE_RENT_DISTANCE_ORDER !== 'undefined') {
+      var enabledCount = 0;
+      WAREHOUSE_RENT_DISTANCE_ORDER.forEach(function(key) {
+        var shouldEnable = !!data._distance_enabled[key];
+        if (shouldEnable && enabledCount < 6) {
+          warehouseRentDistanceState[key] = true;
+          enabledCount++;
+        } else {
+          warehouseRentDistanceState[key] = false;
+        }
+      });
+      if (typeof updateWarehouseRentDistanceUi === 'function') updateWarehouseRentDistanceUi();
+    }
+
+    // Warehouse rent: wybór mapy po mieście.
+    if (typeof autoSelectWarehouseRentMapByCity === 'function') {
+      autoSelectWarehouseRentMapByCity();
+    }
+
+    // Warehouse rent: specyfikacja techniczna — ustaw ptaszki, jeśli AI potwierdza parametr.
+    function isAffirmativeSpecValue(value) {
+      value = normalizeAiValue(value).toUpperCase();
+      if (!value || value === 'NIEZNANE') return false;
+      if (value === 'TAK' || value === 'YES' || value === 'TRUE' || value === '✓') return true;
+      if (value === 'NIE' || value === 'NO' || value === 'FALSE' || value === 'X' || value === '✕') return false;
+      if (/^\d+([,.]\d+)?$/.test(value)) return Number(value.replace(',', '.')) > 0;
+      return false;
+    }
+
+    var specFields = ['heating','sprinklers','smoke_vents','docks','gate0','dust_free_floor','crane','cctv','security','production','ev_charging','solar'];
+    specFields.forEach(function(key) {
+      if (typeof data[key] === 'undefined' || data[key] === null || normalizeAiValue(data[key]) === '') {
+        applyAiFieldStatus(key, fieldStatus[key]);
+        return;
+      }
+
+      var isOn = isAffirmativeSpecValue(data[key]);
+      if (typeof warehouseRentSpecState !== 'undefined') {
+        warehouseRentSpecState[key] = isOn;
+      }
+
+      var specBtn = document.querySelector('[data-spec="' + key + '"]');
+      if (specBtn) {
+        specBtn.classList.toggle('on', isOn);
+        applyAiFieldStatus(key, getAiStatusForField(key, true));
+        filledCount++;
+      }
+    });
+
+    // Zastosuj statusy także dla pól pustych oznaczonych na yellow, np. wysokość/nośność.
+    Object.keys(fieldStatus).forEach(function(id) {
+      if (fieldStatus[id] === 'yellow' || fieldStatus[id] === 'green') {
+        applyAiFieldStatus(id, fieldStatus[id]);
+      }
+    });
+
     // Keep asking price consistent across slide 02, 03 and 04.
     syncAskingPriceGroupFromAvailableData();
 
     // Auto-activate MPZP section if AI found MPZP data
     var mpzpFields = ['mpzp_resolution','mpzp_resolution_date','terrain_card','terrain_function','excluded_functions','building_area_min','building_area_max','intensity_min','intensity_max','height_max','bio_surface_min'];
-    var hasMpzp = mpzpFields.some(function(f) { return data[f] && data[f].trim(); });
+    var hasMpzp = mpzpFields.some(function(f) { return data[f] && String(data[f]).trim(); });
     if (hasMpzp && !slide5Active) { toggleSection('slide5'); }
 
     // Auto-activate Dochody section if AI found income data
     var incomeFields = ['num_tenants','occupancy','noi','yield_pct','price_sale','rent_income','service_charge','gross_income'];
-    var hasIncome = incomeFields.some(function(f) { return data[f] && data[f].trim(); });
+    var hasIncome = incomeFields.some(function(f) { return data[f] && String(data[f]).trim(); });
     if (hasIncome && !slide4Active) { toggleSection('slide4'); }
 
     // Show warnings from API + client-side PDF/TXT extraction
@@ -5035,11 +5233,12 @@ async function aiExtract() {
       console.warn('[AI/PDF Warnings]', allWarnings);
     }
     setStatus(statusMsg);
-    setTimeout(function() { setStatus(''); }, data._warnings ? 12000 : 6000);
+    setTimeout(function() { setStatus(''); }, allWarnings.length ? 12000 : 6000);
   } catch (err) {
     console.error(err);
     setStatus('Błąd: ' + err.message);
   }
+
   btn.disabled = false;
   statusEl.style.display = 'none';
 }
